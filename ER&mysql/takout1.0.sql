@@ -39,7 +39,7 @@ drop table if exists user;
 /*==============================================================*/
 create table admin
 (
-   admin_Id             int not null auto_increment,
+   admin_Id             varchar(20),
    admin_name           varchar(20) not null,
    admin_pwd            varchar(20) not null,
    primary key (admin_Id)
@@ -50,7 +50,7 @@ create table admin
 /*==============================================================*/
 create table business
 (
-   business_Id          int not null auto_increment,
+   business_Id          varchar(20),
    business_name        varchar(20) not null,
    stars                int not null,
    avg_consume          float not null,
@@ -63,9 +63,9 @@ create table business
 /*==============================================================*/
 create table collectOrders
 (
-   user_Id              int not null,
-   business_Id          int not null,
-   alreadycounts        int not null,
+   user_Id              varchar(20) not null,
+   business_Id         varchar(20) not null,
+   alreadycounts        varchar(20) not null,
    primary key (user_Id, business_Id)
 );
 
@@ -74,8 +74,8 @@ create table collectOrders
 /*==============================================================*/
 create table commodity
 (
-   com_Id               int not null auto_increment,
-   category_Id          int not null,
+   com_Id               varchar(20),
+   category_Id          varchar(20) not null,
    com_name             varchar(20) not null,
    price                float not null,
    discount_price       float not null,
@@ -87,7 +87,7 @@ create table commodity
 /*==============================================================*/
 create table commodityCategory
 (
-   category_Id          int not null auto_increment,
+   category_Id          varchar(20),
    category_name        varchar(20) not null,
    category_amount      int not null,
    primary key (category_Id)
@@ -98,8 +98,8 @@ create table commodityCategory
 /*==============================================================*/
 create table coupon
 (
-   coupon_Id            int not null auto_increment,
-   business_Id          int,
+   coupon_Id           varchar(20),
+   business_Id          varchar(20),
    discount_money       float not null,
    need_orders          int not null,
    start_time           date not null,
@@ -113,7 +113,7 @@ create table coupon
 /*==============================================================*/
 create table deliver
 (
-   deliver_Id           int not null auto_increment,
+   deliver_Id           varchar(20),
    deliver_name         varchar(20) not null,
    employ_time          date not null,
    identity             varchar(20) not null,
@@ -125,8 +125,8 @@ create table deliver
 /*==============================================================*/
 create table deliver_income
 (
-   deliver_Id           int,
-   order_Id             int,
+   deliver_Id           varchar(20),
+   order_Id             varchar(20),
    time                 date not null,
    review               varchar(30) not null,
    each_income          float not null
@@ -137,7 +137,7 @@ create table deliver_income
 /*==============================================================*/
 create table fullReduction
 (
-   reduct_Id            int not null auto_increment,
+   reduct_Id            varchar(20),
    require_amount       float not null,
    discount_amount      float not null,
    with_coupon          bool not null,
@@ -149,8 +149,8 @@ create table fullReduction
 /*==============================================================*/
 create table location
 (
-   loca_Id              int not null auto_increment,
-   user_Id              int,
+   loca_Id              varchar(20),
+   user_Id              varchar(20),
    loca                 varchar(20) not null,
    phone_number         varchar(20) not null,
    conn_user            varchar(10) not null,
@@ -162,8 +162,8 @@ create table location
 /*==============================================================*/
 create table orderInfo
 (
-   order_Id             int not null,
-   com_Id               int not null,
+   order_Id             varchar(20) not null,
+   com_Id               varchar(20) not null,
    count                int not null,
    price                float not null,
    primary key (order_Id, com_Id)
@@ -174,12 +174,12 @@ create table orderInfo
 /*==============================================================*/
 create table orders
 (
-   order_Id             int not null auto_increment,
-   user_Id              int,
-   loca_Id              int,
-   coupon_Id            int,
-   deliver_Id           int,
-   business_Id          int,
+   order_Id             varchar(20) not null ,
+   user_Id              varchar(20),
+   loca_Id              varchar(20),
+   coupon_Id            varchar(20),
+   deliver_Id          varchar(20),
+   business_Id          varchar(20),
    origin_amount        float not null,
    final_amount         float not null,
    order_time           date not null,
@@ -193,10 +193,10 @@ create table orders
 /*==============================================================*/
 create table ownedcoupons
 (
-   user_Id              int not null,
-   business_Id          int not null,
-   coupon_Id            int not null,
-   ineffect_time        date not null,
+   user_Id              varchar(20) not null,
+   business_Id          varchar(20) not null,
+   coupon_Id            varchar(20) not null,
+   ineffect_time        datetime not null,
    primary key (user_Id, business_Id, coupon_Id)
 );
 
@@ -205,9 +205,9 @@ create table ownedcoupons
 /*==============================================================*/
 create table review
 (
-   user_Id              int not null auto_increment,
-   com_Id               int not null,
-   business_Id          int not null,
+   user_Id              varchar(20),
+   com_Id               varchar(20) not null,
+   business_Id          varchar(20) not null,
    content              varchar(30),
    review_date          date not null,
    stars                int not null,
@@ -220,14 +220,13 @@ create table review
 /*==============================================================*/
 create table user
 (
-   user_Id              int not null auto_increment,
+   user_Id              varchar(20),
    user_name            varchar(20) not null,
    sex                  varchar(3),
    pwd                  varchar(20) not null,
    phone                varchar(20) not null,
    email                varchar(20),
    city                 varchar(10) not null,
-   create_time          date not null,
    isvip                bool not null,
    vip_start_time       date,
    vip_end_time         date,
