@@ -134,7 +134,7 @@ public class BusinessManager implements IBusiness {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		try {
 			conn = DBUtil.getConnection();
-			sql = "select business_Id, business_name, stars, avg_consume, sales_volume, createtime from business";
+			sql = "select business_Id, business_name, stars, avg_consume, sales_volume, createtime, removetime from business";
 			if(!withDeletedBusiness)
 				sql += " where removetime is null";
 			
@@ -147,7 +147,8 @@ public class BusinessManager implements IBusiness {
 				b.setStars(rs.getInt(3));
 				b.setAvg_consume(rs.getFloat(4));
 				b.setSales_volume(rs.getInt(5));
-				b.setCreateTime(sdf.format(rs.getTimestamp(6)));
+				b.setCreateTime(rs.getTimestamp(6));
+				b.setRemoveTime(rs.getTimestamp(7));
 				businesss.add(b);
 			}
 			rs.close();

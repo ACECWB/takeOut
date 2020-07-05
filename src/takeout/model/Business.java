@@ -1,5 +1,7 @@
 package takeout.model;
 
+import java.util.Date;
+
 public class Business {
 	public static final String[] tableTitles = {"商家编号","商家名称","星级","平均消费","总销量","创建时间","注销时间"};
 	private String businessId;
@@ -7,21 +9,21 @@ public class Business {
 	private int stars;
 	private float avg_consume;
 	private int sales_volume;
-	private String createTime;
-	private String removeTime;
+	private Date createTime;
+	private Date removeTime;
 	
 	
 	
-	public String getCreateTime() {
+	public Date getCreateTime() {
 		return createTime;
 	}
-	public void setCreateTime(String createTime) {
+	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
 	}
-	public String getRemoveTime() {
+	public Date getRemoveTime() {
 		return removeTime;
 	}
-	public void setRemoveTime(String removeTime) {
+	public void setRemoveTime(Date removeTime) {
 		this.removeTime = removeTime;
 	}
 	public String getBusinessId() {

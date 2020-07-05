@@ -36,8 +36,8 @@ public class FrmBusinessManager_AddBusiness extends JDialog implements ActionLis
 	private JTextField edtBusinessName = new JTextField(20);
 //	private JTextField edtStars = new JTextField(20);
 	
-	public FrmBusinessManager_AddBusiness(JDialog f, String s, boolean b) {
-		super(f, s, b);
+	public FrmBusinessManager_AddBusiness(FrmMain frmMain, String s, boolean b) {
+		super(frmMain, s, b);
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		toolBar.add(btnOk);
 		toolBar.add(btnCancel);

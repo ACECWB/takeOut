@@ -82,11 +82,11 @@ public class FrmBusinessManager extends JDialog implements ActionListener{
 	
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnAdd){
-			FrmBusinessManager_AddBusiness dlg=new FrmBusinessManager_AddBusiness(this,"添加商家",true);
-			dlg.setVisible(true);
-			if(dlg.getBusiness()!=null){//刷新表格
-				this.reloadBusinessTable();
-			}
+//			FrmBusinessManager_AddBusiness dlg=new FrmBusinessManager_AddBusiness(this,"添加商家",true);
+//			dlg.setVisible(true);
+//			if(dlg.getBusiness()!=null){//刷新表格
+//				this.reloadBusinessTable();
+//			}
 		}
 		else if(e.getSource()==this.btnDelete){
 			int i=this.deliverTable.getSelectedRow();

@@ -11,7 +11,31 @@ import takeout.model.User;
 import takeout.util.*;
 
 public class UserManager implements IUserManager {
-	
+	public void resetComTitle(String comId)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update commodity set removetime = null where com_Id = ?" ;
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, comId);
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+
 	@Override
 	public void createUser(User user) throws BaseException {
 		// TODO Auto-generated method stub

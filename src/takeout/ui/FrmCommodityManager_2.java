@@ -30,6 +30,7 @@ import takeout.util.BaseException;
 public class FrmCommodityManager_2 extends JDialog implements ActionListener{
 	private JPanel toolBar = new JPanel();
 	private Button btnAdd = new Button("添加新商品类型");
+	private Button btnReset = new Button("上架商品类型");
 	private Button btnDelete = new Button("删除商品类型");
 	
 	private Object tblData[][];
@@ -59,6 +60,7 @@ public class FrmCommodityManager_2 extends JDialog implements ActionListener{
 		toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
 		toolBar.add(btnAdd);
 		toolBar.add(this.btnDelete);
+		toolBar.add(btnReset);
 		this.getContentPane().add(toolBar, BorderLayout.NORTH);
 		//提取现有数据
 		this.reloadComTable();
@@ -71,6 +73,7 @@ public class FrmCommodityManager_2 extends JDialog implements ActionListener{
 		
 		this.btnAdd.addActionListener(this);
 		this.btnDelete.addActionListener(this);
+		this.btnReset.addActionListener(this);
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				//System.exit(0);
@@ -98,6 +101,22 @@ public class FrmCommodityManager_2 extends JDialog implements ActionListener{
 				String comcateid=this.tblData[i][0].toString();
 				try {
 					(new CommodityManager()).deleteComCate(comcateid);
+					this.reloadComTable();
+				} catch (BaseException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
+				}
+				
+			}
+		}else if(e.getSource()==this.btnReset) {
+			int i=this.comTable.getSelectedRow();
+			if(i<0) {
+				JOptionPane.showMessageDialog(null,  "请选择商品类型","提示",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			if(JOptionPane.showConfirmDialog(this,"确定重新上架该类商品吗？","确认",JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+				String comcateid=this.tblData[i][0].toString();
+				try {
+					(new CommodityManager()).resetComCate(comcateid);
 					this.reloadComTable();
 				} catch (BaseException e1) {
 					JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);

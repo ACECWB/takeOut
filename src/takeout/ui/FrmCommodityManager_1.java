@@ -28,10 +28,12 @@ import takeout.util.BaseException;
 
 
 public class FrmCommodityManager_1 extends JDialog implements ActionListener{
+	private FrmCommodityManager a = null;
 	private JPanel toolBar = new JPanel();
 	private Button btnAdd = new Button("添加新商品");
 	private Button btnDelete = new Button("删除商品");
-	
+	private Button btnReset = new Button("上架商品");
+
 	private Object tblData[][];
 	DefaultTableModel tablmod=new DefaultTableModel();
 	public JTable comTable=new JTable(tablmod);
@@ -56,9 +58,11 @@ public class FrmCommodityManager_1 extends JDialog implements ActionListener{
 	
 	public FrmCommodityManager_1(FrmCommodityManager frmCommodityManager, String s, boolean b) {
 		super(frmCommodityManager, s, b);
+		this.a = frmCommodityManager;
 		toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
 		toolBar.add(btnAdd);
 		toolBar.add(this.btnDelete);
+		toolBar.add(btnReset);
 		this.getContentPane().add(toolBar, BorderLayout.NORTH);
 		//提取现有数据
 		this.reloadComTable();
@@ -71,6 +75,7 @@ public class FrmCommodityManager_1 extends JDialog implements ActionListener{
 		
 		this.btnAdd.addActionListener(this);
 		this.btnDelete.addActionListener(this);
+		this.btnReset.addActionListener(this);
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				//System.exit(0);
@@ -99,6 +104,24 @@ public class FrmCommodityManager_1 extends JDialog implements ActionListener{
 				try {
 					(new CommodityManager()).deleteComTitle(commodityid);
 					this.reloadComTable();
+					this.a.reloadCommodityTable();
+				} catch (BaseException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
+				}
+				
+			}
+		}else if(e.getSource()==this.btnReset) {
+			int i=this.comTable.getSelectedRow();
+			if(i<0) {
+				JOptionPane.showMessageDialog(null,  "请选择商品","提示",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			if(JOptionPane.showConfirmDialog(this,"确定重新上架该商品吗？","确认",JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+				String commodityid=this.tblData[i][0].toString();
+				try {
+					(new CommodityManager()).resetComTitle(commodityid);
+					this.reloadComTable();
+					this.a.reloadCommodityTable();
 				} catch (BaseException e1) {
 					JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
 				}

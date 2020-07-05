@@ -6,12 +6,67 @@ import java.util.ArrayList;
 import java.util.List;
 
 import takeout.itf.ICommodityManager;
+import takeout.model.Business;
 import takeout.model.ComCate;
 import takeout.model.ComTitle;
 import takeout.model.Commodity;
 import takeout.util.*;
 
 public class CommodityManager implements ICommodityManager {
+	
+	
+
+	
+	public void resetComCate(String comCateId)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update commoditycategory set removetime = null where category_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, comCateId);
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+
+	public void resetComTitle(String comId)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update commodity set removetime = null where com_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, comId);
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+
 	public List<ComCate> loadAllComCates()throws BaseException{
 		Connection conn = null;
 		String sql = null;
@@ -136,7 +191,44 @@ public class CommodityManager implements ICommodityManager {
 		}
 	}
 	
-	
+	public List<ComTitle> loadAllComTitles(ComCate comcate)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		List<ComTitle> cts = new ArrayList<>();
+		try{
+			conn = DBUtil.getConnection();
+			sql = "select com_Id, category_Id, com_name,createtime,removetime from commodity where category_Id = ?";
+			
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, comcate.getCategoryId());
+			java.sql.ResultSet rs = pst.executeQuery();
+			while(rs.next()) {
+				ComTitle ct = new ComTitle();
+				ct.setComId(rs.getString(1));
+				ct.setCategoryId(rs.getString(2));
+				ct.setComName(rs.getString(3));
+				ct.setCreatetime(rs.getTimestamp(4));
+				ct.setEndtime(rs.getTimestamp(5));
+				cts.add(ct);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		
+		return cts;
+	}
 	public List<ComTitle> loadAllComTitles()throws BaseException{
 		Connection conn = null;
 		String sql = null;
@@ -194,7 +286,7 @@ public class CommodityManager implements ICommodityManager {
 			rs.close();
 			pst.close();
 			
-			sql = "select * from commodity where category_Id = ?";
+			sql = "select * from commoditycategory where category_Id = ? and removetime is null";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, comtitle.getCategoryId());
 			rs = pst.executeQuery();
@@ -261,6 +353,53 @@ public class CommodityManager implements ICommodityManager {
 				}
 		}
 	}
+	
+	public List<Commodity> loadAllCommodity(Business business)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		List<Commodity> coms = new ArrayList<>();
+		try{
+			conn = DBUtil.getConnection();
+			sql = "select cb.com_Id, c.com_name, cc.category_Id, cc.category_name, cb.business_Id, counts, each_price\r\n" + 
+					"from com2bus cb, commodity c,commoditycategory cc\r\n" + 
+					"where cb.business_Id = ? and cb.com_Id = c.com_Id and cc.category_Id = c.category_Id";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, business.getBusinessId());
+			java.sql.ResultSet rs = pst.executeQuery();
+			while(rs.next()) {
+				Commodity c = new Commodity();
+				c.setComId(rs.getString(1));
+				c.setComName(rs.getString(2));
+				c.setCategoryId(rs.getString(3));
+				c.setCategoryName(rs.getString(4));
+				c.setBusinessId(rs.getString(5));
+				c.setCounts(rs.getInt(6));
+				c.setEachPrice(rs.getFloat(7));
+				coms.add(c);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+		}catch(SQLException e) {
+			e.printStackTrace();
+			try {
+				conn.rollback();
+			}catch(Exception ex) {
+				ex.printStackTrace();
+			}
+			
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return coms;
+	}
+
 	@Override
 	public List<Commodity> loadAllCommoditys() throws BaseException {
 		// TODO Auto-generated method stub
@@ -305,7 +444,7 @@ public class CommodityManager implements ICommodityManager {
 		return commoditys;
 	}
 
-	@Override
+	@Override//若有同样商品编号、商家编号加入则价格更新为最新标准，而数量则叠加
 	public void addCommodity(Commodity commodity) throws BaseException {
 		// TODO Auto-generated method stub
 		Connection conn = null;
@@ -317,12 +456,13 @@ public class CommodityManager implements ICommodityManager {
 		
 		try{
 			conn = DBUtil.getConnection();
-			sql = "select * from commodity where com_Id = ?";
+			sql = "select removetime from commodity where com_Id = ? and removetime is null";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, commodity.getComId());
 			java.sql.ResultSet rs = pst.executeQuery();
 			if(!rs.next())
 				throw new BusinessException("不存在该商品编号！！！");
+	
 			rs.close();
 			pst.close();
 			
@@ -335,13 +475,35 @@ public class CommodityManager implements ICommodityManager {
 			rs.close();
 			pst.close();
 			
-			sql = "insert into com2bus (com_Id, business_Id, counts, each_price) values (?,?,?,?)";
+			sql = "select * from com2bus where com_Id = ? and business_Id = ?";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, commodity.getComId());
 			pst.setString(2, commodity.getBusinessId());
-			pst.setInt(3, commodity.getCounts());
-			pst.setFloat(4, commodity.getEachPrice());
-			pst.execute();
+			rs = pst.executeQuery();
+			if(rs.next()) {
+				sql = "update com2bus set counts = counts + ? , each_price = ? where com_Id = ? and business_Id = ?";
+				pst = conn.prepareStatement(sql);
+				pst.setInt(1, commodity.getCounts());
+				pst.setFloat(2, commodity.getEachPrice());
+				pst.setString(3, commodity.getComId());
+				pst.setString(4, commodity.getBusinessId());
+				pst.execute();
+				rs.close();
+				
+			}else {
+				rs.close();
+				pst.close();
+				
+				sql = "insert into com2bus (com_Id, business_Id, counts, each_price) values (?,?,?,?)";
+				pst = conn.prepareStatement(sql);
+				pst.setString(1, commodity.getComId());
+				pst.setString(2, commodity.getBusinessId());
+				pst.setInt(3, commodity.getCounts());
+				pst.setFloat(4, commodity.getEachPrice());
+				pst.execute();
+			}
+			
+			
 			pst.close();
 			conn.close();
 			

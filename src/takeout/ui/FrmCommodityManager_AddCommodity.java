@@ -16,12 +16,14 @@ import javax.swing.JTextField;
 
 import takeout.util.*;
 import takeout.control.CommodityManager;
+import takeout.model.Business;
 import takeout.model.Commodity;
 
 import java.text.SimpleDateFormat;
 
 public class FrmCommodityManager_AddCommodity extends JDialog implements ActionListener{
-	private Commodity commodity = null;
+	public Commodity commodity = null;
+	public Business bus = null;
 	private JPanel toolBar = new JPanel();
 	private JPanel workPane = new JPanel();
 	
@@ -29,25 +31,25 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 	private Button btnCancel = new Button("取消");
 	
 	private JLabel labelCommodityId = new JLabel("商品编号：");
-	private JLabel labelBusinessId = new JLabel("商家编号：");
+//	private JLabel labelBusinessId = new JLabel("商家编号：");
 	private JLabel labelCounts = new JLabel("数量：");
 	private JLabel labelPrice = new JLabel("单价：");
 
 	
 	private JTextField edtCommodityId = new JTextField(20);
-	private JTextField edtBusinessId = new JTextField(20);
+//	private JTextField edtBusinessId = new JTextField(20);
 	private JTextField edtCounts = new JTextField(20);
 	private JTextField edtPrice = new JTextField(20);
 
-	public FrmCommodityManager_AddCommodity(JDialog f, String s, boolean b) {
-		super(f, s, b);
+	public FrmCommodityManager_AddCommodity(FrmMain frmMain, String s, boolean b) {
+		super(frmMain, s, b);
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		toolBar.add(btnOk);
 		toolBar.add(btnCancel);
 		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
 		
 		workPane.add(labelCommodityId); workPane.add(edtCommodityId);
-		workPane.add(labelBusinessId); workPane.add(edtBusinessId);
+//		workPane.add(labelBusinessId); workPane.add(edtBusinessId);
 		workPane.add(labelCounts); workPane.add(edtCounts);
 		workPane.add(labelPrice); workPane.add(edtPrice);
 		
@@ -67,13 +69,13 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 		}
 		else if(e.getSource()==this.btnOk){
 			
-			String businessid = this.edtBusinessId.getText();
+//			String businessid = this.edtBusinessId.getText();
+			
 			String commodityid = this.edtCommodityId.getText();
 			String counts = this.edtCounts.getText();
 			String price = this.edtPrice.getText();
 			
 			commodity=new Commodity();
-			commodity.setBusinessId(businessid);
 			commodity.setComId(commodityid);
 			
 			try{
@@ -88,7 +90,7 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 				JOptionPane.showMessageDialog(null, "数量输入不正确","错误",JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			
+			commodity.setBusinessId(bus.getBusinessId());
 			try {
 				(new CommodityManager()).addCommodity(commodity);
 				this.setVisible(false);
