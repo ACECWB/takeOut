@@ -84,6 +84,18 @@ public class FrmMain extends JFrame implements ActionListener{
 		if(e.getSource()==this.menuItem_userManager){
 			FrmUserManager dlg = new FrmUserManager(this,"用户管理",true);
 			dlg.setVisible(true);
+		}else if(e.getSource()==this.menuItem_locationManager) {
+			FrmLocationManager dlg = new FrmLocationManager(this,"地址管理",true);
+			dlg.setVisible(true);
+		}else if(e.getSource()==this.menuItem_deliverManager) {
+			FrmDeliverManager dlg = new FrmDeliverManager(this,"骑手管理",true);
+			dlg.setVisible(true);
+		}else if(e.getSource()==this.menuItem_businessManager) {
+			FrmBusinessManager dlg = new FrmBusinessManager(this,"商家管理",true);
+			dlg.setVisible(true);
+		}else if(e.getSource()==this.menuItem_commodityManager) {
+			FrmCommodityManager dlg = new FrmCommodityManager(this, "商品管理",true);
+			dlg.setVisible(true);
 		}
 	}
 }

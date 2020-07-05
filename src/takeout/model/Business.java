@@ -1,12 +1,29 @@
 package takeout.model;
 
 public class Business {
-	public static final String[] tableTitles = {"商家编号","商家名称","星级","平均消费","总销量"};
+	public static final String[] tableTitles = {"商家编号","商家名称","星级","平均消费","总销量","创建时间","注销时间"};
 	private String businessId;
 	private String businessName;
 	private int stars;
 	private float avg_consume;
 	private int sales_volume;
+	private String createTime;
+	private String removeTime;
+	
+	
+	
+	public String getCreateTime() {
+		return createTime;
+	}
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
+	}
+	public String getRemoveTime() {
+		return removeTime;
+	}
+	public void setRemoveTime(String removeTime) {
+		this.removeTime = removeTime;
+	}
 	public String getBusinessId() {
 		return businessId;
 	}
@@ -54,6 +71,10 @@ public class Business {
 			return ""+this.avg_consume;
 		else if(col==4)
 			return ""+this.sales_volume;
+		else if(col==5)
+			return ""+this.createTime;
+		else if(col==6)
+			return ""+this.removeTime;
 		else 
 			return "";
 	}

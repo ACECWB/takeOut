@@ -19,8 +19,7 @@ import takeout.control.UserManager;
 import takeout.model.User;
 
 public class FrmUserManager_AddUser extends JDialog implements ActionListener{
-	User user = null;
-	private User newuser = null;
+	private User user = null;
 	private JPanel toolBar = new JPanel();
 	private JPanel workPane = new JPanel();
 	
@@ -29,6 +28,7 @@ public class FrmUserManager_AddUser extends JDialog implements ActionListener{
 	private JLabel labelUsername = new JLabel("姓名：");
 	private JLabel labelUserId = new JLabel("用户编号：");
 	private JLabel labelUserpwd = new JLabel("密码：");
+	private JLabel labelUserSex = new JLabel("性别：");
 	private JComboBox cmbUserSex= new JComboBox(new String[] { "男", "女", "无"});
 	private JLabel labelPhone = new JLabel("绑定手机号码：");
 	private JLabel labelEmail = new JLabel("绑定邮箱");
@@ -52,7 +52,7 @@ public class FrmUserManager_AddUser extends JDialog implements ActionListener{
 		workPane.add(labelUserId); workPane.add(edtUserId);
 		workPane.add(labelUsername); workPane.add(edtUsername);
 		workPane.add(labelUserpwd); workPane.add(edtUserpwd);
-		workPane.add(cmbUserSex);
+		workPane.add(labelUserSex); workPane.add(cmbUserSex);
 		workPane.add(labelPhone); workPane.add(edtPhone);
 		workPane.add(labelEmail); workPane.add(edtEmail);
 		workPane.add(labelCity); workPane.add(edtCity);

@@ -87,7 +87,7 @@ public class FrmLogin extends JDialog implements ActionListener{
 			dlg.setVisible(true);
 		}else if(e.getSource()==this.btnBack) {
 			
-			this.dispose();
+			this.setVisible(false);
 			
 		}
 		
