@@ -35,7 +35,7 @@ public class FrmCommodityManager_AddCommodity_2 extends JDialog implements Actio
 	private JTextField edtCateId = new JTextField(20);
 	private JTextField edtCateName = new JTextField(20);
 
-	public FrmCommodityManager_AddCommodity_2(JDialog f, String s, boolean b) {
+	public FrmCommodityManager_AddCommodity_2(FrmMain f, String s, boolean b) {
 		super(f, s, b);
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		toolBar.add(btnOk);
@@ -53,7 +53,24 @@ public class FrmCommodityManager_AddCommodity_2 extends JDialog implements Actio
 		this.btnOk.addActionListener(this);
 		this.btnCancel.addActionListener(this);
 	}
-	
+	public FrmCommodityManager_AddCommodity_2(FrmCommodityManager_2 f, String s, boolean b) {
+		super(f, s, b);
+		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		toolBar.add(btnOk);
+		toolBar.add(btnCancel);
+		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
+		
+		workPane.add(labelCateId); workPane.add(edtCateId);
+		workPane.add(labelCateName); workPane.add(edtCateName);
+		
+		this.getContentPane().add(workPane, BorderLayout.CENTER);
+		this.setSize(500, 180);
+		this.setLocationRelativeTo(null);
+		
+		this.validate();
+		this.btnOk.addActionListener(this);
+		this.btnCancel.addActionListener(this);
+	}
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnCancel) {
 			this.setVisible(false);

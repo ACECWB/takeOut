@@ -82,7 +82,33 @@ public class FrmCommodityManager_2 extends JDialog implements ActionListener{
 		
 		
 	}
-	
+	public FrmCommodityManager_2(FrmMain frmMain, String s, boolean b) {
+		super(frmMain, s, b);
+		toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
+		toolBar.add(btnAdd);
+		toolBar.add(this.btnDelete);
+		toolBar.add(btnReset);
+		this.getContentPane().add(toolBar, BorderLayout.NORTH);
+		//提取现有数据
+		this.reloadComTable();
+		this.getContentPane().add(new JScrollPane(this.comTable), BorderLayout.CENTER);
+		
+		// 屏幕居中显示
+		this.setSize(500, 500);
+		this.setLocationRelativeTo(null);
+		this.validate();
+		
+		this.btnAdd.addActionListener(this);
+		this.btnDelete.addActionListener(this);
+		this.btnReset.addActionListener(this);
+		this.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				//System.exit(0);
+			}
+		});
+		
+		
+	}
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnAdd){
 			FrmCommodityManager_AddCommodity_2 dlg=new FrmCommodityManager_AddCommodity_2(this,"添加商品类型",true);

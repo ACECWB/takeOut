@@ -332,3 +332,31 @@ alter table coupon change start_time start_time datetime not null
 alter table coupon change end_time end_time datetime not null
 
 alter table coupon add removetime datetime 
+
+
+drop table ownedcoupons
+
+CREATE TABLE `ownedcoupons` (
+  `user_Id` varchar(20) NOT NULL,
+  `business_Id` varchar(20) NOT NULL,
+  `coupon_Id` varchar(20) NOT NULL,
+  `ineffect_time` datetime NOT NULL
+)
+alter table ownedcoupons add ownorder int not null
+
+
+
+alter table ownedcoupons add  PRIMARY KEY (ownorder)
+alter table ownedcoupons change ownorder ownorder int auto_increment 
+
+alter table fullreduction add starttime datetime not NULL
+alter table fullreduction add removetime datetime 
+
+
+alter table fullreduction change with_coupon with_coupon varchar(3) not null
+alter table fullreduction drop starttime
+alter table orders drop FOREIGN KEY FK_couponId
+
+alter table orders change order_time order_time datetime not null
+alter table orders change req_time req_time datetime not null
+

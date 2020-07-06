@@ -16,6 +16,7 @@ import javax.swing.JTextField;
 
 import takeout.util.*;
 import takeout.control.CommodityManager;
+import takeout.model.ComCate;
 import takeout.model.ComTitle;
 
 import java.text.SimpleDateFormat;
@@ -36,9 +37,12 @@ public class FrmCommodityManager_AddCommodity_1 extends JDialog implements Actio
 	private JTextField edtCommodityId = new JTextField(20);
 	private JTextField edtCommodityName = new JTextField(20);
 	private JTextField edtCommodityCate = new JTextField(20);
-
+	public int model = 0;
+	public ComCate curCate = null;
+	
 	public FrmCommodityManager_AddCommodity_1(JDialog f, String s, boolean b) {
 		super(f, s, b);
+		model = 1;
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		toolBar.add(btnOk);
 		toolBar.add(btnCancel);
@@ -56,18 +60,61 @@ public class FrmCommodityManager_AddCommodity_1 extends JDialog implements Actio
 		this.btnOk.addActionListener(this);
 		this.btnCancel.addActionListener(this);
 	}
-	
+	public FrmCommodityManager_AddCommodity_1(FrmMain f, String s, boolean b) {
+		super(f, s, b);
+		model = 2;
+		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		toolBar.add(btnOk);
+		toolBar.add(btnCancel);
+		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
+		
+		workPane.add(labelCommodityId); workPane.add(edtCommodityId);
+		workPane.add(labelCommodityName); workPane.add(edtCommodityName);
+//		workPane.add(labelCommodityCate); workPane.add(edtCommodityCate);
+		
+		this.getContentPane().add(workPane, BorderLayout.CENTER);
+		this.setSize(500, 180);
+		this.setLocationRelativeTo(null);
+		
+		this.validate();
+		this.btnOk.addActionListener(this);
+		this.btnCancel.addActionListener(this);
+	}
+	public FrmCommodityManager_AddCommodity_1(FrmMain f, String s, boolean b,int model) {
+		super(f, s, b);
+		this.model = model;
+		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		toolBar.add(btnOk);
+		toolBar.add(btnCancel);
+		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
+		
+		workPane.add(labelCommodityId); workPane.add(edtCommodityId);
+		workPane.add(labelCommodityName); workPane.add(edtCommodityName);
+		workPane.add(labelCommodityCate); workPane.add(edtCommodityCate);
+		
+		this.getContentPane().add(workPane, BorderLayout.CENTER);
+		this.setSize(500, 180);
+		this.setLocationRelativeTo(null);
+		
+		this.validate();
+		this.btnOk.addActionListener(this);
+		this.btnCancel.addActionListener(this);
+	}
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnCancel) {
 			this.setVisible(false);
 			return;
 		}
 		else if(e.getSource()==this.btnOk){
-			
-			String comid = this.edtCommodityId.getText();
+			String comcate = null;
+			if(model == 1) {
+				comcate = this.edtCommodityCate.getText();
+			}
+			else if(model == 2)
+				comcate = curCate.getCategoryId();
 			String comname = this.edtCommodityName.getText();
-			String comcate = this.edtCommodityCate.getText();
-			
+			String comid = this.edtCommodityId.getText();
+
 			comtitle=new ComTitle();
 			comtitle.setComName(comname);
 			comtitle.setComId(comid);

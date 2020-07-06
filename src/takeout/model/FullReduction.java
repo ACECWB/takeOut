@@ -1,35 +1,65 @@
 package takeout.model;
 
+import java.util.Date;
+
 public class FullReduction {
-	public static final String[] tableTitles = {"满减编号","满减金额","优惠金额","是否可与优惠券叠加"};
+	public static final String[] tableTitles = {"满减编号","满减金额","优惠金额","是否可与优惠券叠加","活动结束时间"};
 	private String reductId;
 	private float requireAmount;
 	private float discountAmount;
-	private int withCoupon;
+	private String withCoupon;
+	private Date endTime;
+	
+	
 	public String getReductId() {
 		return reductId;
 	}
+
+
 	public void setReductId(String reductId) {
 		this.reductId = reductId;
 	}
+
+
 	public float getRequireAmount() {
 		return requireAmount;
 	}
+
+
 	public void setRequireAmount(float requireAmount) {
 		this.requireAmount = requireAmount;
 	}
+
+
 	public float getDiscountAmount() {
 		return discountAmount;
 	}
+
+
 	public void setDiscountAmount(float discountAmount) {
 		this.discountAmount = discountAmount;
 	}
-	public int getWithCoupon() {
+
+
+	public String getWithCoupon() {
 		return withCoupon;
 	}
-	public void setWithCoupon(int withCoupon) {
+
+
+	public void setWithCoupon(String withCoupon) {
 		this.withCoupon = withCoupon;
 	}
+
+	public Date getEndTime() {
+		return endTime;
+	}
+
+
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
+	}
+
+
 	public String getCell(int col){
 //		if(col==0) return "1";
 //		else if(col==1) return "示例计划";
@@ -44,6 +74,8 @@ public class FullReduction {
 			return ""+this.discountAmount;
 		else if(col==3)
 			return ""+this.withCoupon;
+		else if(col==4)
+			return ""+this.endTime;
 		else 
 			return "";
 	}

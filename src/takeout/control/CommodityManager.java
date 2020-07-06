@@ -47,8 +47,19 @@ public class CommodityManager implements ICommodityManager {
 		String sql = null;
 		try {
 			conn = DBUtil.getConnection();
-			sql = "update commodity set removetime = null where com_Id = ?";
+			
+			sql = "select cc.removetime from commoditycategory cc, commodity c where c.com_Id = ? and cc.category_Id = c.category_Id";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, comId);
+			java.sql.ResultSet rs = pst.executeQuery();
+			rs.next();
+			if(rs.getTimestamp(1)!=null)
+				throw new BusinessException("该商品类为上架！！！");
+			rs.close();
+			pst.close();
+			
+			sql = "update commodity set removetime = null where com_Id = ?";
+			pst = conn.prepareStatement(sql);
 			pst.setString(1, comId);
 			pst.execute();
 			pst.close();
@@ -453,6 +464,10 @@ public class CommodityManager implements ICommodityManager {
 			throw new BusinessException("商家编号不可为空！！！");
 		if(commodity.getComId()==null || "".equals(commodity.getComId()))
 			throw new BusinessException("商品编号不可为空！！！");
+		if(commodity.getEachPrice()<0)
+			throw new BusinessException("单价不可为负数！！！");
+		if(commodity.getCounts()<0)
+			throw new BusinessException("数量不可为负数！！！");
 		
 		try{
 			conn = DBUtil.getConnection();

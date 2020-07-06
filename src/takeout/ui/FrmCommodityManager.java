@@ -88,11 +88,11 @@ public class FrmCommodityManager extends JDialog implements ActionListener{
 	
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnAdd){
-//			FrmCommodityManager_AddCommodity dlg=new FrmCommodityManager_AddCommodity(this,"添加商品信息",true);
-//			dlg.setVisible(true);
-//			if(dlg.getCommodity()!=null){//刷新表格
-//				this.reloadCommodityTable();
-//			}
+			FrmCommodityManager_AddCommodity dlg=new FrmCommodityManager_AddCommodity(this,"添加商品信息",true);
+			dlg.setVisible(true);
+			if(dlg.getCommodity()!=null){//刷新表格
+				this.reloadCommodityTable();
+			}
 		}
 		else if(e.getSource()==this.btnDelete){
 			int i=this.commodityTable.getSelectedRow();

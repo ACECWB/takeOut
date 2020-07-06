@@ -31,18 +31,21 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 	private Button btnCancel = new Button("取消");
 	
 	private JLabel labelCommodityId = new JLabel("商品编号：");
-//	private JLabel labelBusinessId = new JLabel("商家编号：");
+	private JLabel labelBusinessId = new JLabel("商家编号：");
 	private JLabel labelCounts = new JLabel("数量：");
 	private JLabel labelPrice = new JLabel("单价：");
 
 	
 	private JTextField edtCommodityId = new JTextField(20);
-//	private JTextField edtBusinessId = new JTextField(20);
+	private JTextField edtBusinessId = new JTextField(20);
 	private JTextField edtCounts = new JTextField(20);
 	private JTextField edtPrice = new JTextField(20);
 
+	public int model = 0;//页面启动模式
+	
 	public FrmCommodityManager_AddCommodity(FrmMain frmMain, String s, boolean b) {
 		super(frmMain, s, b);
+		model = 1;
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		toolBar.add(btnOk);
 		toolBar.add(btnCancel);
@@ -62,6 +65,28 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 		this.btnCancel.addActionListener(this);
 	}
 	
+	public FrmCommodityManager_AddCommodity(FrmCommodityManager frmCommodityManager, String s, boolean b) {
+		super(frmCommodityManager, s, b);
+		model = 2;
+		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		toolBar.add(btnOk);
+		toolBar.add(btnCancel);
+		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
+		
+		workPane.add(labelCommodityId); workPane.add(edtCommodityId);
+		workPane.add(labelBusinessId); workPane.add(edtBusinessId);
+		workPane.add(labelCounts); workPane.add(edtCounts);
+		workPane.add(labelPrice); workPane.add(edtPrice);
+		
+		this.getContentPane().add(workPane, BorderLayout.CENTER);
+		this.setSize(600, 180);
+		this.setLocationRelativeTo(null);
+		
+		this.validate();
+		this.btnOk.addActionListener(this);
+		this.btnCancel.addActionListener(this);
+	}
+	
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnCancel) {
 			this.setVisible(false);
@@ -69,7 +94,7 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 		}
 		else if(e.getSource()==this.btnOk){
 			
-//			String businessid = this.edtBusinessId.getText();
+			
 			
 			String commodityid = this.edtCommodityId.getText();
 			String counts = this.edtCounts.getText();
@@ -77,20 +102,30 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 			
 			commodity=new Commodity();
 			commodity.setComId(commodityid);
+			String businessid = null;
+			
+			if(this.model==2) {
+				businessid = this.edtBusinessId.getText();
+			}else if(this.model==1){
+				businessid = bus.getBusinessId();
+			}
+			commodity.setBusinessId(businessid);
 			
 			try{
 				commodity.setEachPrice(Float.parseFloat(price));
+				
 			}catch(Exception ex) {
-				JOptionPane.showMessageDialog(null, "单价输入不正确","错误",JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "请正确输入单价！！！","错误",JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			try {
 				commodity.setCounts(Integer.parseInt(counts));
 			}catch(Exception ei) {
-				JOptionPane.showMessageDialog(null, "数量输入不正确","错误",JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "请正确输入数量！！！","错误",JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			commodity.setBusinessId(bus.getBusinessId());
+			
+			
 			try {
 				(new CommodityManager()).addCommodity(commodity);
 				this.setVisible(false);
