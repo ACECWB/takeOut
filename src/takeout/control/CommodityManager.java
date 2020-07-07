@@ -14,7 +14,105 @@ import takeout.util.*;
 
 public class CommodityManager implements ICommodityManager {
 	
-	
+	public void modifyCom2bus(Commodity com)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		if(com.getCounts()<0)
+			throw new BusinessException("数量不可为负数！！！");
+		
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update com2bus set counts = ? , each_price = ? where com_Id = ? and business_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setInt(1, com.getCounts());
+			pst.setFloat(2, com.getEachPrice());
+			pst.setString(3, com.getComId());
+			pst.setString(4, com.getBusinessId());
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+	public void modifyCom(Commodity com)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		if(com.getCategoryId() == null || "".equals(com.getCategoryId()))
+			throw new BusinessException("商品类别编号不可为空！！！");
+		if(com.getComName() == null || "".equals(com.getComName()))
+			throw new BusinessException("商品名称不可为空！！！");
+		
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select * from commoditycategory where category_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, com.getCategoryId());
+			java.sql.ResultSet rs = pst.executeQuery();
+			if(!rs.next())
+				throw new BusinessException("不存在该商品分类编号！！！");
+			rs.close();
+			pst.close();
+			
+			sql = "update commodity set category_Id = ? , com_name = ? where com_Id = ?"; 
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, com.getCategoryId());
+			pst.setString(2, com.getComName());
+			pst.setString(3, com.getComId());
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+
+	public void modifyCateName(String comcateid, String catename)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		if(catename == null || "".equals(catename))
+			throw new BusinessException("商品类别名不可为空！！！");
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update commoditycategory set category_name = ? where category_Id = ? ";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, catename);
+			pst.setString(2, comcateid);
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+
 
 	
 	public void resetComCate(String comCateId)throws BaseException{

@@ -11,6 +11,38 @@ import takeout.model.User;
 import takeout.util.*;
 
 public class UserManager implements IUserManager {
+	
+	public void modifyUser(User user)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update `user` set user_name = ?, sex = ?, pwd = ?, phone = ?, email = ?, city = ? where user_Id = ? ";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, user.getUserName());
+			pst.setString(2, user.getSex());
+			pst.setString(3, user.getPwd());
+			pst.setString(4, user.getPhone());
+			pst.setString(5, user.getEmail());
+			pst.setString(6, user.getCity());
+			pst.setString(7, user.getUserId());
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+	
 	public void resetComTitle(String comId)throws BaseException{
 		Connection conn = null;
 		String sql = null;

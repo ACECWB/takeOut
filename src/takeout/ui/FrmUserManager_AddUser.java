@@ -66,6 +66,30 @@ public class FrmUserManager_AddUser extends JDialog implements ActionListener{
 		this.btnCancel.addActionListener(this);
 	}
 	
+	public FrmUserManager_AddUser(FrmMain f, String s, boolean b) {
+		super(f, s, b);
+		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		toolBar.add(btnOk);
+		toolBar.add(btnCancel);
+		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
+		
+		workPane.add(labelUserId); workPane.add(edtUserId);
+		workPane.add(labelUsername); workPane.add(edtUsername);
+		workPane.add(labelUserpwd); workPane.add(edtUserpwd);
+		workPane.add(labelUserSex); workPane.add(cmbUserSex);
+		workPane.add(labelPhone); workPane.add(edtPhone);
+		workPane.add(labelEmail); workPane.add(edtEmail);
+		workPane.add(labelCity); workPane.add(edtCity);
+		
+		this.getContentPane().add(workPane, BorderLayout.CENTER);
+		this.setSize(600, 180);
+		this.setLocationRelativeTo(null);
+		
+		this.validate();
+		this.btnOk.addActionListener(this);
+		this.btnCancel.addActionListener(this);
+	}
+	
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnCancel) {
 			this.setVisible(false);

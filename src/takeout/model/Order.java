@@ -3,7 +3,7 @@ package takeout.model;
 import java.util.Date;
 
 public class Order {
-	public static final String[] tableTitles = {"订单编号","骑手编号","商品编号","数量","价格","优惠券编号","原总价","现总价","下单时间","送达要求","状态"};
+	public static final String[] tableTitles = {"订单编号","骑手编号","商品编号","数量","价格","优惠券编号","原总价","现总价","下单时间","送达要求","送达时间","状态"};
 	
 	private String orderid;
 	private String couponid;
@@ -16,6 +16,14 @@ public class Order {
 	private int counts;
 	private float price;
 	private Date ordertime;
+	private Date receivetime;
+	
+	public void setReceiveTime(Date time) {
+		this.receivetime = time;
+	}
+	public Date getReceiveTime() {
+		return this.receivetime;
+	}
 	
 	public String getCell(int col){
 //		if(col==0) return "1";
@@ -44,6 +52,8 @@ public class Order {
 		else if(col==9)
 			return ""+this.reqtime;
 		else if(col==10)
+			return ""+this.receivetime;
+		else if(col==11)
 			return ""+this.status;
 		else 
 			return "";

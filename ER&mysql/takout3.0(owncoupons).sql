@@ -360,3 +360,7 @@ alter table orders drop FOREIGN KEY FK_couponId
 alter table orders change order_time order_time datetime not null
 alter table orders change req_time req_time datetime not null
 
+alter table deliver_income change time time datetime
+alter table deliver_income change each_income each_bonus float not null
+alter table orders add receive_time datetime 
+

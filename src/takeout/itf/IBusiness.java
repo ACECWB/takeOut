@@ -11,4 +11,6 @@ public interface IBusiness {
 	public void deleteBusiness(String businessId) throws BaseException;
 	public List<Business> loadAllBusiness(boolean withDeletedBusiness) throws BaseException;
 	
+	public void modifyBusinessName(String businessname, String businessid)throws BaseException;
+	
 }

@@ -27,5 +27,9 @@ public interface ICommodityManager {
 	public void addComCate(ComCate comcate)throws BaseException;
 	public void deleteComCate(String comcateid)throws BaseException;
 	
+	public void modifyCateName(String comcateid, String catename)throws BaseException;
+	public void modifyCom(Commodity com)throws BaseException;
+	public void modifyCom2bus(Commodity com)throws BaseException;
+	
 	
 }

@@ -58,7 +58,26 @@ public class FrmDeliverManager_AddDeliver extends JDialog implements ActionListe
 		this.btnOk.addActionListener(this);
 		this.btnCancel.addActionListener(this);
 	}
-	
+	public FrmDeliverManager_AddDeliver(FrmMain f, String s, boolean b) {
+		super(f, s, b);
+		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		toolBar.add(btnOk);
+		toolBar.add(btnCancel);
+		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
+		
+		workPane.add(labelDeliverId); workPane.add(edtDeliverId);
+		workPane.add(labelDeliverName); workPane.add(edtDeliverName);
+		workPane.add(labelEmployTime); workPane.add(edtEmployTime);
+		workPane.add(labelIdentity); workPane.add(cmbDeliverIdentity);
+		
+		this.getContentPane().add(workPane, BorderLayout.CENTER);
+		this.setSize(600, 180);
+		this.setLocationRelativeTo(null);
+		
+		this.validate();
+		this.btnOk.addActionListener(this);
+		this.btnCancel.addActionListener(this);
+	}
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnCancel) {
 			this.setVisible(false);

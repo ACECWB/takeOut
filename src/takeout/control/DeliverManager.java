@@ -16,6 +16,52 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 public class DeliverManager implements IDeliverManager {
 
+	public void modifyDeliver(Deliver deliver)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update deliver set deliver_name = ?, employ_time = ?, quit_time = ?, identity = ? where deliver_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, deliver.getDeliverName());
+			try {
+				pst.setTimestamp(2, new java.sql.Timestamp(sdf.parse(deliver.getEmployTime()).getTime()));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(deliver.getQuitTime() == null || "null".equals(deliver.getQuitTime()))
+				pst.setNull(3, java.sql.Types.DATE);
+			else {
+				System.out.println("get:"+deliver.getQuitTime());
+				try {
+					pst.setTimestamp(3, new java.sql.Timestamp(sdf.parse(deliver.getQuitTime()).getTime()));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			pst.setString(4, deliver.getIdentity());
+			pst.setString(5, deliver.getDeliverId());
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+	
 	@Override
 	public void addDeliver(Deliver deliver) throws BaseException {
 		// TODO Auto-generated method stub
@@ -86,7 +132,16 @@ public class DeliverManager implements IDeliverManager {
 			rs.close();
 			pst.close();
 			
-			sql = "delete from deliver where deliver_Id = ?";
+			sql = "select quit_time from deliver where deliver_Id = ? and quit_time is not null";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, deliverId);
+			rs = pst.executeQuery();
+			if(rs.next())
+				throw new BusinessException("该骑手已经删除！！！");
+			rs.close();
+			pst.close();
+			
+			sql = "update deliver set quit_time = now() where deliver_Id = ?";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, deliverId);
 			pst.execute();

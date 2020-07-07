@@ -12,6 +12,34 @@ import takeout.model.Business;
 import java.text.SimpleDateFormat;
 public class BusinessManager implements IBusiness {
 
+	public void modifyBusinessName(String businessname, String businessid)throws BaseException{
+		if(businessname == null || "".equals(businessname))
+			throw new BusinessException("商家名称不可为空！！！");
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update business set business_name = ? where business_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, businessname);
+			pst.setString(2, businessid);
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+
 	@Override
 	public void addBusiness(Business business) throws BaseException {
 		// TODO Auto-generated method stub

@@ -108,6 +108,13 @@ public class AdminManager implements IAdminManager {
 		// TODO Auto-generated method stub
 		Connection conn = null;
 		String sql = null;
+		if(oldPwd == null || "".equals(oldPwd))
+			throw new BusinessException("密码不可为空！！！");
+		if(newPwd == null || "".equals(newPwd))
+			throw new BusinessException("新密码不可为空！！！");
+		if(newPwd2 == null || "".equals(newPwd2))
+			throw new BusinessException("新密码不可为空！！！");
+		
 		try {
 			conn = DBUtil.getConnection();
 			sql = "select * from admin where admin_Id = ?";

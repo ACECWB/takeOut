@@ -22,11 +22,12 @@ public class OrderManager implements IOrderManager {
 		try {
 			conn = DBUtil.getConnection();
 			sql = "select o.order_Id, deliver_Id, com_Id, count, price, coupon_Id,\r\n" + 
-					"origin_amount, final_amount, order_time, req_time, `status` \r\n" + 
+					"origin_amount, final_amount, order_time, req_time, receive_time, `status` \r\n" + 
 					"from orders o, orderinfo oi \r\n" + 
-					"where o.order_Id = oi.order_Id ";
-			java.sql.Statement st = conn.createStatement();
-			java.sql.ResultSet rs = st.executeQuery(sql);
+					"where user_Id = ? and o.order_Id = oi.order_Id ";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, userid);
+			java.sql.ResultSet rs = pst.executeQuery();
 			while(rs.next()) {
 				Order o = new Order();
 				o.setOrderid(rs.getString(1));
@@ -43,7 +44,7 @@ public class OrderManager implements IOrderManager {
 				orders.add(o);
 			}
 			rs.close();
-			st.close();
+			pst.close();
 			conn.close();
 			
 		}catch(SQLException e) {

@@ -16,7 +16,65 @@ import takeout.util.DbException;
 
 public class CouponManager implements ICouponManager {
 
-	
+	public void modifyCcoupon(Coupon coupon)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update ownedcoupons set ineffect_time = ? where user_Id = ? and business_Id = ? and coupon_Id = ? and ownorder = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setTimestamp(1, new java.sql.Timestamp(coupon.getRemoveTime().getTime()));
+			pst.setString(2, coupon.getUserId());
+			pst.setString(3, coupon.getBusinessId());
+			pst.setString(4, coupon.getCouponId());
+			pst.setInt(5, coupon.getOwnOrder());
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+	public void modifyBcoupon(Coupon coupon)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update coupon set discount_money = ?, need_orders = ?, start_time = ?,\r\n" + 
+					" end_time = ?, effect_days = ? where coupon_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setFloat(1, coupon.getDiscountMoney());
+			pst.setInt(2, coupon.getNeedOrders());
+			pst.setTimestamp(3, new java.sql.Timestamp(coupon.getStartTime().getTime()));
+			pst.setTimestamp(4, new java.sql.Timestamp(coupon.getEndTime().getTime()));
+			pst.setInt(5, coupon.getEffectDays());
+			pst.setString(6, coupon.getCouponId());
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+
 	public List<Coupon> loadAllBCoupons(Business business)throws BaseException{
 		Connection conn = null;
 		String sql = null;

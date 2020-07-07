@@ -15,5 +15,8 @@ public interface ICouponManager {
 
 	public void deleteBCoupon(String couponid)throws BaseException;
 	public void deleteCCoupon(int order)throws BaseException;
+	
+	public void modifyBcoupon(Coupon coupon)throws BaseException;
+	public void modifyCcoupon(Coupon coupon)throws BaseException;
 
 }

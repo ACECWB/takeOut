@@ -17,4 +17,6 @@ public interface IUserManager {
 //	public boolean modifyUserName(String userid, String updateName) throws BusinessException;
 	public void resetUserPwd(String userid)throws BaseException;
 	
+	public void modifyUser(User user)throws BaseException;
+	
 }
