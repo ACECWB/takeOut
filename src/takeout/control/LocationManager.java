@@ -11,6 +11,118 @@ import takeout.util.*;
 
 
 public class LocationManager implements ILocationManager {
+	public void modifyLoca(int locaid, String loca)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update location set loca = ? where loca_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, loca);
+			pst.setInt(2, locaid);
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+	public void modifyPhone(int locaid, String phone)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update location set phone_number = ? where loca_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, phone);
+			pst.setInt(2, locaid);
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+	public void modifyCon(int locaid, String con)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update location set conn_user = ? where loca_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, con);
+			pst.setInt(2, locaid);
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+	public List<Location> loadAllLocations(String userid)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		List<Location> locs = new ArrayList<>();
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select loca_Id, loca, phone_number, conn_user from location where user_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, userid);
+			java.sql.ResultSet rs = pst.executeQuery();
+			while(rs.next()) {
+				Location l = new Location();
+				l.setLocaId(rs.getInt(1));
+				l.setUserId(userid);
+				l.setLoca(rs.getString(2));
+				l.setPhone(rs.getString(3));
+				l.setConnUser(rs.getString(4));
+				locs.add(l);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return locs;
+		
+	}
 
 	@Override
 	public void addLocation(Location loc) throws BaseException {
@@ -105,8 +217,17 @@ public class LocationManager implements ILocationManager {
 		String sql = null;
 		try {
 			conn = DBUtil.getConnection();
-			sql = "delete from location where loca_Id = ?";
+			sql = "select * from orders where loca_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setInt(1, locaId);
+			java.sql.ResultSet rs = pst.executeQuery();
+			if(rs.next())
+				throw new BusinessException("订单信息中使用了该地址信息！故不能删除！！！");
+			rs.close();
+			pst.close();
+			
+			sql = "delete from location where loca_Id = ?";
+			pst = conn.prepareStatement(sql);
 			pst.setInt(1, locaId);
 			pst.execute();
 			pst.close();

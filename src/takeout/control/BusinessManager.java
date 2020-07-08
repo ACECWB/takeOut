@@ -123,6 +123,12 @@ public class BusinessManager implements IBusiness {
 			pst.execute();
 			pst.close();
 			
+			sql = "delete from cart where business_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, businessId);
+			pst.execute();
+			pst.close();
+			
 			sql = "update business set removetime = now() where business_Id = ?";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, businessId);

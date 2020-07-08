@@ -22,6 +22,7 @@ public class CommodityManager implements ICommodityManager {
 		
 		try {
 			conn = DBUtil.getConnection();
+			conn.setAutoCommit(false);
 			sql = "update com2bus set counts = ? , each_price = ? where com_Id = ? and business_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setInt(1, com.getCounts());
@@ -30,10 +31,24 @@ public class CommodityManager implements ICommodityManager {
 			pst.setString(4, com.getBusinessId());
 			pst.execute();
 			pst.close();
+			
+			sql = "update cart set price = counts * ?  where com_Id = ? and business_Id = ?"; 
+			pst = conn.prepareStatement(sql);
+			pst.setFloat(1, com.getEachPrice());
+			pst.setString(2, com.getComId());
+			pst.setString(3, com.getBusinessId());
+			pst.execute();
+			pst.close();
+			conn.commit();
 			conn.close();
 			
 		}catch(SQLException e) {
 			e.printStackTrace();
+			try {
+				conn.rollback();
+			}catch(Exception e1) {
+				e1.printStackTrace();
+			}
 			throw new DbException(e);
 		}finally {
 			if(conn!=null)
@@ -54,6 +69,7 @@ public class CommodityManager implements ICommodityManager {
 		
 		try {
 			conn = DBUtil.getConnection();
+			conn.setAutoCommit(false);
 			sql = "select * from commoditycategory where category_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, com.getCategoryId());
@@ -70,10 +86,23 @@ public class CommodityManager implements ICommodityManager {
 			pst.setString(3, com.getComId());
 			pst.execute();
 			pst.close();
+			
+			sql = "update cart set com_name = ? where com_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, com.getComName());
+			pst.setString(2, com.getComId());
+			pst.execute();
+			pst.close();
+			conn.commit();
 			conn.close();
 			
 		}catch(SQLException e) {
 			e.printStackTrace();
+			try {
+				conn.rollback();
+			}catch(Exception e1) {
+				e1.printStackTrace();
+			}
 			throw new DbException(e);
 		}finally {
 			if(conn!=null)
@@ -278,6 +307,13 @@ public class CommodityManager implements ICommodityManager {
 			pst.setString(1, comcateid);
 			pst.execute();
 			pst.close();
+			
+			sql = "delete cart from commodity cd, cart c where cd.com_Id = c.com_Id and cd.category_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, comcateid);
+			pst.execute();
+			pst.close();
+			
 			conn.commit();
 			conn.close();
 			
@@ -437,6 +473,12 @@ public class CommodityManager implements ICommodityManager {
 			pst.close();
 			
 			sql = "delete from com2bus where com_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, comId);
+			pst.execute();
+			pst.close();
+			
+			sql = "delete from cart where com_Id = ?";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, comId);
 			pst.execute();
@@ -641,12 +683,21 @@ public class CommodityManager implements ICommodityManager {
 		String sql = null;
 		try{
 			conn = DBUtil.getConnection();
+			conn.setAutoCommit(false);
 			sql = "delete from com2bus where com_Id = ? and business_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, comId);
 			pst.setString(2, businessId);
 			pst.execute();
 			pst.close();
+			
+			sql = "delete from cart where com_Id = ? and business_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, comId);
+			pst.setString(2, businessId);
+			pst.execute();
+			pst.close();
+			conn.commit();
 			conn.close();
 			
 		}catch(SQLException e) {

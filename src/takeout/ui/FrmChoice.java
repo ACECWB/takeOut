@@ -31,6 +31,7 @@ public class FrmChoice extends JDialog implements ActionListener{
 	private JButton btnUserLogin = new JButton("用户身份登陆");
 	private JButton btnCancel = new JButton("退出");
 	
+
 	public FrmChoice() {
 		
 		toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -51,15 +52,16 @@ public class FrmChoice extends JDialog implements ActionListener{
 			}
 		});
 		
+		
 	}
 	
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnAdminLogin) {
 //			FrmMain fr = new FrmMain();
 //			fr.setVisible(true);
-			FrmLogin dlg = new FrmLogin(this,"管理员登陆",true);
-			dlg.setVisible(true);
-			this.setVisible(false);
+//			FrmLogin dlg = new FrmLogin(this,"管理员登陆",true);
+//			dlg.setVisible(true);
+			this.setVisible(true);
 			
 		}else if(e.getSource()==this.btnUserLogin) {
 			System.exit(0);

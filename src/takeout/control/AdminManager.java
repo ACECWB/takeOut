@@ -70,14 +70,14 @@ public class AdminManager implements IAdminManager {
 		// TODO Auto-generated method stub
 		Admin ad = new Admin();
 		ad.setPwd(pwd);
-		ad.setName(userid);
+		ad.setUserid(userid);
 		Connection conn = null;
 		String sql = null;
 		try {
 			conn = DBUtil.getConnection();
 			sql = "select * from admin where admin_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
-			pst.setString(1, userid.replaceAll("'", "''"));
+			pst.setString(1, userid);
 			java.sql.ResultSet rs = pst.executeQuery();
 			if(!rs.next()) {
 				throw new BusinessException("该用户不存在！");
@@ -114,26 +114,30 @@ public class AdminManager implements IAdminManager {
 			throw new BusinessException("新密码不可为空！！！");
 		if(newPwd2 == null || "".equals(newPwd2))
 			throw new BusinessException("新密码不可为空！！！");
-		
+		if(!newPwd.equals(newPwd2)) {
+			throw new BusinessException("密码不一致！！！");
+		}
 		try {
 			conn = DBUtil.getConnection();
-			sql = "select * from admin where admin_Id = ?";
+			sql = "select admin_pwd from admin where admin_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
-			pst.setString(1, admin.getName().replaceAll("'", "''"));
+			pst.setString(1, admin.getUserid());
+			System.out.print("ad:"+admin.getUserid());
+
 			java.sql.ResultSet rs = pst.executeQuery();
-			rs.next();
-			if(!rs.getString(3).equals(oldPwd)) {
-				throw new BusinessException("密码错误！！！");
+			while(rs.next()) {
+				if(!rs.getString(1).equals(oldPwd)) {
+					throw new BusinessException("密码错误！！！");
+				}
 			}
-			if(!newPwd.equals(newPwd2)) {
-				throw new BusinessException("密码不一致！！！");
-			}
+			
+			
 			pst.close();
 			rs.close();
 			sql = "update admin set admin_pwd = ? where admin_Id = ? ";
 			pst = conn.prepareStatement(sql);
-			pst.setString(1,newPwd.replaceAll("'", "''"));
-			pst.setString(2, admin.getName().replaceAll("'", "''"));
+			pst.setString(1,newPwd);
+			pst.setString(2, admin.getUserid());
 			pst.execute();
 			pst.close();
 			conn.close();

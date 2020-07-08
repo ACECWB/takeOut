@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import takeout.util.*;
 import takeout.control.LocationManager;
 import takeout.model.Location;
+import takeout.model.User;
 
 public class FrmLocationManager_AddLocation extends JDialog implements ActionListener{
 	private Location location = null;
@@ -41,8 +42,10 @@ public class FrmLocationManager_AddLocation extends JDialog implements ActionLis
 		toolBar.add(btnOk);
 		toolBar.add(btnCancel);
 		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
-		
-		workPane.add(labelUserId); workPane.add(edtUserId);
+		if(User.currentLoginUser == null) {
+			workPane.add(labelUserId); workPane.add(edtUserId);
+
+		}
 		workPane.add(labelLocation); workPane.add(edtLocation);
 		workPane.add(labelPhone); workPane.add(edtPhone);
 		workPane.add(labelConnUser); workPane.add(edtConnUser);
@@ -62,8 +65,14 @@ public class FrmLocationManager_AddLocation extends JDialog implements ActionLis
 			return;
 		}
 		else if(e.getSource()==this.btnOk){
+			String userid;
+			if(User.currentLoginUser==null) {
+				userid = this.edtUserId.getText();
+			}else {
+				userid = User.currentLoginUser.getUserId();
+			}
+				
 			
-			String userid = this.edtUserId.getText();
 			String loca = this.edtLocation.getText();
 			String connUser = this.edtConnUser.getText();
 			String phone = this.edtPhone.getText();

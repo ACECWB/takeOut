@@ -21,9 +21,9 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
-
 import takeout.control.LocationManager;
 import takeout.model.Location;
+import takeout.model.User;
 import takeout.util.BaseException;
 
 
@@ -31,23 +31,29 @@ public class FrmLocationManager extends JDialog implements ActionListener{
 	private JPanel toolBar = new JPanel();
 	private Button btnAdd = new Button("添加地址信息");
 	private Button btnDelete = new Button("删除地址信息");
-	
+	private Button btnModify = new Button("修改地址信息");
+
 	private Object tblData[][];
 	DefaultTableModel tablmod=new DefaultTableModel();
-	public JTable userTable=new JTable(tablmod);
-	
+	public JTable locationTable=new JTable(tablmod);
+	List<Location> locations;
 	private void reloadLocationTable(){
 		try {
-			List<Location> locations=(new LocationManager()).loadAllLocations();
-			tblData = new Object[locations.size()][Location.tableTitles.length];
+			
+			if(User.currentLoginUser==null)
+				locations=(new LocationManager()).loadAllLocations();
+			else
+				locations=(new LocationManager()).loadAllLocations(User.currentLoginUser.getUserId());
+
+			tblData = new Object[locations.size()][Location.UtableTitles.length];
 			for(int i=0;i<locations.size();i++){
-				for(int j=0;j<Location.tableTitles.length;j++) {
-					tblData[i][j] = locations.get(i).getCell(j); 
+				for(int j=0;j<Location.UtableTitles.length;j++) {
+					tblData[i][j] = locations.get(i).getUCell(j); 
 				}
 			}
-			tablmod.setDataVector(tblData, Location.tableTitles);
-			this.userTable.validate();
-			this.userTable.repaint();
+			tablmod.setDataVector(tblData, Location.UtableTitles);
+			this.locationTable.validate();
+			this.locationTable.repaint();
 		} catch (BaseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -59,10 +65,11 @@ public class FrmLocationManager extends JDialog implements ActionListener{
 		toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
 		toolBar.add(btnAdd);
 		toolBar.add(this.btnDelete);
+		toolBar.add(btnModify);
 		this.getContentPane().add(toolBar, BorderLayout.NORTH);
 		//提取现有数据
 		this.reloadLocationTable();
-		this.getContentPane().add(new JScrollPane(this.userTable), BorderLayout.CENTER);
+		this.getContentPane().add(new JScrollPane(this.locationTable), BorderLayout.CENTER);
 		
 		// 屏幕居中显示
 		this.setSize(800, 800);
@@ -71,6 +78,7 @@ public class FrmLocationManager extends JDialog implements ActionListener{
 		
 		this.btnAdd.addActionListener(this);
 		this.btnDelete.addActionListener(this);
+		this.btnModify.addActionListener(this);
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				//System.exit(0);
@@ -89,7 +97,7 @@ public class FrmLocationManager extends JDialog implements ActionListener{
 			}
 		}
 		else if(e.getSource()==this.btnDelete){
-			int i=this.userTable.getSelectedRow();
+			int i=this.locationTable.getSelectedRow();
 			if(i<0) {
 				JOptionPane.showMessageDialog(null,  "请选择地址信息","提示",JOptionPane.ERROR_MESSAGE);
 				return;
@@ -103,6 +111,19 @@ public class FrmLocationManager extends JDialog implements ActionListener{
 					JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
 				}
 				
+			}
+		}else if(e.getSource()==this.btnModify){
+			int i=this.locationTable.getSelectedRow();
+			if(i<0) {
+				JOptionPane.showMessageDialog(null,  "请选择地址信息","提示",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			Location location=this.locations.get(i);
+			
+			FrmLocationManager_Modify dlg=new FrmLocationManager_Modify(this,"修改地址信息",true,location);
+			dlg.setVisible(true);
+			if(dlg.getLocation2()!=null){//刷新表格
+				this.reloadLocationTable();
 			}
 		}
 	}

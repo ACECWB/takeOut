@@ -61,6 +61,7 @@ import takeout.util.BusinessException;
 public class FrmMain extends JFrame implements ActionListener{
 	private JFrame jframe = new JFrame("外卖助手"); 
 	private JMenuBar menubar=new JMenuBar();
+	//以下为管理员菜单栏
 	private JMenu menu_Manager=new JMenu("系统管理");
 	private JMenu menu_Business = new JMenu("商家管理");
 	private JMenu menu_ComCate = new JMenu("商品类管理");
@@ -71,6 +72,15 @@ public class FrmMain extends JFrame implements ActionListener{
 	private JMenu menu_Coupon = new JMenu("优惠券管理");
 	private JMenu menu_Statistic = new JMenu("统计");
 	private JMenuItem menuItem_Income = new JMenuItem("骑手收入统计");
+
+	//以下为用户菜单栏
+	private JMenu menu_InfoManager = new JMenu("个人信息管理");
+	private JMenu menu_CartManager = new JMenu("购物车管理");
+	private JMenuItem menuItem_addgoods = new JMenuItem("添加到购物车");
+	private JMenuItem menuItem_cart = new JMenuItem("查看当前购物车");
+	private JMenuItem menuItem_location = new JMenuItem("地址信息编辑");
+	private JMenuItem menuItem_orderInfo = new JMenuItem("订单信息查看");
+
 
 	private int model = 0;//1:商家-商品，2:商品类别-商品，3:商家-优惠券，4:用户-优惠券，5:用户-订单，6:骑手-订单,7:骑手-收入统计
 //	private JMenu menu_commoditycategoryManager = new JMenuItem("商品类别管理");
@@ -133,7 +143,7 @@ public class FrmMain extends JFrame implements ActionListener{
 	private User curUser = null;
 	private Deliver curDeliver = null;
 	
-//	private FrmLogin dlgLogin=null;
+	private FrmLogin dlgLogin=null;
 	private JPanel statusBar = new JPanel();
 	
 	private JPanel westBar = new JPanel();
@@ -431,64 +441,562 @@ public class FrmMain extends JFrame implements ActionListener{
 		this.setExtendedState(Frame.MAXIMIZED_BOTH);
 		this.setTitle("外卖助手");
 		
-//		dlgLogin=new FrmLogin(this,"登陆",true);
-//		dlgLogin.setVisible(true);
+		dlgLogin=new FrmLogin(this,"登陆",true);
+		dlgLogin.setVisible(true);
 		
-//		menu_Manager.add(menuItem_userManager); menuItem_userManager.addActionListener(this);
-//		menu_Manager.add(menuItem_deliverManager); menuItem_deliverManager.addActionListener(this);
-//		menu_Manager.add(menuItem_commoditycategoryManager); menuItem_commoditycategoryManager.addActionListener(this);
-//		menu_Manager.add(menuItem_couponManager); menuItem_couponManager.addActionListener(this);
-		menu_Manager.add(menuItem_fullReductionManager); menuItem_fullReductionManager.addActionListener(this);
-//		menu_Manager.add(menuItem_orderManager); menuItem_orderManager.addActionListener(this);
-		menu_Manager.add(menuItem_locationManager); menuItem_locationManager.addActionListener(this);
-//		menu_Manager.add(menuItem_adminManager); menuItem_adminManager.addActionListener(this);
-		menu_Manager.add(menuItem_ModifyPwd); menuItem_ModifyPwd.addActionListener(this);
+		if(Admin.currentLoginUser!=null) {
+			
 		
-		menu_Business.add(menuItem_businessManager); menuItem_businessManager.addActionListener(this);
-		menu_Business.add(menuItem_addBus); menuItem_addBus.addActionListener(this);
-		menu_Business.add(menuItem_deleteBus);menuItem_deleteBus.addActionListener(this);
-		menu_Business.add(menuItem_addCom); menuItem_addCom.addActionListener(this);
-		menu_Business.add(menuItem_deleteCom); menuItem_deleteCom.addActionListener(this);
-		menu_Business.add(menuItem_commodityManager); menuItem_commodityManager.addActionListener(this);
-		menu_Business.add(menuItem_businessReview); menuItem_businessReview.addActionListener(this);
+	//		menu_Manager.add(menuItem_userManager); menuItem_userManager.addActionListener(this);
+	//		menu_Manager.add(menuItem_deliverManager); menuItem_deliverManager.addActionListener(this);
+	//		menu_Manager.add(menuItem_commoditycategoryManager); menuItem_commoditycategoryManager.addActionListener(this);
+	//		menu_Manager.add(menuItem_couponManager); menuItem_couponManager.addActionListener(this);
+			menu_Manager.add(menuItem_fullReductionManager); menuItem_fullReductionManager.addActionListener(this);
+	//		menu_Manager.add(menuItem_orderManager); menuItem_orderManager.addActionListener(this);
+			menu_Manager.add(menuItem_locationManager); menuItem_locationManager.addActionListener(this);
+	//		menu_Manager.add(menuItem_adminManager); menuItem_adminManager.addActionListener(this);
+			menu_Manager.add(menuItem_ModifyPwd); menuItem_ModifyPwd.addActionListener(this);
+			
+			menu_Business.add(menuItem_businessManager); menuItem_businessManager.addActionListener(this);
+			menu_Business.add(menuItem_addBus); menuItem_addBus.addActionListener(this);
+			menu_Business.add(menuItem_deleteBus);menuItem_deleteBus.addActionListener(this);
+			menu_Business.add(menuItem_addCom); menuItem_addCom.addActionListener(this);
+			menu_Business.add(menuItem_deleteCom); menuItem_deleteCom.addActionListener(this);
+			menu_Business.add(menuItem_commodityManager); menuItem_commodityManager.addActionListener(this);
+			menu_Business.add(menuItem_businessReview); menuItem_businessReview.addActionListener(this);
+	
+			menu_ComCate.add(menuItem_ComCate); menuItem_ComCate.addActionListener(this);
+			menu_ComCate.add(menuItem_addComCate); menuItem_addComCate.addActionListener(this);
+			menu_ComCate.add(menuItem_deleteComCate); menuItem_deleteComCate.addActionListener(this);
+			menu_ComCate.add(menuItem_resetComCate); menuItem_resetComCate.addActionListener(this);
+	
+			menu_Com.add(menuItem_addCommodity); menuItem_addCommodity.addActionListener(this);
+			menu_Com.add(menuItem_deleteCommodity); menuItem_deleteCommodity.addActionListener(this);
+			menu_Com.add(menuItem_resetCommodity); menuItem_resetCommodity.addActionListener(this);
+			
+			menu_Coupon.add(menuItem_BCoupon); menuItem_BCoupon.addActionListener(this);
+			menu_Coupon.add(menuItem_CCoupon); menuItem_CCoupon.addActionListener(this);
+			menu_Coupon.add(menuItem_addCoupon); menuItem_addCoupon.addActionListener(this);
+			menu_Coupon.add(menuItem_deleteCoupon); menuItem_deleteCoupon.addActionListener(this);
+	
+			menu_User.add(menuItem_order); menuItem_order.addActionListener(this);
+			menu_User.add(menuItem_addUser); menuItem_addUser.addActionListener(this);
+			menu_User.add(menuItem_deleteUser); menuItem_deleteUser.addActionListener(this);
+			menu_User.add(menuItem_resetUser); menuItem_resetUser.addActionListener(this);
+	
+			menu_Deliver.add(menuItem_Deliver); menuItem_Deliver.addActionListener(this);
+			menu_Deliver.add(menuItem_addDeliver); menuItem_addDeliver.addActionListener(this);
+			menu_Deliver.add(menuItem_deleteDeliver); menuItem_deleteDeliver.addActionListener(this);
+			
+			menu_Statistic.add(menuItem_Income); menuItem_Income.addActionListener(this);
+			
+			menubar.add(menu_Manager);
+			menubar.add(menu_Business);
+			menubar.add(menu_ComCate);
+			menubar.add(menu_Com);
+			menubar.add(menu_Coupon);
+			menubar.add(menu_User);
+			menubar.add(menu_Deliver);
+			menubar.add(menu_Statistic);
+	//		this.btnModifyPwd.addActionListener(this);
+	//		menu_Business.addActionListener(this);
+	//		menu_Com.addActionListener(this);
+			this.setJMenuBar(menubar);
+			this.dataTable1.getModel().addTableModelListener(new TableModelListener() {
+				
+				@Override
+				public void tableChanged(TableModelEvent e) {
+					// TODO Auto-generated method stub
+					int i = dataTable1.getSelectedRow();
+					int j = dataTable2.getSelectedRow();
+					int c = e.getColumn();
+					int r = e.getFirstRow();
+					if(c>=0 && r>=0) {
+						if(model == 1) {
+							if(c == 5) {
+								try {
+									if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
+										throw new BusinessException("数量不可为空！！！");
+									}
+									if(Integer.parseInt(dataTable1.getValueAt(r, c).toString())<0) {
+										throw new BusinessException("数量不可为负数！！！");
+									}
 
-		menu_ComCate.add(menuItem_ComCate); menuItem_ComCate.addActionListener(this);
-		menu_ComCate.add(menuItem_addComCate); menuItem_addComCate.addActionListener(this);
-		menu_ComCate.add(menuItem_deleteComCate); menuItem_deleteComCate.addActionListener(this);
-		menu_ComCate.add(menuItem_resetComCate); menuItem_resetComCate.addActionListener(this);
+									tblData1[r][c] = dataTable1.getValueAt(r, c);
+									Commodity com = new Commodity();
+									com.setComId(tblData1[r][0].toString());
+									com.setBusinessId(tblData2[j][0].toString());
+									com.setCounts(Integer.parseInt(tblData1[r][5].toString()));
+									com.setEachPrice(Float.parseFloat(tblData1[r][6].toString()));
+									
+									(new CommodityManager()).modifyCom2bus(com);
+									
+								}catch(Exception e2) {
+									JOptionPane.showMessageDialog(null,  "请输入正确值！！！","提示",JOptionPane.ERROR_MESSAGE);
+									tabModel1.setDataVector(tblData1, ComTitle.tableTitles);
+									dataTable1.validate();
+									dataTable1.repaint();
+								}
 
-		menu_Com.add(menuItem_addCommodity); menuItem_addCommodity.addActionListener(this);
-		menu_Com.add(menuItem_deleteCommodity); menuItem_deleteCommodity.addActionListener(this);
-		menu_Com.add(menuItem_resetCommodity); menuItem_resetCommodity.addActionListener(this);
-		
-		menu_Coupon.add(menuItem_BCoupon); menuItem_BCoupon.addActionListener(this);
-		menu_Coupon.add(menuItem_CCoupon); menuItem_CCoupon.addActionListener(this);
-		menu_Coupon.add(menuItem_addCoupon); menuItem_addCoupon.addActionListener(this);
-		menu_Coupon.add(menuItem_deleteCoupon); menuItem_deleteCoupon.addActionListener(this);
+//								FrmMain.this.reloadComTable();
+								FrmMain.this.reloadComTable(j);
+								
+							}else if(c == 6) {
+								try {
+									if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
+										throw new BusinessException("单价不可为空！！！");
+									}
+									if(Float.parseFloat(dataTable1.getValueAt(r, c).toString())<0) {
+										throw new BusinessException("单价不可为负数！！！");
+									}
 
-		menu_User.add(menuItem_order); menuItem_order.addActionListener(this);
-		menu_User.add(menuItem_addUser); menuItem_addUser.addActionListener(this);
-		menu_User.add(menuItem_deleteUser); menuItem_deleteUser.addActionListener(this);
-		menu_User.add(menuItem_resetUser); menuItem_resetUser.addActionListener(this);
+									tblData1[r][c] = dataTable1.getValueAt(r, c);
+									Commodity com = new Commodity();
+									com.setComId(tblData1[r][0].toString());
+									com.setBusinessId(tblData2[j][0].toString());
+									com.setCounts(Integer.parseInt(tblData1[r][5].toString()));
+									com.setEachPrice(Float.parseFloat(tblData1[r][6].toString()));
+									
+									(new CommodityManager()).modifyCom2bus(com);
+									
+								}catch(Exception e1) {
+									JOptionPane.showMessageDialog(null,  "请输入正确值！！！","提示",JOptionPane.ERROR_MESSAGE);
+									tabModel1.setDataVector(tblData1, ComTitle.tableTitles);
+									dataTable1.validate();
+									dataTable1.repaint();
+								}
+								
+//								FrmMain.this.reloadComTable();
+								FrmMain.this.reloadComTable(j);
+								
+							}else {
+								JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+								tabModel1.setDataVector(tblData1, Commodity.tableTitles);
+								dataTable1.validate();
+								dataTable1.repaint();
+							}
+						}else if(model == 2) {
+							if(c == 2) {
+								tblData1[r][c] = dataTable1.getValueAt(r, c);
+								Commodity com = new Commodity();
+								com.setCategoryId(tblData1[r][c].toString());
+								com.setComName(tblData1[r][c-1].toString());
+								com.setComId(tblData1[r][0].toString());
+								try {
+									(new CommodityManager()).modifyCom(com);
+								} catch (BaseException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+								FrmMain.this.reloadComTable();
+								FrmMain.this.reloadComTitleTable(j);
+							}else if(c == 1) {
+								tblData1[r][c] = dataTable1.getValueAt(r, c);
+								Commodity com = new Commodity();
+								com.setCategoryId(tblData1[r][c+1].toString());
+								com.setComName(tblData1[r][c].toString());
+								com.setComId(tblData1[r][0].toString());
+								try {
+									(new CommodityManager()).modifyCom(com);
+								} catch (BaseException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+								FrmMain.this.reloadComTitleTable(j);
 
-		menu_Deliver.add(menuItem_Deliver); menuItem_Deliver.addActionListener(this);
-		menu_Deliver.add(menuItem_addDeliver); menuItem_addDeliver.addActionListener(this);
-		menu_Deliver.add(menuItem_deleteDeliver); menuItem_deleteDeliver.addActionListener(this);
-		
-		menu_Statistic.add(menuItem_Income); menuItem_Income.addActionListener(this);
-		
-		menubar.add(menu_Manager);
-		menubar.add(menu_Business);
-		menubar.add(menu_ComCate);
-		menubar.add(menu_Com);
-		menubar.add(menu_Coupon);
-		menubar.add(menu_User);
-		menubar.add(menu_Deliver);
-		menubar.add(menu_Statistic);
-//		this.btnModifyPwd.addActionListener(this);
-//		menu_Business.addActionListener(this);
-//		menu_Com.addActionListener(this);
-		this.setJMenuBar(menubar);
+							}else {
+								JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+								tabModel1.setDataVector(tblData1, ComTitle.tableTitles);
+								dataTable1.validate();
+								dataTable1.repaint();
+							}
+						}else if(model == 3) {
+							SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+							try {
+								if(c == 1) {
+									if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
+										throw new BusinessException("优惠金额不可为空！！！");
+									}
+									if(Float.parseFloat(dataTable1.getValueAt(r, c).toString())<0) {
+										throw new BusinessException("优惠金额不可为负数！！！");
+									}
+									
+								}else if(c == 2) {
+									if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
+										throw new BusinessException("订单数不可为空！！！");
+									}
+									if(Integer.parseInt(dataTable1.getValueAt(r, c).toString())<0) {
+										throw new BusinessException("订单数不可为负数！！！");
+									}
+								}else if(c == 3) {
+									if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
+										throw new BusinessException("活动开始时间不可为空！！！");
+									}
+									if(sdf.parse(dataTable1.getValueAt(r, c).toString()).after(sdf.parse(dataTable1.getValueAt(r, c+1).toString()))) {
+										throw new BusinessException("活动开始时间不可晚于结束时间！！！");
+									}
+								}else if(c == 4) {
+									if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
+										throw new BusinessException("活动结束时间不可为空！！！");
+									}
+									if(sdf.parse(dataTable1.getValueAt(r, c-1).toString()).after(sdf.parse(dataTable1.getValueAt(r, c).toString()))) {
+										throw new BusinessException("活动结束时间不可早于开始时间！！！");
+									}
+								}else if(c == 5) {
+									if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
+										throw new BusinessException("有效天数不可为空！！！");
+									}
+									if(Float.parseFloat(dataTable1.getValueAt(r, c).toString())<0) {
+										throw new BusinessException("有效天数不可为负数！！！");
+									}
+								}else {
+									JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+									tabModel1.setDataVector(tblData1, Coupon.BtableTitles);
+									dataTable1.validate();
+									dataTable1.repaint();
+									return;
+								}
+								
+								tblData1[r][c] = dataTable1.getValueAt(r, c);
+
+							}catch(Exception e3) {
+								System.out.println("543");
+								JOptionPane.showMessageDialog(null,  "请输入正确值！！！","提示",JOptionPane.ERROR_MESSAGE);
+								tabModel1.setDataVector(tblData1, Coupon.BtableTitles);
+								dataTable1.validate();
+								dataTable1.repaint();
+								FrmMain.this.reloadBCouponTable(j);
+								return;
+							}
+							
+							Coupon bc = new Coupon();
+							bc.setBusinessId(tblData2[j][0].toString());
+							bc.setCouponId(tblData1[i][0].toString());
+							bc.setDiscountMoney(Float.parseFloat(tblData1[i][1].toString()));
+							bc.setNeedOrders(Integer.parseInt(tblData1[i][2].toString()));
+							try {
+								bc.setStartTime(sdf.parse(tblData1[i][3].toString()));
+							} catch (ParseException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							try {
+								bc.setEndTime(sdf.parse(tblData1[i][4].toString()));
+							} catch (ParseException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							bc.setEffectDays(Integer.parseInt(tblData1[i][5].toString()));
+							try {
+								(new CouponManager()).modifyBcoupon(bc);
+							} catch (BaseException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						}else if(model == 4) {
+							SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+							if(c == 3) {
+								try {
+									if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
+										throw new BusinessException("优惠券有效截止期不可为空！！！");
+									}
+								}catch(Exception e4) {
+									JOptionPane.showMessageDialog(null,  "请输入正确信息！！！","提示",JOptionPane.ERROR_MESSAGE);
+									tabModel1.setDataVector(tblData1, Coupon.CtableTitles);
+									dataTable1.validate();
+									dataTable1.repaint();
+									return;
+								}
+
+							}else {
+								JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+								tabModel1.setDataVector(tblData1, Coupon.CtableTitles);
+								dataTable1.validate();
+								dataTable1.repaint();
+								return;
+							}
+							tblData1[r][c] = dataTable1.getValueAt(r, c);
+
+							Coupon coupon = new Coupon();
+							coupon.setUserId(tblData1[j][0].toString());
+							coupon.setBusinessId(tblData1[i][0].toString());
+							coupon.setCouponId(tblData1[i][2].toString());
+							coupon.setOwnOrder(Integer.parseInt(tblData1[i][4].toString()));
+							try {
+								coupon.setRemoveTime(sdf.parse(tblData1[i][3].toString()));
+							} catch (ParseException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							try {
+								(new CouponManager()).modifyCcoupon(coupon);
+							} catch (BaseException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							FrmMain.this.reloadCCouponTable(j);
+						}else if(model == 5){//用户-订单信息
+							JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+							tabModel1.setDataVector(tblData1, Order.tableTitles);
+							dataTable1.validate();
+							dataTable1.repaint();
+							return;
+						}else if(model == 6) {//骑手-订单信息
+							JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+							tabModel1.setDataVector(tblData1, Income.tableTitles);
+							dataTable1.validate();
+							dataTable1.repaint();
+							return;
+						}else if(model == 7) {//骑手-统计信息
+							JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+							tabModel1.setDataVector(tblData1, IncomeStatistic.tableTitles);
+							dataTable1.validate();
+							dataTable1.repaint();
+							return;
+						}else if(model == 8) {//商家-评论
+							JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+							tabModel1.setDataVector(tblData1, Review.tableTitles);
+							dataTable1.validate();
+							dataTable1.repaint();
+							return;
+						}
+					}
+				}
+			});
+			
+			
+			this.dataTable2.getModel().addTableModelListener(new TableModelListener() {
+				@Override
+				public void tableChanged(TableModelEvent e) {
+					int i = dataTable1.getSelectedRow();
+					int j = dataTable2.getSelectedRow();
+					int c = e.getColumn();
+					int r = e.getFirstRow();
+					if(c>=0 && r>=0) {
+						if(model == 1 || model == 3 || model == 8) {
+							if(c != 1) {
+								JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+								tabModel2.setDataVector(tblData2, Business.tableTitles);
+								dataTable2.validate();
+								dataTable2.repaint();
+							}else {
+								try {
+									if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString()))
+										throw new BusinessException("商家名称不可为空！！！");
+									tblData2[r][c] = dataTable2.getValueAt(r, c);
+									(new BusinessManager()).modifyBusinessName(tblData2[r][c].toString(),dataTable2.getValueAt(r, 0).toString());
+								} catch (BaseException e1) {
+									// TODO Auto-generated catch block
+									JOptionPane.showMessageDialog(null,  "商家名不可为空！！！","提示",JOptionPane.ERROR_MESSAGE);
+									tabModel2.setDataVector(tblData2, Business.tableTitles);
+									dataTable2.validate();
+									dataTable2.repaint();
+								}
+							}
+						}else if(model == 2) {//商品类别
+							
+							if(c != 1) {
+								JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+
+								tabModel2.setDataVector(tblData2, ComCate.tableTitles);
+//								System.out.println(dataTable2.getValueAt(r, c).toString());
+//								tabModel2.setValueAt("c", r, c);
+//								System.out.println(dataTable2.getValueAt(r, c).toString());
+								dataTable2.validate();
+								dataTable2.repaint();
+//								System.out.println(dataTable2.getValueAt(r, c).toString());
+
+//								System.out.println(dataTable2.getValueAt(r, c).toString().length());
+	//
+//								dataTable2.setValueAt(tblData2[r][c].toString(), r, c);
+//								dataTable2.validate();
+//								dataTable2.repaint();
+//								if(dataTable2.isEditing()) {
+//									System.out.println("正在编辑");
+//									dataTable2.getCellEditor().stopCellEditing();
+//								}
+//									dataTable2.getCellEditor().stopCellEditing();
+//								dataTable2.setValueAt(tblData2[r][c].toString(), r, c);
+								return;
+							}else {
+								tblData2[r][c] = dataTable2.getValueAt(r, c);
+								try {
+									(new CommodityManager()).modifyCateName(dataTable2.getValueAt(r, 0).toString(),dataTable2.getValueAt(r, c).toString());
+								} catch (BaseException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+								
+							}
+						}else if(model == 4 || model == 5) {//用户信息
+							SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+							try {
+								if(c == 1) {//用户名
+									if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
+										throw new BusinessException("用户名不可为空！！！");
+									}
+									
+								}else if(c == 2) {//性别
+									String[] sex = {"男", "女", "无" }; 
+									int c1 = 0;
+									if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
+										throw new BusinessException("性别不可为空！！！");
+									}
+									for(String s:sex) {
+										if(s.equals(dataTable2.getValueAt(r, c).toString())) {
+											c1+=1;
+										}
+									}
+									if(c1 == 0) {
+										throw new BusinessException("性别内容添加错误！！！");
+									}
+								}else if(c == 3) {//密码
+									if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
+										throw new BusinessException("密码不可为空！！！");
+									}
+								}else if(c == 4) {//绑定手机号码
+									if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
+										throw new BusinessException("绑定手机号码不可为空！！！");
+									}
+								}else if(c == 5) {
+									
+								}else if(c == 6) {//城市
+									if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
+										throw new BusinessException("所在城市不可为空！！！");
+									}
+
+								}else {
+									JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+									tabModel2.setDataVector(tblData2, User.tableTitles);
+									dataTable2.validate();
+									dataTable2.repaint();
+									return;
+								}
+								
+								tblData2[r][c] = dataTable2.getValueAt(r, c);
+
+							}catch(Exception e3) {
+								JOptionPane.showMessageDialog(null,  "请输入正确值！！！","提示",JOptionPane.ERROR_MESSAGE);
+								tabModel2.setDataVector(tblData2, User.tableTitles);
+								dataTable2.validate();
+								dataTable2.repaint();
+								FrmMain.this.reloadUserTable();
+								return;
+							}
+							
+							User user = new User();
+							user.setUserId(tblData2[j][0].toString());
+							user.setUserName(tblData2[j][1].toString());
+							user.setSex(tblData2[j][2].toString());
+							user.setPwd(tblData2[j][3].toString());
+							user.setPhone(tblData2[j][4].toString());
+							user.setEmail(tblData2[j][5].toString());
+							user.setCity(tblData2[j][6].toString());
+							try {
+								(new UserManager()).modifyUser(user);
+							} catch (BaseException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							
+						}else if(model == 6 || model == 7) {//骑手信息
+							SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+							try {
+								if(c == 1) {//骑手姓名
+									if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
+										throw new BusinessException("骑手名不可为空！！！");
+									}
+
+								}else if(c == 4) {//身份
+									String[] identify = {"新人", "正式员工", "单王" }; 
+									int c1 = 0;
+									if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
+										throw new BusinessException("身份不可为空！！！");
+									}
+									for(String s:identify) {
+										if(s.equals(dataTable2.getValueAt(r, c).toString())) {
+											c1+=1;
+										}
+									}
+									if(c1 == 0) {
+										throw new BusinessException("身份内容添加错误！！！");
+									}
+								}else if(c == 2) {//就职时间
+									if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
+										System.out.println("here");
+										throw new BusinessException("就职时间不可为空！！！");
+									}
+									if(dataTable2.getValueAt(r, c+1).toString() != null && !"".equals(dataTable2.getValueAt(r, c+1).toString()) && !"null".equals(dataTable2.getValueAt(r, c+1).toString())) {
+										if(sdf.parse(dataTable2.getValueAt(r, c).toString()).after(sdf.parse(dataTable2.getValueAt(r, c+1).toString()))) {
+											throw new BusinessException("就职时间不可晚于辞职时间！！！");
+										}
+									}
+									
+									
+								}else if(c == 3) {//辞职时间
+//									if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
+//										throw new BusinessException("辞职时间不可为空！！！");
+//									}
+									if(dataTable2.getValueAt(r, c).toString() != null && !"".equals(dataTable2.getValueAt(r, c).toString())){
+										if(sdf.parse(dataTable2.getValueAt(r, c-1).toString()).after(sdf.parse(dataTable2.getValueAt(r, c).toString()))) {
+											throw new BusinessException("活动开始时间不可晚于结束时间！！！");
+										}
+									}
+									
+								}else {
+									JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+									tabModel2.setDataVector(tblData2, Deliver.tableTitles);
+									dataTable2.validate();
+									dataTable2.repaint();
+									return;
+								}
+								
+								tblData2[r][c] = dataTable2.getValueAt(r, c);
+
+							}catch(Exception e3) {
+								System.out.println("123456");
+								JOptionPane.showMessageDialog(null,  "请输入正确值！！！","提示",JOptionPane.ERROR_MESSAGE);
+								tabModel2.setDataVector(tblData2, Deliver.tableTitles);
+								dataTable2.validate();
+								dataTable2.repaint();
+								FrmMain.this.reloadDeliverTable();
+								return;
+							}
+							
+							Deliver deliver = new Deliver();
+							deliver.setDeliverId(tblData2[j][0].toString());
+							deliver.setDeliverName(tblData2[j][1].toString());
+							deliver.setEmployTime(tblData2[j][2].toString());
+							deliver.setQuitTime(tblData2[j][3].toString());
+							deliver.setIdentity(tblData2[j][4].toString());
+							try {
+								(new DeliverManager()).modifyDeliver(deliver);
+							} catch (BaseException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							
+						}
+					}
+					
+				}
+			});
+		}else if(User.currentLoginUser!=null) {
+			
+			menu_InfoManager.add(menuItem_location); menuItem_location.addActionListener(this);
+			menu_InfoManager.add(menuItem_orderInfo); menuItem_orderInfo.addActionListener(this);
+			menu_InfoManager.add(menuItem_ModifyPwd); menuItem_ModifyPwd.addActionListener(this);
+
+			menu_CartManager.add(menuItem_cart); menuItem_cart.addActionListener(this);
+			menu_CartManager.add(menuItem_addgoods); menuItem_addgoods.addActionListener(this);
+			
+			menubar.add(menu_InfoManager);
+			menubar.add(menu_CartManager);
+			
+			this.setJMenuBar(menubar);
+			
+		}
 		JScrollPane jsp2 = new JScrollPane(this.dataTable2);
 		jsp2.setPreferredSize(new Dimension(550,740));
 		westBar.add(jsp2);
@@ -536,486 +1044,7 @@ public class FrmMain extends JFrame implements ActionListener{
 				}
 		
 		    );
-		this.dataTable1.getModel().addTableModelListener(new TableModelListener() {
-			
-			@Override
-			public void tableChanged(TableModelEvent e) {
-				// TODO Auto-generated method stub
-				int i = dataTable1.getSelectedRow();
-				int j = dataTable2.getSelectedRow();
-				int c = e.getColumn();
-				int r = e.getFirstRow();
-				if(c>=0 && r>=0) {
-					if(model == 1) {
-						if(c == 5) {
-							try {
-								if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
-									throw new BusinessException("数量不可为空！！！");
-								}
-								if(Integer.parseInt(dataTable1.getValueAt(r, c).toString())<0) {
-									throw new BusinessException("数量不可为负数！！！");
-								}
-
-								tblData1[r][c] = dataTable1.getValueAt(r, c);
-								Commodity com = new Commodity();
-								com.setComId(tblData1[r][0].toString());
-								com.setBusinessId(tblData2[j][0].toString());
-								com.setCounts(Integer.parseInt(tblData1[r][5].toString()));
-								com.setEachPrice(Float.parseFloat(tblData1[r][6].toString()));
-								
-								(new CommodityManager()).modifyCom2bus(com);
-								
-							}catch(Exception e2) {
-								JOptionPane.showMessageDialog(null,  "请输入正确值！！！","提示",JOptionPane.ERROR_MESSAGE);
-								tabModel1.setDataVector(tblData1, ComTitle.tableTitles);
-								dataTable1.validate();
-								dataTable1.repaint();
-							}
-
-//							FrmMain.this.reloadComTable();
-							FrmMain.this.reloadComTable(j);
-							
-						}else if(c == 6) {
-							try {
-								if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
-									throw new BusinessException("单价不可为空！！！");
-								}
-								if(Float.parseFloat(dataTable1.getValueAt(r, c).toString())<0) {
-									throw new BusinessException("单价不可为负数！！！");
-								}
-
-								tblData1[r][c] = dataTable1.getValueAt(r, c);
-								Commodity com = new Commodity();
-								com.setComId(tblData1[r][0].toString());
-								com.setBusinessId(tblData2[j][0].toString());
-								com.setCounts(Integer.parseInt(tblData1[r][5].toString()));
-								com.setEachPrice(Float.parseFloat(tblData1[r][6].toString()));
-								
-								(new CommodityManager()).modifyCom2bus(com);
-								
-							}catch(Exception e1) {
-								JOptionPane.showMessageDialog(null,  "请输入正确值！！！","提示",JOptionPane.ERROR_MESSAGE);
-								tabModel1.setDataVector(tblData1, ComTitle.tableTitles);
-								dataTable1.validate();
-								dataTable1.repaint();
-							}
-							
-//							FrmMain.this.reloadComTable();
-							FrmMain.this.reloadComTable(j);
-							
-						}else {
-							JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
-							tabModel1.setDataVector(tblData1, Commodity.tableTitles);
-							dataTable1.validate();
-							dataTable1.repaint();
-						}
-					}else if(model == 2) {
-						if(c == 2) {
-							tblData1[r][c] = dataTable1.getValueAt(r, c);
-							Commodity com = new Commodity();
-							com.setCategoryId(tblData1[r][c].toString());
-							com.setComName(tblData1[r][c-1].toString());
-							com.setComId(tblData1[r][0].toString());
-							try {
-								(new CommodityManager()).modifyCom(com);
-							} catch (BaseException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-							FrmMain.this.reloadComTable();
-							FrmMain.this.reloadComTitleTable(j);
-						}else if(c == 1) {
-							tblData1[r][c] = dataTable1.getValueAt(r, c);
-							Commodity com = new Commodity();
-							com.setCategoryId(tblData1[r][c+1].toString());
-							com.setComName(tblData1[r][c].toString());
-							com.setComId(tblData1[r][0].toString());
-							try {
-								(new CommodityManager()).modifyCom(com);
-							} catch (BaseException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-							FrmMain.this.reloadComTitleTable(j);
-
-						}else {
-							JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
-							tabModel1.setDataVector(tblData1, ComTitle.tableTitles);
-							dataTable1.validate();
-							dataTable1.repaint();
-						}
-					}else if(model == 3) {
-						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-						try {
-							if(c == 1) {
-								if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
-									throw new BusinessException("优惠金额不可为空！！！");
-								}
-								if(Float.parseFloat(dataTable1.getValueAt(r, c).toString())<0) {
-									throw new BusinessException("优惠金额不可为负数！！！");
-								}
-								
-							}else if(c == 2) {
-								if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
-									throw new BusinessException("订单数不可为空！！！");
-								}
-								if(Integer.parseInt(dataTable1.getValueAt(r, c).toString())<0) {
-									throw new BusinessException("订单数不可为负数！！！");
-								}
-							}else if(c == 3) {
-								if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
-									throw new BusinessException("活动开始时间不可为空！！！");
-								}
-								if(sdf.parse(dataTable1.getValueAt(r, c).toString()).after(sdf.parse(dataTable1.getValueAt(r, c+1).toString()))) {
-									throw new BusinessException("活动开始时间不可晚于结束时间！！！");
-								}
-							}else if(c == 4) {
-								if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
-									throw new BusinessException("活动结束时间不可为空！！！");
-								}
-								if(sdf.parse(dataTable1.getValueAt(r, c-1).toString()).after(sdf.parse(dataTable1.getValueAt(r, c).toString()))) {
-									throw new BusinessException("活动结束时间不可早于开始时间！！！");
-								}
-							}else if(c == 5) {
-								if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
-									throw new BusinessException("有效天数不可为空！！！");
-								}
-								if(Float.parseFloat(dataTable1.getValueAt(r, c).toString())<0) {
-									throw new BusinessException("有效天数不可为负数！！！");
-								}
-							}else {
-								JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
-								tabModel1.setDataVector(tblData1, Coupon.BtableTitles);
-								dataTable1.validate();
-								dataTable1.repaint();
-								return;
-							}
-							
-							tblData1[r][c] = dataTable1.getValueAt(r, c);
-
-						}catch(Exception e3) {
-							System.out.println("543");
-							JOptionPane.showMessageDialog(null,  "请输入正确值！！！","提示",JOptionPane.ERROR_MESSAGE);
-							tabModel1.setDataVector(tblData1, Coupon.BtableTitles);
-							dataTable1.validate();
-							dataTable1.repaint();
-							FrmMain.this.reloadBCouponTable(j);
-							return;
-						}
-						
-						Coupon bc = new Coupon();
-						bc.setBusinessId(tblData2[j][0].toString());
-						bc.setCouponId(tblData1[i][0].toString());
-						bc.setDiscountMoney(Float.parseFloat(tblData1[i][1].toString()));
-						bc.setNeedOrders(Integer.parseInt(tblData1[i][2].toString()));
-						try {
-							bc.setStartTime(sdf.parse(tblData1[i][3].toString()));
-						} catch (ParseException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						try {
-							bc.setEndTime(sdf.parse(tblData1[i][4].toString()));
-						} catch (ParseException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						bc.setEffectDays(Integer.parseInt(tblData1[i][5].toString()));
-						try {
-							(new CouponManager()).modifyBcoupon(bc);
-						} catch (BaseException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}else if(model == 4) {
-						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-
-						if(c == 3) {
-							try {
-								if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
-									throw new BusinessException("优惠券有效截止期不可为空！！！");
-								}
-							}catch(Exception e4) {
-								JOptionPane.showMessageDialog(null,  "请输入正确信息！！！","提示",JOptionPane.ERROR_MESSAGE);
-								tabModel1.setDataVector(tblData1, Coupon.CtableTitles);
-								dataTable1.validate();
-								dataTable1.repaint();
-								return;
-							}
-
-						}else {
-							JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
-							tabModel1.setDataVector(tblData1, Coupon.CtableTitles);
-							dataTable1.validate();
-							dataTable1.repaint();
-							return;
-						}
-						tblData1[r][c] = dataTable1.getValueAt(r, c);
-
-						Coupon coupon = new Coupon();
-						coupon.setUserId(tblData1[j][0].toString());
-						coupon.setBusinessId(tblData1[i][0].toString());
-						coupon.setCouponId(tblData1[i][2].toString());
-						coupon.setOwnOrder(Integer.parseInt(tblData1[i][4].toString()));
-						try {
-							coupon.setRemoveTime(sdf.parse(tblData1[i][3].toString()));
-						} catch (ParseException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						try {
-							(new CouponManager()).modifyCcoupon(coupon);
-						} catch (BaseException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						FrmMain.this.reloadCCouponTable(j);
-					}else if(model == 5){//用户-订单信息
-						JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
-						tabModel1.setDataVector(tblData1, Order.tableTitles);
-						dataTable1.validate();
-						dataTable1.repaint();
-						return;
-					}else if(model == 6) {//骑手-订单信息
-						JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
-						tabModel1.setDataVector(tblData1, Income.tableTitles);
-						dataTable1.validate();
-						dataTable1.repaint();
-						return;
-					}else if(model == 7) {//骑手-统计信息
-						JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
-						tabModel1.setDataVector(tblData1, IncomeStatistic.tableTitles);
-						dataTable1.validate();
-						dataTable1.repaint();
-						return;
-					}else if(model == 8) {//商家-评论
-						JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
-						tabModel1.setDataVector(tblData1, Review.tableTitles);
-						dataTable1.validate();
-						dataTable1.repaint();
-						return;
-					}
-				}
-			}
-		});
 		
-		
-		this.dataTable2.getModel().addTableModelListener(new TableModelListener() {
-			@Override
-			public void tableChanged(TableModelEvent e) {
-				int i = dataTable1.getSelectedRow();
-				int j = dataTable2.getSelectedRow();
-				int c = e.getColumn();
-				int r = e.getFirstRow();
-				if(c>=0 && r>=0) {
-					if(model == 1 || model == 3 || model == 8) {
-						if(c != 1) {
-							JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
-							tabModel2.setDataVector(tblData2, Business.tableTitles);
-							dataTable2.validate();
-							dataTable2.repaint();
-						}else {
-							try {
-								if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString()))
-									throw new BusinessException("商家名称不可为空！！！");
-								tblData2[r][c] = dataTable2.getValueAt(r, c);
-								(new BusinessManager()).modifyBusinessName(tblData2[r][c].toString(),dataTable2.getValueAt(r, 0).toString());
-							} catch (BaseException e1) {
-								// TODO Auto-generated catch block
-								JOptionPane.showMessageDialog(null,  "商家名不可为空！！！","提示",JOptionPane.ERROR_MESSAGE);
-								tabModel2.setDataVector(tblData2, Business.tableTitles);
-								dataTable2.validate();
-								dataTable2.repaint();
-							}
-						}
-					}else if(model == 2) {//商品类别
-						
-						if(c != 1) {
-							JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
-
-							tabModel2.setDataVector(tblData2, ComCate.tableTitles);
-//							System.out.println(dataTable2.getValueAt(r, c).toString());
-//							tabModel2.setValueAt("c", r, c);
-//							System.out.println(dataTable2.getValueAt(r, c).toString());
-							dataTable2.validate();
-							dataTable2.repaint();
-//							System.out.println(dataTable2.getValueAt(r, c).toString());
-
-//							System.out.println(dataTable2.getValueAt(r, c).toString().length());
-//
-//							dataTable2.setValueAt(tblData2[r][c].toString(), r, c);
-//							dataTable2.validate();
-//							dataTable2.repaint();
-//							if(dataTable2.isEditing()) {
-//								System.out.println("正在编辑");
-//								dataTable2.getCellEditor().stopCellEditing();
-//							}
-//								dataTable2.getCellEditor().stopCellEditing();
-//							dataTable2.setValueAt(tblData2[r][c].toString(), r, c);
-							return;
-						}else {
-							tblData2[r][c] = dataTable2.getValueAt(r, c);
-							try {
-								(new CommodityManager()).modifyCateName(dataTable2.getValueAt(r, 0).toString(),dataTable2.getValueAt(r, c).toString());
-							} catch (BaseException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-							
-						}
-					}else if(model == 4 || model == 5) {//用户信息
-						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-						try {
-							if(c == 1) {//用户名
-								if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
-									throw new BusinessException("用户名不可为空！！！");
-								}
-								
-							}else if(c == 2) {//性别
-								String[] sex = {"男", "女", "无" }; 
-								int c1 = 0;
-								if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
-									throw new BusinessException("性别不可为空！！！");
-								}
-								for(String s:sex) {
-									if(s.equals(dataTable2.getValueAt(r, c).toString())) {
-										c1+=1;
-									}
-								}
-								if(c1 == 0) {
-									throw new BusinessException("性别内容添加错误！！！");
-								}
-							}else if(c == 3) {//密码
-								if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
-									throw new BusinessException("密码不可为空！！！");
-								}
-							}else if(c == 4) {//绑定手机号码
-								if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
-									throw new BusinessException("绑定手机号码不可为空！！！");
-								}
-							}else if(c == 5) {
-								
-							}else if(c == 6) {//城市
-								if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
-									throw new BusinessException("所在城市不可为空！！！");
-								}
-
-							}else {
-								JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
-								tabModel2.setDataVector(tblData2, User.tableTitles);
-								dataTable2.validate();
-								dataTable2.repaint();
-								return;
-							}
-							
-							tblData2[r][c] = dataTable2.getValueAt(r, c);
-
-						}catch(Exception e3) {
-							JOptionPane.showMessageDialog(null,  "请输入正确值！！！","提示",JOptionPane.ERROR_MESSAGE);
-							tabModel2.setDataVector(tblData2, User.tableTitles);
-							dataTable2.validate();
-							dataTable2.repaint();
-							FrmMain.this.reloadUserTable();
-							return;
-						}
-						
-						User user = new User();
-						user.setUserId(tblData2[j][0].toString());
-						user.setUserName(tblData2[j][1].toString());
-						user.setSex(tblData2[j][2].toString());
-						user.setPwd(tblData2[j][3].toString());
-						user.setPhone(tblData2[j][4].toString());
-						user.setEmail(tblData2[j][5].toString());
-						user.setCity(tblData2[j][6].toString());
-						try {
-							(new UserManager()).modifyUser(user);
-						} catch (BaseException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						
-					}else if(model == 6 || model == 7) {//骑手信息
-						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-						try {
-							if(c == 1) {//骑手姓名
-								if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
-									throw new BusinessException("骑手名不可为空！！！");
-								}
-
-							}else if(c == 4) {//身份
-								String[] identify = {"新人", "正式员工", "单王" }; 
-								int c1 = 0;
-								if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
-									throw new BusinessException("身份不可为空！！！");
-								}
-								for(String s:identify) {
-									if(s.equals(dataTable2.getValueAt(r, c).toString())) {
-										c1+=1;
-									}
-								}
-								if(c1 == 0) {
-									throw new BusinessException("身份内容添加错误！！！");
-								}
-							}else if(c == 2) {//就职时间
-								if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
-									System.out.println("here");
-									throw new BusinessException("就职时间不可为空！！！");
-								}
-								if(dataTable2.getValueAt(r, c+1).toString() != null && !"".equals(dataTable2.getValueAt(r, c+1).toString()) && !"null".equals(dataTable2.getValueAt(r, c+1).toString())) {
-									if(sdf.parse(dataTable2.getValueAt(r, c).toString()).after(sdf.parse(dataTable2.getValueAt(r, c+1).toString()))) {
-										throw new BusinessException("就职时间不可晚于辞职时间！！！");
-									}
-								}
-								
-								
-							}else if(c == 3) {//辞职时间
-//								if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
-//									throw new BusinessException("辞职时间不可为空！！！");
-//								}
-								if(dataTable2.getValueAt(r, c).toString() != null && !"".equals(dataTable2.getValueAt(r, c).toString())){
-									if(sdf.parse(dataTable2.getValueAt(r, c-1).toString()).after(sdf.parse(dataTable2.getValueAt(r, c).toString()))) {
-										throw new BusinessException("活动开始时间不可晚于结束时间！！！");
-									}
-								}
-								
-							}else {
-								JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
-								tabModel2.setDataVector(tblData2, Deliver.tableTitles);
-								dataTable2.validate();
-								dataTable2.repaint();
-								return;
-							}
-							
-							tblData2[r][c] = dataTable2.getValueAt(r, c);
-
-						}catch(Exception e3) {
-							System.out.println("123456");
-							JOptionPane.showMessageDialog(null,  "请输入正确值！！！","提示",JOptionPane.ERROR_MESSAGE);
-							tabModel2.setDataVector(tblData2, Deliver.tableTitles);
-							dataTable2.validate();
-							dataTable2.repaint();
-							FrmMain.this.reloadDeliverTable();
-							return;
-						}
-						
-						Deliver deliver = new Deliver();
-						deliver.setDeliverId(tblData2[j][0].toString());
-						deliver.setDeliverName(tblData2[j][1].toString());
-						deliver.setEmployTime(tblData2[j][2].toString());
-						deliver.setQuitTime(tblData2[j][3].toString());
-						deliver.setIdentity(tblData2[j][4].toString());
-						try {
-							(new DeliverManager()).modifyDeliver(deliver);
-						} catch (BaseException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						
-					}
-				}
-				
-			}
-		});
 //		this.getContentPane().add(new JScrollPane(this.dataTable1), BorderLayout.CENTER);
 	  
 
@@ -1035,14 +1064,24 @@ public class FrmMain extends JFrame implements ActionListener{
 //	    this.getContentPane().add(new JScrollPane(this.dataTableComTitle), BorderLayout.CENTER);
 
 		statusBar.setLayout(new FlowLayout(FlowLayout.LEFT));
-	    JLabel label=new JLabel("您好!"+Admin.currentLoginUser.getName());
-	    statusBar.add(label);
+		if(Admin.currentLoginUser!=null) {
+			JLabel label=new JLabel("您好!"+Admin.currentLoginUser.getName());
+		    statusBar.add(label);
+		}else if(User.currentLoginUser!=null) {
+			JLabel label=new JLabel("您好!"+User.currentLoginUser.getUserName());
+		    statusBar.add(label);
+		}
+
 	    this.getContentPane().add(statusBar,BorderLayout.SOUTH);
 	    this.addWindowListener(new WindowAdapter(){   
 	    	public void windowClosing(WindowEvent e){ 
 	    		System.exit(0);
              }
         });
+	    if(User.currentLoginUser!=null) {
+	    	this.reloadBusinessTable();
+	    	this.model = 1;
+	    }
 	    this.setVisible(true);
 	
 		
@@ -1378,7 +1417,13 @@ public class FrmMain extends JFrame implements ActionListener{
 				
 			}
 		}else if(e.getSource()==menuItem_ModifyPwd) {
-			FrmModifyAdminPwd dlg=new FrmModifyAdminPwd(this,"密码修改",true);
+			int m = 0;//1：管理员，2：用户
+			if(User.currentLoginUser!=null)
+				m = 2;
+			else 
+				m = 1;
+			System.out.println(m);
+			FrmModifyPwd dlg=new FrmModifyPwd(this,"密码修改",true, m);
 			dlg.setVisible(true);
 		}else if(e.getSource()==menuItem_Income) {
 			this.model = 7;
@@ -1386,6 +1431,26 @@ public class FrmMain extends JFrame implements ActionListener{
 		}else if(e.getSource()==menuItem_businessReview) {
 			this.model = 8;
 			this.reloadBusinessTable();
+		}else if(e.getSource()==menuItem_cart) {
+			FrmCartManager dlg = new FrmCartManager(this,"购物车管理",true);
+			dlg.setVisible(true);
+		}else if(e.getSource()==menuItem_addgoods) {
+			int i=this.dataTable2.getSelectedRow();
+			int j=this.dataTable1.getSelectedRow();
+
+			FrmCartManager_Add dlg = new FrmCartManager_Add(this,"添加购物车",true);
+			dlg.businessid = tblData2[i][0].toString();
+			dlg.comid = tblData1[j][0].toString();
+			dlg.price = Float.parseFloat(tblData1[j][6].toString());
+			dlg.businessname = tblData2[i][1].toString();
+			dlg.comname = tblData1[j][1].toString();
+			dlg.setVisible(true);
+		}else if(e.getSource()==menuItem_location) {
+			FrmLocationManager dlg = new FrmLocationManager(this,"地址信息管理",true);
+			dlg.setVisible(true);
+		}else if(e.getSource()==menuItem_orderInfo) {
+			FrmOrderManager dlg = new FrmOrderManager(this,"订单查看",true);
+			dlg.setVisible(true);
 		}
 	}
 }

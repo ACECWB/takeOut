@@ -16,16 +16,20 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import takeout.control.AdminManager;
+import takeout.control.UserManager;
 import takeout.model.Admin;
+import takeout.model.User;
 import takeout.util.BaseException;
 
 
 
-public class FrmModifyAdminPwd extends JDialog implements ActionListener {
+public class FrmModifyPwd extends JDialog implements ActionListener {
 	private JPanel toolBar = new JPanel();
 	private JPanel workPane = new JPanel();
 	private Button btnOk = new Button("确定");
 	private Button btnCancel = new Button("取消");
+	
+	private int model = 0;//1:管理员，2：用户
 	
 	private JLabel labelPwdOld = new JLabel("原密码：");
 	private JLabel labelPwd = new JLabel("新密码：");
@@ -33,8 +37,9 @@ public class FrmModifyAdminPwd extends JDialog implements ActionListener {
 	private JPasswordField edtPwdOld = new JPasswordField(20);
 	private JPasswordField edtPwd = new JPasswordField(20);
 	private JPasswordField edtPwd2 = new JPasswordField(20);
-	public FrmModifyAdminPwd(FrmMain f, String s, boolean b) {
+	public FrmModifyPwd(FrmMain f, String s, boolean b, int m) {
 		super(f, s, b);
+		model = m;
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		toolBar.add(this.btnOk);
 		toolBar.add(btnCancel);
@@ -55,13 +60,24 @@ public class FrmModifyAdminPwd extends JDialog implements ActionListener {
 		if(e.getSource()==this.btnCancel)
 			this.setVisible(false);
 		else if(e.getSource()==this.btnOk){
-			try {
-				new AdminManager().changePwd(Admin.currentLoginUser, new String(edtPwdOld.getPassword()), new String(edtPwd.getPassword()), new String(edtPwd2.getPassword()));
-				this.setVisible(false);
-			} catch (BaseException e1) {
-				JOptionPane.showMessageDialog(null, e1.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
-				return;
+			if(model == 1) {
+				try {
+					new AdminManager().changePwd(Admin.currentLoginUser, new String(edtPwdOld.getPassword()), new String(edtPwd.getPassword()), new String(edtPwd2.getPassword()));
+					this.setVisible(false);
+				} catch (BaseException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+			}else if(model == 2) {
+				try {
+					new UserManager().changeUserPwd(User.currentLoginUser.getUserId(), new String(edtPwdOld.getPassword()), new String(edtPwd.getPassword()), new String(edtPwd2.getPassword()));
+					this.setVisible(false);
+				} catch (BaseException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 			}
+			
 		}
 			
 		

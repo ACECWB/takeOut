@@ -364,3 +364,13 @@ alter table deliver_income change time time datetime
 alter table deliver_income change each_income each_bonus float not null
 alter table orders add receive_time datetime 
 
+create table cart(
+user_Id varchar(30) not null,
+com_Id varchar(30) not null,
+com_name varchar(30) not null,
+business_Id varchar(30) not null,
+counts int not null,
+price float not null
+)
+
+alter table cart add business_name varchar(30) not null

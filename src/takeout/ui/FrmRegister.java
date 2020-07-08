@@ -7,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -16,42 +17,73 @@ import javax.swing.JTextField;
 
 import StartTakeout.takeOutUtil;
 import takeout.model.Admin;
+import takeout.model.User;
 import takeout.util.BaseException;
 
 
 public class FrmRegister extends JDialog implements ActionListener {
+	
+	private int model = 0;//1：管理员，2：用户
 	private JPanel toolBar = new JPanel();
 	private JPanel workPane1 = new JPanel();
 	private JPanel workPane = new JPanel();
 	private Button btnOk = new Button("注册");
 	private Button btnCancel = new Button("取消");
 	
-	private JLabel labelUser = new JLabel("管理员账号：");
-	private JLabel labelUserName = new JLabel("管理员姓名：");
+	private JLabel labelUser = new JLabel("用户账号：");
+	private JLabel labelUserName = new JLabel("用户名：");
+	private JLabel labelSex = new JLabel("性别：");
+	private JLabel labelPhone = new JLabel("绑定手机号码：");
+	private JLabel labelEmail = new JLabel("绑定邮箱：");
+	private JLabel labelCity = new JLabel("所在城市：");
+	private JComboBox cmbSex= new JComboBox(new String[] { "男", "女", "无"});
+
+	
+	private JLabel labelAdmin = new JLabel("管理员账号：");
+	private JLabel labelAdminName = new JLabel("管理员姓名：");
 	private JLabel labelPwd = new JLabel("设置密码：");
 	private JLabel labelPwd2 = new JLabel("确认密码：");
+	
+	private JTextField edtPhone = new JTextField(20);
+	private JTextField edtCity = new JTextField(20);
+	private JTextField edtEmail = new JTextField(20);
+
 	private JTextField edtUserId = new JTextField(20);
 	private JTextField edtName = new JTextField(20);
 	private JPasswordField edtPwd = new JPasswordField(20);
 	private JPasswordField edtPwd2 = new JPasswordField(20);
 	
-	public FrmRegister(Dialog f, String s, boolean b) {
+	public FrmRegister(Dialog f, String s, boolean b, int m) {
 		super(f, s, b);
+		model = m;
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		toolBar.add(this.btnOk);
 		toolBar.add(btnCancel);
 		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
-		workPane.add(labelUser);
-		workPane.add(edtUserId);
-		workPane.add(labelUserName);
-		workPane.add(edtName);
-		workPane.add(labelPwd);
-		workPane.add(edtPwd);
-		workPane.add(labelPwd2);
-		workPane.add(edtPwd2);
-		this.getContentPane().add(workPane, BorderLayout.CENTER);
-//		this.getContentPane().add(workPane1, BorderLayout.CENTER);
-		this.setSize(320, 200);
+		if(m == 1) {//管理员
+			workPane.add(labelAdmin); workPane.add(edtUserId);
+			workPane.add(labelAdminName); workPane.add(edtName);
+			workPane.add(labelPwd); workPane.add(edtPwd);
+			workPane.add(labelPwd2); workPane.add(edtPwd2);
+			this.getContentPane().add(workPane, BorderLayout.CENTER);
+//			this.getContentPane().add(workPane1, BorderLayout.CENTER);
+			this.setSize(320, 200);
+		}else if(m == 2) {//用户
+			workPane.add(labelUser); workPane.add(edtUserId);
+			workPane.add(labelUserName); workPane.add(edtName);
+			workPane.add(labelSex); workPane.add(cmbSex);
+			workPane.add(labelPhone); workPane.add(edtPhone);
+			workPane.add(labelEmail); workPane.add(edtEmail);
+			workPane.add(labelCity); workPane.add(edtCity);
+			workPane.add(labelPwd); workPane.add(edtPwd);
+			workPane.add(labelPwd2); workPane.add(edtPwd2);
+			this.getContentPane().add(workPane, BorderLayout.CENTER);
+//			this.getContentPane().add(workPane1, BorderLayout.CENTER);
+			this.setSize(320, 500);
+
+		}
+		
+		
 		this.setLocationRelativeTo(null);
 		this.btnCancel.addActionListener(this);
 		this.btnOk.addActionListener(this);
@@ -65,13 +97,39 @@ public class FrmRegister extends JDialog implements ActionListener {
 			String username=this.edtName.getText();
 			String pwd1=new String(this.edtPwd.getPassword());
 			String pwd2=new String(this.edtPwd2.getPassword());
-			try {
-				Admin admin=takeOutUtil.adminManager.reg(userid,username,pwd1,pwd2);
-				this.setVisible(false);
-			} catch (BaseException e1) {
-				JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
-				return;
+			if(model == 1) {
+				try {
+					Admin admin=takeOutUtil.adminManager.reg(userid,username,pwd1,pwd2);
+					this.setVisible(false);
+				} catch (BaseException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+			}else if(model == 2) {
+				
+				if(!pwd1.equals(pwd2)) {
+					JOptionPane.showMessageDialog(null, "两次密码不一致！！！","错误",JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
+				User user = new User();
+				user.setSex(this.cmbSex.getSelectedItem().toString());
+				user.setUserId(userid);
+				user.setUserName(username);
+				user.setPwd(pwd1);
+				user.setPhone(this.edtPhone.getText().toString());
+				user.setCity(this.edtCity.getText().toString());
+				user.setEmail(this.edtEmail.getText().toString());
+
+				try {
+					takeOutUtil.userManager.reg(user);
+					this.setVisible(false);
+				} catch (BaseException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 			}
+			
 			
 		}
 			

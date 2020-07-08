@@ -8,10 +8,62 @@ import java.util.List;
 import takeout.itf.IOrderManager;
 import takeout.model.Order;
 import takeout.util.BaseException;
+import takeout.util.BusinessException;
 import takeout.util.DBUtil;
 import takeout.util.DbException;
 
 public class OrderManager implements IOrderManager {
+	public void deleteOrder(String userid, String orderid)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			conn.setAutoCommit(false);
+			sql = "select receive_time from orders where order_Id = ? and user_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, orderid);
+			pst.setString(2, userid);
+			java.sql.ResultSet rs = pst.executeQuery();
+			rs.next();
+			if(rs.getTimestamp(1)!=null)
+				throw new BusinessException("不可退已签收的订单！！！");
+			rs.close();
+			pst.close();
+			
+			sql = "delete from orderinfo where order_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, orderid);
+			pst.execute();
+			pst.close();
+			
+			sql = "delete from orders where order_Id = ? and user_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, orderid);
+			pst.setString(2, userid);
+			pst.execute();
+			pst.close();
+			
+			
+			conn.commit();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			try {
+				conn.rollback();
+			}catch(Exception e1) {
+				e1.printStackTrace();
+			}
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
 
 	@Override
 	public List<Order> loadAllOrders(String userid) throws BaseException {
@@ -40,7 +92,8 @@ public class OrderManager implements IOrderManager {
 				o.setFinalamount(rs.getFloat(8));
 				o.setOrderTime(rs.getTimestamp(9));
 				o.setReqtime(rs.getTimestamp(10));
-				o.setStatus(rs.getString(11));
+				o.setReceiveTime(rs.getTimestamp(11));
+				o.setStatus(rs.getString(12));
 				orders.add(o);
 			}
 			rs.close();

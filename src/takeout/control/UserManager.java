@@ -12,6 +12,84 @@ import takeout.util.*;
 
 public class UserManager implements IUserManager {
 	
+	public void reg(User user) throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		if(user.getUserId() == null || "".equals(user.getUserId()))
+			throw new BusinessException("用户账号不可为空！！！");
+		if(user.getPwd() == null || "".equals(user.getPwd()))
+			throw new BusinessException("用户密码不可为空！！！");
+		if(user.getUserName() == null || "".equals(user.getUserName()))
+			throw new BusinessException("用户名不可为空！！！");
+		if(user.getPhone() == null || "".equals(user.getPhone()))
+			throw new BusinessException("绑定手机号不可为空！！！");
+		if(user.getCity() == null || "".equals(user.getCity()))
+			throw new BusinessException("用户所在城市不可为空！！！");
+
+		try {
+			conn = DBUtil.getConnection();
+			sql = "insert into `user`(user_Id, user_name, sex, pwd, phone, email, city, isvip, createtime)\r\n" + 
+					"values (?,?,?,?,?,?,?,0,now())";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, user.getUserId());
+			pst.setString(2, user.getUserName());
+			pst.setString(3, user.getSex());
+			pst.setString(4, user.getPwd());
+			pst.setString(5, user.getPhone());		
+			pst.setString(6, user.getEmail());
+			pst.setString(7, user.getCity());
+			pst.execute();
+			pst.close();
+			conn.close();
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		
+	}
+	public User login(String userid, String pwd)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		User user = new User();
+		user.setUserId(userid);
+		user.setPwd(pwd);
+		
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select pwd ,user_name from user where user_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, userid);
+			java.sql.ResultSet rs = pst.executeQuery();
+			if(!rs.next())
+				throw new BusinessException("不存在该用户！！！");
+			if(!rs.getString(1).equals(pwd))
+				throw new BusinessException("密码错误！！！");
+			user.setUserName(rs.getString(2));
+			rs.close();
+			pst.close();
+			conn.close();
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return user;
+	}
+	
+	
 	public void modifyUser(User user)throws BaseException{
 		Connection conn = null;
 		String sql = null;
@@ -123,9 +201,49 @@ public class UserManager implements IUserManager {
 	}
 
 	@Override
-	public void changeUserPwd(String userid, String oldPwd, String newPwd) throws BaseException {
+	public void changeUserPwd(String userid, String oldPwd, String newPwd1, String newPwd2) throws BaseException {
 		// TODO Auto-generated method stub
-
+		Connection conn = null;
+		String sql = null;
+		if(newPwd1 == null || "".equals(newPwd1))
+			throw new BusinessException("新密码不可为空！！！");
+		if(newPwd2 == null || "".equals(newPwd2))
+			throw new BusinessException("新密码不可为空！！！");
+		if(!newPwd1.equals(newPwd2))
+			throw new BusinessException("新密码不一致！！！");
+		
+		
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select pwd from user where user_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, userid);
+			java.sql.ResultSet rs = pst.executeQuery();
+			rs.next();
+			if(!rs.getString(1).equals(oldPwd)) {
+				throw new BusinessException("密码错误！！！");
+			}
+			
+			pst.close();
+			rs.close();
+			sql = "update user set pwd = ? where user_Id = ? ";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1,newPwd1);
+			pst.setString(2, userid);
+			pst.execute();
+			pst.close();
+			conn.close();
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
 	}
 
 	@Override
