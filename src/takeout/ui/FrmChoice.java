@@ -55,9 +55,12 @@ public class FrmChoice extends JDialog implements ActionListener{
 	
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnAdminLogin) {
-			FrmMain fr = new FrmMain();
+//			FrmMain fr = new FrmMain();
+//			fr.setVisible(true);
+			FrmLogin dlg = new FrmLogin(this,"π‹¿Ì‘±µ«¬Ω",true);
+			dlg.setVisible(true);
 			this.setVisible(false);
-			fr.setVisible(true);
+			
 		}else if(e.getSource()==this.btnUserLogin) {
 			System.exit(0);
 		}else if(e.getSource()==this.btnCancel) {

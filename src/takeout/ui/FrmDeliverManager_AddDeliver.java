@@ -32,7 +32,7 @@ public class FrmDeliverManager_AddDeliver extends JDialog implements ActionListe
 	private JLabel labelDeliverName = new JLabel("骑手姓名：");
 	private JLabel labelEmployTime = new JLabel("就职时间：");
 	private JLabel labelIdentity = new JLabel("身份：");
-	private JComboBox cmbDeliverIdentity= new JComboBox(new String[] { "兼职", "正式员工", "单王"});
+	private JComboBox cmbDeliverIdentity= new JComboBox(new String[] { "新人", "正式员工", "单王"});
 
 	private JTextField edtDeliverId = new JTextField(20);
 	private JTextField edtDeliverName = new JTextField(20);

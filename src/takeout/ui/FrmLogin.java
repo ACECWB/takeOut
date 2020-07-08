@@ -37,8 +37,42 @@ public class FrmLogin extends JDialog implements ActionListener{
 	private JTextField edtUserId = new JTextField(20);
 	private JPasswordField edtPwd = new JPasswordField(20);
 	
+	FrmChoice fs =null;
+	
 	public FrmLogin(Frame f, String s, boolean b) {
 		super(f, s, b);
+		toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
+		toolBar.add(btnRegister);
+		toolBar.add(btnLogin);
+		toolBar.add(btnBack);
+		toolBar.add(btnCancel);
+		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
+		workBar.add(labelUser);
+		workBar.add(edtUserId);
+		workBar.add(labelPwd);
+		workBar.add(edtPwd);
+		this.getContentPane().add(workBar, BorderLayout.CENTER);
+		this.setSize(300,200);
+//		double width = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+//		double height = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+//		this.setLocation((int)(width/2), (int)(height/2));
+		this.setLocationRelativeTo(null);
+		
+		btnLogin.addActionListener(this);
+		btnCancel.addActionListener(this);
+		btnBack.addActionListener(this);
+		this.btnRegister.addActionListener(this);
+		
+		this.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				System.exit(0);
+			}
+		});
+	}
+	
+	public FrmLogin(FrmChoice f, String s, boolean b) {
+		super(f, s, b);
+		fs = f;
 		toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
 		toolBar.add(btnRegister);
 		toolBar.add(btnLogin);
@@ -79,6 +113,9 @@ public class FrmLogin extends JDialog implements ActionListener{
 				return;
 			}
 			this.setVisible(false);
+			FrmMain dlg = new FrmMain();
+			dlg.setVisible(true);
+			
 			
 		} else if (e.getSource() == this.btnCancel) {
 			System.exit(0);
@@ -87,6 +124,7 @@ public class FrmLogin extends JDialog implements ActionListener{
 			dlg.setVisible(true);
 		}else if(e.getSource()==this.btnBack) {
 			
+			this.fs.setVisible(true);
 			this.setVisible(false);
 			
 		}

@@ -36,7 +36,9 @@ import takeout.control.CommodityManager;
 import takeout.control.CouponManager;
 import takeout.control.DeliverManager;
 import takeout.control.IncomeManager;
+import takeout.control.IncomeStatisticManager;
 import takeout.control.OrderManager;
+import takeout.control.ReviewManager;
 import takeout.control.UserManager;
 import takeout.model.Admin;
 import takeout.model.Business;
@@ -46,7 +48,9 @@ import takeout.model.Commodity;
 import takeout.model.Coupon;
 import takeout.model.Deliver;
 import takeout.model.Income;
+import takeout.model.IncomeStatistic;
 import takeout.model.Order;
+import takeout.model.Review;
 import takeout.model.User;
 import takeout.ui.FrmLogin;
 import takeout.util.BaseException;
@@ -65,8 +69,10 @@ public class FrmMain extends JFrame implements ActionListener{
 	private JMenu menu_Deliver = new JMenu("骑手管理");
 	
 	private JMenu menu_Coupon = new JMenu("优惠券管理");
-	
-	private int model = 0;//1:商家-商品，2:商品类别-商品，3:商家-优惠券，4:用户-优惠券，5:用户-订单，6:骑手-订单
+	private JMenu menu_Statistic = new JMenu("统计");
+	private JMenuItem menuItem_Income = new JMenuItem("骑手收入统计");
+
+	private int model = 0;//1:商家-商品，2:商品类别-商品，3:商家-优惠券，4:用户-优惠券，5:用户-订单，6:骑手-订单,7:骑手-收入统计
 //	private JMenu menu_commoditycategoryManager = new JMenuItem("商品类别管理");
 	private JMenuItem menuItem_ModifyPwd = new JMenuItem("修改密码");
 
@@ -85,7 +91,8 @@ public class FrmMain extends JFrame implements ActionListener{
 	private JMenuItem menuItem_deleteComCate = new JMenuItem("删除商品类");
 	private JMenuItem menuItem_resetComCate = new JMenuItem("上架商品类");
 	
-	private JMenuItem menuItem_businessManager = new JMenuItem("查看商家信息");
+	private JMenuItem menuItem_businessManager = new JMenuItem("查看商家商品信息");
+	private JMenuItem menuItem_businessReview = new JMenuItem("查看商家评论信息");
 	private JMenuItem menuItem_addBus = new JMenuItem("添加商家");
 	private JMenuItem menuItem_deleteBus = new JMenuItem("删除商家");
 	private JMenuItem menuItem_commodityManager = new JMenuItem("商品全局管理");
@@ -118,14 +125,15 @@ public class FrmMain extends JFrame implements ActionListener{
 	List<Order> allOrder = null;
 	List<Deliver> allDeliver = null;
 	List<Income> allIncome = null;
-	
+	List<IncomeStatistic> allTotalIncome = null;
+	List<Review> allReview = null;
 	
 	private Business curBus = null; 
 	private ComCate curCate = null; 
 	private User curUser = null;
 	private Deliver curDeliver = null;
 	
-	private FrmLogin dlgLogin=null;
+//	private FrmLogin dlgLogin=null;
 	private JPanel statusBar = new JPanel();
 	
 	private JPanel westBar = new JPanel();
@@ -377,14 +385,54 @@ public class FrmMain extends JFrame implements ActionListener{
 		this.dataTable1.validate();
 		this.dataTable1.repaint();
 	}
-
 	
+	private void reloadIncomeStatisticTable(int deliverIdx){
+		if(deliverIdx<0) return;
+			curDeliver = allDeliver.get(deliverIdx);
+		try {
+			allTotalIncome = new IncomeStatisticManager().loadAllIncomeStatistics(curDeliver.getDeliverId());
+		} catch (BaseException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		tblData1 = new Object[allTotalIncome.size()][IncomeStatistic.tableTitles.length];
+		for(int i=0;i<allTotalIncome.size();i++){
+			for(int j=0;j<IncomeStatistic.tableTitles.length;j++) {
+				tblData1[i][j] = allTotalIncome.get(i).getCell(j); 
+			}
+		}
+		tabModel1.setDataVector(tblData1, IncomeStatistic.tableTitles);
+		this.dataTable1.validate();
+		this.dataTable1.repaint();
+	}
+	
+	private void reloadReviewTable(int businessIdx){
+		if(businessIdx<0) return;
+			curBus = allBusiness.get(businessIdx);
+		try {
+			allReview = new ReviewManager().loadAllReviews(curBus.getBusinessId());
+		} catch (BaseException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		tblData1 = new Object[allReview.size()][Review.tableTitles.length];
+		for(int i=0;i<allReview.size();i++){
+			for(int j=0;j<Review.tableTitles.length;j++) {
+				tblData1[i][j] = allReview.get(i).getCell(j); 
+			}
+		}
+		tabModel1.setDataVector(tblData1, Review.tableTitles);
+		this.dataTable1.validate();
+		this.dataTable1.repaint();
+	}
 	public FrmMain(){
 		this.setExtendedState(Frame.MAXIMIZED_BOTH);
 		this.setTitle("外卖助手");
 		
-		dlgLogin=new FrmLogin(this,"登陆",true);
-		dlgLogin.setVisible(true);
+//		dlgLogin=new FrmLogin(this,"登陆",true);
+//		dlgLogin.setVisible(true);
 		
 //		menu_Manager.add(menuItem_userManager); menuItem_userManager.addActionListener(this);
 //		menu_Manager.add(menuItem_deliverManager); menuItem_deliverManager.addActionListener(this);
@@ -402,6 +450,7 @@ public class FrmMain extends JFrame implements ActionListener{
 		menu_Business.add(menuItem_addCom); menuItem_addCom.addActionListener(this);
 		menu_Business.add(menuItem_deleteCom); menuItem_deleteCom.addActionListener(this);
 		menu_Business.add(menuItem_commodityManager); menuItem_commodityManager.addActionListener(this);
+		menu_Business.add(menuItem_businessReview); menuItem_businessReview.addActionListener(this);
 
 		menu_ComCate.add(menuItem_ComCate); menuItem_ComCate.addActionListener(this);
 		menu_ComCate.add(menuItem_addComCate); menuItem_addComCate.addActionListener(this);
@@ -426,7 +475,7 @@ public class FrmMain extends JFrame implements ActionListener{
 		menu_Deliver.add(menuItem_addDeliver); menuItem_addDeliver.addActionListener(this);
 		menu_Deliver.add(menuItem_deleteDeliver); menuItem_deleteDeliver.addActionListener(this);
 		
-			
+		menu_Statistic.add(menuItem_Income); menuItem_Income.addActionListener(this);
 		
 		menubar.add(menu_Manager);
 		menubar.add(menu_Business);
@@ -435,7 +484,7 @@ public class FrmMain extends JFrame implements ActionListener{
 		menubar.add(menu_Coupon);
 		menubar.add(menu_User);
 		menubar.add(menu_Deliver);
-		
+		menubar.add(menu_Statistic);
 //		this.btnModifyPwd.addActionListener(this);
 //		menu_Business.addActionListener(this);
 //		menu_Com.addActionListener(this);
@@ -477,6 +526,10 @@ public class FrmMain extends JFrame implements ActionListener{
 						FrmMain.this.reloadOrderTable(i);
 					else if(model == 6)
 						FrmMain.this.reloadIncomeTable(i);
+					else if(model == 7)
+						FrmMain.this.reloadIncomeStatisticTable(i);
+					else if(model == 8)
+						FrmMain.this.reloadReviewTable(i);
 				}
 				
 
@@ -717,6 +770,30 @@ public class FrmMain extends JFrame implements ActionListener{
 							e1.printStackTrace();
 						}
 						FrmMain.this.reloadCCouponTable(j);
+					}else if(model == 5){//用户-订单信息
+						JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+						tabModel1.setDataVector(tblData1, Order.tableTitles);
+						dataTable1.validate();
+						dataTable1.repaint();
+						return;
+					}else if(model == 6) {//骑手-订单信息
+						JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+						tabModel1.setDataVector(tblData1, Income.tableTitles);
+						dataTable1.validate();
+						dataTable1.repaint();
+						return;
+					}else if(model == 7) {//骑手-统计信息
+						JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+						tabModel1.setDataVector(tblData1, IncomeStatistic.tableTitles);
+						dataTable1.validate();
+						dataTable1.repaint();
+						return;
+					}else if(model == 8) {//商家-评论
+						JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+						tabModel1.setDataVector(tblData1, Review.tableTitles);
+						dataTable1.validate();
+						dataTable1.repaint();
+						return;
 					}
 				}
 			}
@@ -731,7 +808,7 @@ public class FrmMain extends JFrame implements ActionListener{
 				int c = e.getColumn();
 				int r = e.getFirstRow();
 				if(c>=0 && r>=0) {
-					if(model == 1 || model == 3) {
+					if(model == 1 || model == 3 || model == 8) {
 						if(c != 1) {
 							JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
 							tabModel2.setDataVector(tblData2, Business.tableTitles);
@@ -751,7 +828,7 @@ public class FrmMain extends JFrame implements ActionListener{
 								dataTable2.repaint();
 							}
 						}
-					}else if(model == 2) {
+					}else if(model == 2) {//商品类别
 						
 						if(c != 1) {
 							JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
@@ -857,7 +934,7 @@ public class FrmMain extends JFrame implements ActionListener{
 							e1.printStackTrace();
 						}
 						
-					}else if(model == 6) {//骑手信息
+					}else if(model == 6 || model == 7) {//骑手信息
 						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 						try {
 							if(c == 1) {//骑手姓名
@@ -866,7 +943,7 @@ public class FrmMain extends JFrame implements ActionListener{
 								}
 
 							}else if(c == 4) {//身份
-								String[] identify = {"兼职", "正式员工", "单王" }; 
+								String[] identify = {"新人", "正式员工", "单王" }; 
 								int c1 = 0;
 								if(dataTable2.getValueAt(r, c).toString() == null || "".equals(dataTable2.getValueAt(r, c).toString())) {
 									throw new BusinessException("身份不可为空！！！");
@@ -1303,6 +1380,12 @@ public class FrmMain extends JFrame implements ActionListener{
 		}else if(e.getSource()==menuItem_ModifyPwd) {
 			FrmModifyAdminPwd dlg=new FrmModifyAdminPwd(this,"密码修改",true);
 			dlg.setVisible(true);
+		}else if(e.getSource()==menuItem_Income) {
+			this.model = 7;
+			this.reloadDeliverTable();
+		}else if(e.getSource()==menuItem_businessReview) {
+			this.model = 8;
+			this.reloadBusinessTable();
 		}
 	}
 }
