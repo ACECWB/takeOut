@@ -22,7 +22,7 @@ public class FullReductionManager implements IFullReductionManager {
 		List<FullReduction> reducts = new ArrayList<>();
 		try {
 			conn = DBUtil.getConnection();
-			sql = "select reduct_Id, require_amount, discount_amount, with_coupon, removetime from fullreduction";
+			sql = "select reduct_Id, require_amount, discount_amount, with_coupon, removetime, business_Id from fullreduction";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			java.sql.ResultSet rs = pst.executeQuery();
 			while(rs.next()) {
@@ -33,6 +33,7 @@ public class FullReductionManager implements IFullReductionManager {
 				r.setWithCoupon(rs.getString(4));
 //				r.setStartTime(rs.getTimestamp(5));
 				r.setEndTime(rs.getTimestamp(5));
+				r.setBusinessId(rs.getString(6));
 				reducts.add(r);
 			}
 			rs.close();
@@ -58,6 +59,8 @@ public class FullReductionManager implements IFullReductionManager {
 		// TODO Auto-generated method stub
 		Connection conn = null;
 		String sql = null;
+		System.out.println(fullreduction.getBusinessId() + "  "+fullreduction.getReductId());
+
 		if(fullreduction.getReductId() == null || "".equals(fullreduction.getReductId()))
 			throw new BusinessException("满减活动编号不可为空！！！");
 		if(fullreduction.getDiscountAmount()<=0)
@@ -76,13 +79,21 @@ public class FullReductionManager implements IFullReductionManager {
 			rs.close();
 			pst.close();
 			
-			sql = "insert into fullreduction(reduct_Id, require_amount, discount_amount, with_coupon)\r\n" + 
-					"VALUES (?,?,?,?)";
+			sql = "select * from business where business_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, fullreduction.getBusinessId());
+			rs = pst.executeQuery();
+			if(!rs.next())
+				throw new BusinessException("不存在该商家！！！");
+			
+			sql = "insert into fullreduction(reduct_Id, require_amount, discount_amount, with_coupon, business_Id)\r\n" + 
+					"VALUES (?,?,?,?,?)";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, fullreduction.getReductId());
 			pst.setFloat(2, fullreduction.getRequireAmount());
 			pst.setFloat(3, fullreduction.getDiscountAmount());
 			pst.setString(4, fullreduction.getWithCoupon());
+			pst.setString(5, fullreduction.getBusinessId());
 //			pst.setTimestamp(5, new java.sql.Timestamp(fullreduction.getEndTime().getTime()));
 //			pst.setTimestamp(6, new java.sql.Timestamp(fullreduction.getStartTime().getTime()));
 			pst.execute();

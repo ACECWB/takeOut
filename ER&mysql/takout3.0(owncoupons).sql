@@ -374,3 +374,11 @@ price float not null
 )
 
 alter table cart add business_name varchar(30) not null
+alter table cart drop com_name
+alter table cart drop business_name
+
+alter table fullreduction add business_Id varchar(30) not null
+
+alter table deliver add `status` varchar(10) not null
+alter table ownedcoupons add removetime datetime
+alter table orders add couponorder int not null

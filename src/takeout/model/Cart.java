@@ -1,7 +1,7 @@
 package takeout.model;
 
 public class Cart {
-	public static final String[] tableTitles = {"商家编号","商家名称","商品编号","商品名称","数量","价格"};
+	public static final String[] tableTitles = {"商品编号","商品名称","数量","价格"};
 	private String userid;
 	private String comid;
 	private String comname;
@@ -17,16 +17,12 @@ public class Cart {
 //		else if(col==3) return "1";
 //		else return "";
 		if(col==0)
-			return ""+this.businessid;
-		else if(col==1)
-			return ""+this.businessname;
-		else if(col==2)
 			return ""+this.comid;
-		else if(col==3)
+		else if(col==1)
 			return ""+this.comname;
-		else if(col==4)
+		else if(col==2)
 			return ""+this.counts;
-		else if(col==5)
+		else if(col==3)
 			return ""+this.price;
 		else 
 			return "";

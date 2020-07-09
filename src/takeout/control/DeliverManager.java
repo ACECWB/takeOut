@@ -88,7 +88,7 @@ public class DeliverManager implements IDeliverManager {
 			rs.close();
 			pst.close();
 			
-			sql = "insert into deliver(deliver_Id, deliver_name, employ_time, identity) values (?,?,?,?)";
+			sql = "insert into deliver(deliver_Id, deliver_name, employ_time, identity, status) values (?,?,?,?, 'ø’œ–')";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, deliver.getDeliverId());
 			pst.setString(2, deliver.getDeliverName());
@@ -170,7 +170,7 @@ public class DeliverManager implements IDeliverManager {
 		List<Deliver> delivers = new ArrayList<>();
 		try {
 			conn = DBUtil.getConnection();
-			sql = "select deliver_Id, deliver_name, employ_time, quit_time, identity from deliver";
+			sql = "select deliver_Id, deliver_name, employ_time, quit_time, identity, status from deliver";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			java.sql.ResultSet rs = pst.executeQuery();
 			while(rs.next()) {
@@ -181,6 +181,7 @@ public class DeliverManager implements IDeliverManager {
 				if(rs.getTimestamp(4)!=null)
 					d.setQuitTime(sdf.format(rs.getTimestamp(4)));
 				d.setIdentity(rs.getString(5));
+				d.setStatus(rs.getString(6));
 				delivers.add(d);
 			}
 			rs.close();

@@ -3,12 +3,20 @@ package takeout.model;
 import java.util.Date;
 
 public class Deliver {
-	public static final String[] tableTitles = {"骑手编号","骑手姓名","就职时间","辞职时间","身份"};
+	public static final String[] tableTitles = {"骑手编号","骑手姓名","就职时间","辞职时间","身份","状态"};
 	private String deliverId;
 	private String deliverName;
 	private String employTime;
 	private String identity;
 	private String quitTime;
+	private String status;
+	
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	
 	public String getQuitTime() {
 		return quitTime;

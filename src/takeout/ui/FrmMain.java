@@ -170,7 +170,11 @@ public class FrmMain extends JFrame implements ActionListener{
 	
 	private void reloadBusinessTable(){//这是测试数据，需要用实际数替换
 		try {
-			allBusiness = new BusinessManager().loadAllBusiness(true);
+			if(User.currentLoginUser!=null)
+				allBusiness = new BusinessManager().loadAllBusiness(false);
+			else
+				allBusiness = new BusinessManager().loadAllBusiness(true);
+
 		} catch (BaseException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
 			return;
@@ -211,7 +215,7 @@ public class FrmMain extends JFrame implements ActionListener{
 //	DefaultTableModel tabComModel=new DefaultTableModel();
 //	private JTable dataTableCom=new JTable(tabComModel);
 	
-	private void reloadComTable(int businessIdx){
+	public void reloadComTable(int businessIdx){
 		if(businessIdx<0) return;
 			curBus = allBusiness.get(businessIdx);
 		try {
@@ -331,7 +335,7 @@ public class FrmMain extends JFrame implements ActionListener{
 	}
 //	private Object tblOrderData[][];
 	
-	private void reloadOrderTable(int userIdx){
+	public void reloadOrderTable(int userIdx){
 		if(userIdx<0) return;
 			curUser = allUser.get(userIdx);
 		try {
@@ -1432,18 +1436,24 @@ public class FrmMain extends JFrame implements ActionListener{
 			this.model = 8;
 			this.reloadBusinessTable();
 		}else if(e.getSource()==menuItem_cart) {
-			FrmCartManager dlg = new FrmCartManager(this,"购物车管理",true);
+			int i=this.dataTable2.getSelectedRow();
+
+			FrmCartManager dlg = new FrmCartManager(this,"购物车管理",true, i);
 			dlg.setVisible(true);
 		}else if(e.getSource()==menuItem_addgoods) {
 			int i=this.dataTable2.getSelectedRow();
 			int j=this.dataTable1.getSelectedRow();
-
+			if(i<0) {
+				JOptionPane.showMessageDialog(null, "请选择一个商品！！！","错误",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			FrmCartManager_Add dlg = new FrmCartManager_Add(this,"添加购物车",true);
 			dlg.businessid = tblData2[i][0].toString();
 			dlg.comid = tblData1[j][0].toString();
 			dlg.price = Float.parseFloat(tblData1[j][6].toString());
 			dlg.businessname = tblData2[i][1].toString();
 			dlg.comname = tblData1[j][1].toString();
+			dlg.counts = Integer.parseInt(tblData1[j][5].toString());
 			dlg.setVisible(true);
 		}else if(e.getSource()==menuItem_location) {
 			FrmLocationManager dlg = new FrmLocationManager(this,"地址信息管理",true);

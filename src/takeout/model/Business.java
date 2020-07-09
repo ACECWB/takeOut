@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class Business {
 	public static final String[] tableTitles = {"商家编号","商家名称","星级","平均消费","总销量","创建时间","注销时间"};
+	public static final String[] CtableTitles = {"商家编号","商家名称"};
 	private String businessId;
 	private String businessName;
 	private int stars;

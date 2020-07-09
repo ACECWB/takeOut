@@ -33,6 +33,7 @@ public class FrmCartManager_Add extends JDialog implements ActionListener{
 	public float price;
 	public String comname;
 	public String businessname;
+	public int counts;
 	
 	private Button btnOk = new Button("确定");
 	private Button btnCancel = new Button("取消");
@@ -74,6 +75,11 @@ public class FrmCartManager_Add extends JDialog implements ActionListener{
 //			String businessid = this.edtBusinessId.getText();
 //			String businessname = this.edtCounts.getText();
 //			String stars = this.edtStars.getText();
+			
+			if(counts < Integer.parseInt(this.edtCounts.getText())) {
+				JOptionPane.showMessageDialog(null, "购买数量大于库存数量！！！","错误",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			
 			cart=new Cart();
 //			cart.setBusinessId(businessid);

@@ -14,6 +14,10 @@ public class LocationManager implements ILocationManager {
 	public void modifyLoca(int locaid, String loca)throws BaseException{
 		Connection conn = null;
 		String sql = null;
+		
+		if(loca == null || "".equals(loca)) {
+			throw new BusinessException("具体地址信息不可为空！！！");
+		}
 		try {
 			conn = DBUtil.getConnection();
 			sql = "update location set loca = ? where loca_Id = ?";
@@ -39,6 +43,10 @@ public class LocationManager implements ILocationManager {
 	public void modifyPhone(int locaid, String phone)throws BaseException{
 		Connection conn = null;
 		String sql = null;
+		
+		if(phone == null || "".equals(phone)) {
+			throw new BusinessException("绑定手机号码不可为空！！！");
+		}
 		try {
 			conn = DBUtil.getConnection();
 			sql = "update location set phone_number = ? where loca_Id = ?";
@@ -64,6 +72,9 @@ public class LocationManager implements ILocationManager {
 	public void modifyCon(int locaid, String con)throws BaseException{
 		Connection conn = null;
 		String sql = null;
+		if(con == null || "".equals(con)) {
+			throw new BusinessException("联系人不可为空！！！");
+		}
 		try {
 			conn = DBUtil.getConnection();
 			sql = "update location set conn_user = ? where loca_Id = ?";

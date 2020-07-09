@@ -3,7 +3,7 @@ package takeout.model;
 import java.util.Date;
 
 public class Order {
-	public static final String[] tableTitles = {"订单编号","骑手编号","商品编号","数量","价格","优惠券编号","原总价","现总价","下单时间","送达要求","送达时间","状态"};
+	public static final String[] tableTitles = {"订单编号","商家编号","骑手编号","商品编号","数量","价格","优惠券编号","原总价","现总价","下单时间","送达要求","送达时间","状态"};
 	
 	private String orderid;
 	private String couponid;
@@ -17,6 +17,43 @@ public class Order {
 	private float price;
 	private Date ordertime;
 	private Date receivetime;
+	
+	private String userid;
+	private String businessid;
+	private String locaid;
+	private int ownorder;
+	
+	public int getOwnOrder() {
+		return ownorder;
+	}
+	
+	public void setOwnOrder(int ownorder) {
+		this.ownorder = ownorder;
+	}
+	
+	public String getLocaid() {
+		return locaid;
+	}
+
+	public void setLocaid(String locaid) {
+		this.locaid = locaid;
+	}
+	
+	public String getUserid() {
+		return userid;
+	}
+
+	public void setUserid(String userid) {
+		this.userid = userid;
+	}
+	
+	public String getBusinessid() {
+		return businessid;
+	}
+
+	public void setBusinessid(String businessid) {
+		this.businessid = businessid;
+	}
 	
 	public void setReceiveTime(Date time) {
 		this.receivetime = time;
@@ -34,26 +71,28 @@ public class Order {
 		if(col==0)
 			return ""+this.orderid;
 		else if(col==1)
-			return ""+this.deliverid;
+			return ""+this.businessid;
 		else if(col==2)
-			return ""+this.comid;
+			return ""+this.deliverid;
 		else if(col==3)
-			return ""+this.counts;
+			return ""+this.comid;
 		else if(col==4)
-			return ""+this.price;
+			return ""+this.counts;
 		else if(col==5)
-			return ""+this.couponid;
+			return ""+this.price;
 		else if(col==6)
-			return ""+this.originamount;
+			return ""+this.couponid;
 		else if(col==7)
-			return ""+this.finalamount;
+			return ""+this.originamount;
 		else if(col==8)
-			return ""+this.ordertime;
+			return ""+this.finalamount;
 		else if(col==9)
-			return ""+this.reqtime;
+			return ""+this.ordertime;
 		else if(col==10)
-			return ""+this.receivetime;
+			return ""+this.reqtime;
 		else if(col==11)
+			return ""+this.receivetime;
+		else if(col==12)
 			return ""+this.status;
 		else 
 			return "";

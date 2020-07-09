@@ -92,13 +92,14 @@ public class FrmOrderManager extends JDialog implements ActionListener{
 //		else 
 		if(e.getSource()==this.btnDelete){
 			int i=this.orderTable.getSelectedRow();
+			String businessid = tblData[i][1].toString();
 			if(i<0) {
 				JOptionPane.showMessageDialog(null,  "请选择订单","提示",JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			if(JOptionPane.showConfirmDialog(this,"确定退掉该订单吗？","确认",JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
 				try {
-					(new OrderManager()).deleteOrder(User.currentLoginUser.getUserId(), tblData[i][0].toString());
+					(new OrderManager()).deleteOrder(User.currentLoginUser.getUserId(), tblData[i][0].toString(),businessid);
 					this.reloadOrderTable();
 				} catch (BaseException e1) {
 					JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);

@@ -10,7 +10,8 @@ public interface IBusiness {
 	public void addBusiness(Business business) throws BaseException;
 	public void deleteBusiness(String businessId) throws BaseException;
 	public List<Business> loadAllBusiness(boolean withDeletedBusiness) throws BaseException;
-	
+	public List<Business> loadAllBusiness(String userid) throws BaseException;
+
 	public void modifyBusinessName(String businessname, String businessid)throws BaseException;
 	
 }
