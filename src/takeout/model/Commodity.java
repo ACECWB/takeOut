@@ -1,7 +1,7 @@
 package takeout.model;
 
 public class Commodity extends ComTitle{
-	public static final String[] tableTitles = {"商品编号","商品名称","类型编号","类型名","商家编号","数量","单价"};
+	public static final String[] tableTitles = {"商品编号","商品名称","类型编号","类型名","商家编号","数量","单价","会员价"};
 	public static final String[] tableTitles_1 = {"商品编号","商品名称"};
 	public static final String[] tableTitles_2 = {"类型编号","类型名"};
 
@@ -13,6 +13,14 @@ public class Commodity extends ComTitle{
 	private String businessId;
 	private int counts;
 	private float eachPrice;
+	private float vipprice;
+	
+	public float getVipprice() {
+		return this.vipprice;
+	}
+	public void setVipprice(float vipprice) {
+		this.vipprice = vipprice;
+	}
 	
 	public String getComId() {
 		return comId;
@@ -57,11 +65,7 @@ public class Commodity extends ComTitle{
 		this.eachPrice = eachPrice;
 	}
 	public String getCell(int col){
-//		if(col==0) return "1";
-//		else if(col==1) return "示例计划";
-//		else if(col==2) return "2";
-//		else if(col==3) return "1";
-//		else return "";
+
 		if(col==0)
 			return ""+this.comId;
 		else if(col==1)
@@ -76,6 +80,8 @@ public class Commodity extends ComTitle{
 			return ""+this.counts;
 		else if(col==6)
 			return ""+this.eachPrice;
+		else if(col==7)
+			return ""+this.vipprice;
 		else 
 			return "";
 	}

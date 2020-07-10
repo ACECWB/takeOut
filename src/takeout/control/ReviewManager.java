@@ -24,7 +24,7 @@ public class ReviewManager implements IReviewManager {
 			conn.setAutoCommit(false);
 			sql = "insert into review(order_Id, content, review_date, stars) values (?,?,?,?)";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
-			pst.setString(1, review.getOrderId());
+			pst.setString(1, review.getOrderid());
 			pst.setString(2, review.getContent());
 			pst.setTimestamp(3, new java.sql.Timestamp(review.getReviewtime().getTime()));
 			pst.setFloat(4, review.getStars());
@@ -43,7 +43,7 @@ public class ReviewManager implements IReviewManager {
 			
 			sql = "update orders set isreviewed = 1 where order_Id = ?";
 			pst = conn.prepareStatement(sql);
-			pst.setString(1, review.getOrderId());
+			pst.setString(1, review.getOrderid());
 			pst.execute();
 			pst.close();
 			
@@ -70,8 +70,53 @@ public class ReviewManager implements IReviewManager {
 		
 		
 	}
+	
+	public List<Review> loadAllUReviews(String userid)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		List<Review> reviews = new ArrayList<>();
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select r.order_Id, b.business_Id, b.business_name, r.stars, r.content, d.deliver_Id,\r\n" + 
+					"d.deliver_name, di.review, r.review_date\r\n" + 
+					"from orders o, business b, review r, deliver d, deliver_income di\r\n" + 
+					"where o.user_Id = ? and o.order_Id = r.order_Id and di.order_Id = o.order_Id and \r\n" + 
+					"o.deliver_Id = di.deliver_Id and o.business_Id = b.business_Id and d.deliver_Id = di.deliver_Id";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, userid);
+			java.sql.ResultSet rs = pst.executeQuery();
+			while(rs.next()) {
+				Review review = new Review();
+				review.setOrderid(rs.getString(1));
+				review.setBusinessid(rs.getString(2));
+				review.setBusinessname(rs.getString(3));
+				review.setStars(rs.getFloat(4));
+				review.setContent(rs.getString(5));
+				review.setDeliverid(rs.getString(6));
+				review.setDelivername(rs.getString(7));
+				review.setDeliverreview(rs.getString(8));
+				review.setReviewtime(rs.getTimestamp(9));
+				reviews.add(review);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return reviews;
+	}
 	@Override
-	public List<Review> loadAllReviews(String businessid) throws BaseException {
+	public List<Review> loadAllBReviews(String businessid) throws BaseException {
 		// TODO Auto-generated method stub
 		Connection conn = null;
 		String sql = null;

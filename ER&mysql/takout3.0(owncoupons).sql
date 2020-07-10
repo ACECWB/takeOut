@@ -399,3 +399,13 @@ alter table review drop user_Id
 alter table review drop business_Id
 
 alter table review add order_Id varchar(20) not null
+
+
+create view userownedcollects as(
+select user_Id, c.business_Id, b.business_name, c.coupon_Id, c.end_time, c.need_orders, co.alreadycounts,
+c.discount_money, effect_days from coupon c, collectorders co, business b
+where  co.business_Id = b.business_Id and co.business_Id = c.business_Id
+
+)
+alter table user change vip_start_time  vip_start_time  datetime
+alter table user change vip_end_time  vip_end_time  datetime

@@ -33,7 +33,6 @@ import takeout.util.BaseException;
 
 public class FrmOrderManager extends JDialog implements ActionListener{
 	private JPanel toolBar = new JPanel();
-//	private Button btnAdd = new Button("添加地址信息");
 	private FrmMain fm = null;
 	private Button btnLook = new Button("查看订单详情");
 	private Button btnDelete = new Button("退单");
@@ -80,6 +79,7 @@ public class FrmOrderManager extends JDialog implements ActionListener{
 		toolBar.add(btnLook);
 		toolBar.add(this.btnDelete);
 		toolBar.add(btnReview);
+		toolBar.add(btnLookReview);
 		
 		this.getContentPane().add(toolBar, BorderLayout.NORTH);
 		//提取现有数据
@@ -95,22 +95,9 @@ public class FrmOrderManager extends JDialog implements ActionListener{
 		this.btnLook.addActionListener(this);
 		this.btnDelete.addActionListener(this);
 		this.btnReview.addActionListener(this);
+		this.btnLookReview.addActionListener(this);
 		
-//		this.orderTable.addMouseListener(new MouseAdapter (){
-//				
-//				@Override
-//				public void mouseClicked(MouseEvent e) {
-//					int i=FrmOrderManager.this.orderTable.getSelectedRow();
-//					int j=FrmOrderManager.this.orderTable.getSelectedColumn();
-//					if(i<0) {
-//						return;
-//					}
-//					FrmOrderManager.this.reloadInfoTable(i);
-//					
-//				}
-//				
-//
-//				});
+
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				//System.exit(0);
@@ -121,14 +108,7 @@ public class FrmOrderManager extends JDialog implements ActionListener{
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-//		if(e.getSource()==this.btnAdd){
-//			FrmLocationManager_AddLocation dlg=new FrmLocationManager_AddLocation(this,"添加地址信息",true);
-//			dlg.setVisible(true);
-//			if(dlg.getLocation1()!=null){//刷新表格
-//				this.reloadLocationTable();
-//			}
-//		}
-//		else 
+
 		if(e.getSource()==this.btnDelete){
 			int i=this.orderTable.getSelectedRow();
 			String businessid = tblData[i][1].toString();
@@ -174,7 +154,8 @@ public class FrmOrderManager extends JDialog implements ActionListener{
 			this.reloadOrderTable();
 			fm.reloadBusinessTable();
 		}else if(e.getSource() == this.btnLookReview) {
-			
+			FrmLookReviews flr = new FrmLookReviews(this, "查看评价", true);
+			flr.setVisible(true);
 			
 		}
 	}

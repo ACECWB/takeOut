@@ -113,6 +113,90 @@ public class CouponManager implements ICouponManager {
 		}
 		return coupons;
 	}
+	public List<Coupon> loadAllCollects(String userid)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		List<Coupon> coupons = new ArrayList<>();
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select business_Id, business_name, coupon_Id, end_time, need_orders, alreadycounts,\r\n" + 
+					" discount_money, effect_days from userownedcollects where end_time>now() and user_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, userid);
+			java.sql.ResultSet rs = pst.executeQuery();
+			while(rs.next()) {
+				Coupon c = new Coupon();
+				c.setBusinessId(rs.getString(1));
+				c.setBusinessName(rs.getString(2));
+				c.setCouponId(rs.getString(3));
+				c.setEndTime(rs.getTimestamp(4));
+				c.setNeedOrders(rs.getInt(5));
+				c.setAlreadyCounts(rs.getInt(6));
+				c.setDiscountMoney(rs.getFloat(7));
+				c.setEffectDays(rs.getInt(8));
+				coupons.add(c);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return coupons;
+		
+	}
+
+	public List<Coupon> loadAllUCoupons(String userid)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		List<Coupon> coupons = new ArrayList<>();
+		try {
+			conn = DBUtil.getConnection();
+			sql = "\r\n" + 
+					"select oc.business_Id, b.business_name, oc.coupon_Id, c.discount_money, oc.ineffect_time from business b, ownedcoupons oc,coupon c\r\n" + 
+					"where user_Id = ? and oc.coupon_Id = c.coupon_Id and oc.business_Id = b.business_Id and ineffect_time>now() order by ineffect_time\r\n" + 
+					"\r\n" + 
+					"";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, userid);
+			java.sql.ResultSet rs = pst.executeQuery();
+			while(rs.next()) {
+				Coupon coupon = new Coupon();
+				coupon.setBusinessId(rs.getString(1));
+				coupon.setBusinessName(rs.getString(2));
+				coupon.setCouponId(rs.getString(3));
+				coupon.setDiscountMoney(rs.getFloat(4));
+				coupon.setIneffectDate(rs.getTimestamp(5));
+				coupons.add(coupon);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+			
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return coupons;
+		
+	}
 	public List<Coupon> loadAllCCoupons(User user)throws BaseException{
 		Connection conn = null;
 		String sql = null;

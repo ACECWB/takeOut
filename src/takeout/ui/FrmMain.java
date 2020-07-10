@@ -14,6 +14,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -71,6 +72,11 @@ public class FrmMain extends JFrame implements ActionListener{
 	
 	private JMenu menu_Coupon = new JMenu("优惠券管理");
 	private JMenu menu_Statistic = new JMenu("统计");
+	private JMenu menu_CouponInfo = new JMenu("优惠券信息");
+	private JMenuItem menuItem_OwnedCoupons = new JMenuItem("已拥有的优惠券");
+	private JMenuItem menuItem_Collects = new JMenuItem("个人集单数信息");
+
+	
 	private JMenuItem menuItem_Income = new JMenuItem("骑手收入统计");
 
 	//以下为用户菜单栏
@@ -80,6 +86,8 @@ public class FrmMain extends JFrame implements ActionListener{
 	private JMenuItem menuItem_cart = new JMenuItem("查看当前购物车");
 	private JMenuItem menuItem_location = new JMenuItem("地址信息编辑");
 	private JMenuItem menuItem_orderInfo = new JMenuItem("订单信息查看");
+	private JMenuItem menuItem_UserInfo = new JMenuItem("个人账号信息");
+
 
 
 	private int model = 0;//1:商家-商品，2:商品类别-商品，3:商家-优惠券，4:用户-优惠券，5:用户-订单，6:骑手-订单,7:骑手-收入统计
@@ -425,7 +433,7 @@ public class FrmMain extends JFrame implements ActionListener{
 		if(businessIdx<0) return;
 			curBus = allBusiness.get(businessIdx);
 		try {
-			allReview = new ReviewManager().loadAllReviews(curBus.getBusinessId());
+			allReview = new ReviewManager().loadAllBReviews(curBus.getBusinessId());
 		} catch (BaseException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
 			return;
@@ -560,6 +568,36 @@ public class FrmMain extends JFrame implements ActionListener{
 									com.setBusinessId(tblData2[j][0].toString());
 									com.setCounts(Integer.parseInt(tblData1[r][5].toString()));
 									com.setEachPrice(Float.parseFloat(tblData1[r][6].toString()));
+									com.setVipprice(Float.parseFloat(tblData1[r][7].toString()));
+
+									(new CommodityManager()).modifyCom2bus(com);
+									
+								}catch(Exception e1) {
+									JOptionPane.showMessageDialog(null,  "请输入正确值！！！","提示",JOptionPane.ERROR_MESSAGE);
+									tabModel1.setDataVector(tblData1, ComTitle.tableTitles);
+									dataTable1.validate();
+									dataTable1.repaint();
+								}
+								
+//								FrmMain.this.reloadComTable();
+								FrmMain.this.reloadComTable(j);
+								
+							}else if(c == 7){
+								try {
+									if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
+										throw new BusinessException("会员价不可为空！！！");
+									}
+									if(Float.parseFloat(dataTable1.getValueAt(r, c).toString())<0) {
+										throw new BusinessException("会员价不可为负数！！！");
+									}
+
+									tblData1[r][c] = dataTable1.getValueAt(r, c);
+									Commodity com = new Commodity();
+									com.setComId(tblData1[r][0].toString());
+									com.setBusinessId(tblData2[j][0].toString());
+									com.setCounts(Integer.parseInt(tblData1[r][5].toString()));
+									com.setEachPrice(Float.parseFloat(tblData1[r][6].toString()));
+									com.setVipprice(Float.parseFloat(tblData1[r][7].toString()));
 									
 									(new CommodityManager()).modifyCom2bus(com);
 									
@@ -988,15 +1026,21 @@ public class FrmMain extends JFrame implements ActionListener{
 			});
 		}else if(User.currentLoginUser!=null) {
 			
+			menu_InfoManager.add(menuItem_UserInfo); menuItem_UserInfo.addActionListener(this);
 			menu_InfoManager.add(menuItem_location); menuItem_location.addActionListener(this);
 			menu_InfoManager.add(menuItem_orderInfo); menuItem_orderInfo.addActionListener(this);
 			menu_InfoManager.add(menuItem_ModifyPwd); menuItem_ModifyPwd.addActionListener(this);
-
+			
 			menu_CartManager.add(menuItem_cart); menuItem_cart.addActionListener(this);
 			menu_CartManager.add(menuItem_addgoods); menuItem_addgoods.addActionListener(this);
 			
+			menu_CouponInfo.add(menuItem_OwnedCoupons); menuItem_OwnedCoupons.addActionListener(this);
+			menu_CouponInfo.add(menuItem_Collects); menuItem_Collects.addActionListener(this);
+
+			
 			menubar.add(menu_InfoManager);
 			menubar.add(menu_CartManager);
+			menubar.add(menu_CouponInfo);
 			
 			this.setJMenuBar(menubar);
 			
@@ -1091,10 +1135,7 @@ public class FrmMain extends JFrame implements ActionListener{
 		
 	}
 	public void actionPerformed(ActionEvent e) {
-//		if(e.getSource()==this.menuItem_userManager){
-//			FrmUserManager dlg = new FrmUserManager(this,"用户管理",true);
-//			dlg.setVisible(true);
-//		}else 
+		
 		if(e.getSource()==this.menuItem_locationManager) {
 			FrmLocationManager dlg = new FrmLocationManager(this,"地址管理",true);
 			dlg.setVisible(true);
@@ -1450,7 +1491,10 @@ public class FrmMain extends JFrame implements ActionListener{
 			FrmCartManager_Add dlg = new FrmCartManager_Add(this,"添加购物车",true);
 			dlg.businessid = tblData2[i][0].toString();
 			dlg.comid = tblData1[j][0].toString();
-			dlg.price = Float.parseFloat(tblData1[j][6].toString());
+			if(User.currentLoginUser.getVipEndTime()==null || User.currentLoginUser.getVipEndTime().before(new Date()))
+				dlg.price = Float.parseFloat(tblData1[j][6].toString());
+			else
+				dlg.price = Float.parseFloat(tblData1[j][7].toString());
 			dlg.businessname = tblData2[i][1].toString();
 			dlg.comname = tblData1[j][1].toString();
 			dlg.counts = Integer.parseInt(tblData1[j][5].toString());
@@ -1461,6 +1505,15 @@ public class FrmMain extends JFrame implements ActionListener{
 		}else if(e.getSource()==menuItem_orderInfo) {
 			FrmOrderManager dlg = new FrmOrderManager(this,"订单查看",true);
 			dlg.setVisible(true);
+		}else if(e.getSource()==menuItem_OwnedCoupons) {
+			FrmOwnedCoupon fci = new FrmOwnedCoupon(this,"优惠券信息",true);
+			fci.setVisible(true);
+		}else if(e.getSource()==menuItem_Collects) {
+			FrmCollects fc = new FrmCollects(this, "集单信息", true);
+			fc.setVisible(true);
+		}else if(e.getSource()==menuItem_UserInfo) {
+			FrmUserInfo fui = new FrmUserInfo(this, "修改账户信息", true);
+			fui.setVisible(true);
 		}
 	}
 }

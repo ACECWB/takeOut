@@ -22,6 +22,7 @@ import takeout.model.User;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class FrmCartManager_Add extends JDialog implements ActionListener{
 	private Cart cart = null;
@@ -88,7 +89,7 @@ public class FrmCartManager_Add extends JDialog implements ActionListener{
 			cart.setUserid(User.currentLoginUser.getUserId());
 			cart.setBusinessid(businessid);
 			cart.setComid(comid);
-			cart.setCounts(Integer.parseInt(this.edtCounts.getText()));
+			cart.setCounts(Integer.parseInt(this.edtCounts.getText()));				
 			cart.setPrice(price * cart.getCounts());
 			cart.setBusinessname(businessname);
 			cart.setComname(comname);

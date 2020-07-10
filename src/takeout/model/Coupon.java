@@ -7,6 +7,8 @@ public class Coupon {
 	public static final String[] BtableTitles = {"优惠券编号","优惠金额","需要订单数","活动开始时间","活动结束时间","有效天数","删除时间"};
 	public static final String[] CtableTitles = {"商家编号","商家名称","优惠券编号","有效截止日期"};
 	public static final String[] CtableTitles1 = {"商家编号","商家名称","优惠券编号","有效截止日期","序号"};
+	public static final String[] UtableTitles = {"商家编号","商家名称","优惠券编号","有效截止日期"};
+	public static final String[] OtableTitles = {"商家编号","商家名称","优惠券编号","活动截止日期","要求单数","已集单数","优惠金额","有效天数"};
 
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	
@@ -23,6 +25,49 @@ public class Coupon {
 	private int ownorder;
 	private String userid;
 	private Date ineffectDate;
+	private int alreadycounts;
+	
+	
+	public int getAlreadyCounts() {
+		return alreadycounts;
+	}
+	public void setAlreadyCounts(int alreadycounts) {
+		this.alreadycounts = alreadycounts;
+	}
+	
+	public String getOCell(int col){
+		if(col==0)
+			return ""+this.businessId;
+		else if(col==1)
+			return ""+this.businessName;
+		else if(col==2)
+			return ""+this.couponId;
+		else if(col==3)
+			return ""+this.endTime;
+		else if(col==4)
+			return ""+this.needOrders;
+		else if(col==5)
+			return ""+this.alreadycounts;
+		else if(col==6)
+			return ""+this.discountMoney;
+		else if(col==7)
+			return ""+this.effectDays;
+		else 
+			return "";
+	}
+	
+	public String getUCell(int col){
+		if(col==0)
+			return ""+this.businessId;
+		else if(col==1)
+			return ""+this.businessName;
+		else if(col==2)
+			return ""+this.couponId;
+		else if(col==3)
+			return ""+this.ineffectDate;
+		else 
+			return "";
+	}
 	
 	public void setOwnOrder(int ownorder) {
 		this.ownorder = ownorder;
@@ -52,11 +97,6 @@ public class Coupon {
 	}
 	
 	public String getCCell(int col){
-//		if(col==0) return "1";
-//		else if(col==1) return "示例计划";
-//		else if(col==2) return "2";
-//		else if(col==3) return "1";
-//		else return "";
 		if(col==0)
 			return ""+this.businessId;
 		else if(col==1)
@@ -141,11 +181,6 @@ public class Coupon {
 	}
 
 	public String getBCell(int col){
-//		if(col==0) return "1";
-//		else if(col==1) return "示例计划";
-//		else if(col==2) return "2";
-//		else if(col==3) return "1";
-//		else return "";
 		if(col==0)
 			return ""+this.couponId;
 		else if(col==1)

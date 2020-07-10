@@ -23,22 +23,37 @@ public class CommodityManager implements ICommodityManager {
 		try {
 			conn = DBUtil.getConnection();
 			conn.setAutoCommit(false);
-			sql = "update com2bus set counts = ? , each_price = ? where com_Id = ? and business_Id = ?";
+			sql = "update com2bus set counts = ? , each_price = ?, vipprice = ? where com_Id = ? and business_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setInt(1, com.getCounts());
 			pst.setFloat(2, com.getEachPrice());
-			pst.setString(3, com.getComId());
-			pst.setString(4, com.getBusinessId());
+			pst.setFloat(3, com.getVipprice());
+			pst.setString(4, com.getComId());
+			pst.setString(5, com.getBusinessId());
 			pst.execute();
 			pst.close();
 			
-			sql = "update cart set price = counts * ?  where com_Id = ? and business_Id = ?"; 
+			
+			sql = "update cart set price = counts * ?  where com_Id = ? and business_Id = ? and user_Id in(\r\n" + 
+					"select user_Id from user where vip_end_time is null or vip_end_time<NOW()\r\n" + 
+					")"; 
 			pst = conn.prepareStatement(sql);
 			pst.setFloat(1, com.getEachPrice());
 			pst.setString(2, com.getComId());
 			pst.setString(3, com.getBusinessId());
 			pst.execute();
 			pst.close();
+			
+			sql = "update cart set price = counts * ?  where com_Id = ? and business_Id = ? and user_Id in(\r\n" + 
+					"select user_Id from user where  vip_end_time>NOW()\r\n" + 
+					")"; 
+			pst = conn.prepareStatement(sql);
+			pst.setFloat(1, com.getVipprice());
+			pst.setString(2, com.getComId());
+			pst.setString(3, com.getBusinessId());
+			pst.execute();
+			pst.close();
+			
 			conn.commit();
 			conn.close();
 			
@@ -511,7 +526,7 @@ public class CommodityManager implements ICommodityManager {
 		List<Commodity> coms = new ArrayList<>();
 		try{
 			conn = DBUtil.getConnection();
-			sql = "select cb.com_Id, c.com_name, cc.category_Id, cc.category_name, cb.business_Id, counts, each_price\r\n" + 
+			sql = "select cb.com_Id, c.com_name, cc.category_Id, cc.category_name, cb.business_Id, counts, each_price, vipprice\r\n" + 
 					"from com2bus cb, commodity c,commoditycategory cc\r\n" + 
 					"where cb.business_Id = ? and cb.com_Id = c.com_Id and cc.category_Id = c.category_Id";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
@@ -526,6 +541,7 @@ public class CommodityManager implements ICommodityManager {
 				c.setBusinessId(rs.getString(5));
 				c.setCounts(rs.getInt(6));
 				c.setEachPrice(rs.getFloat(7));
+				c.setVipprice(rs.getFloat(8));
 				coms.add(c);
 			}
 			rs.close();
@@ -559,7 +575,7 @@ public class CommodityManager implements ICommodityManager {
 		List<Commodity> commoditys = new ArrayList<>();
 		try{
 			conn = DBUtil.getConnection();
-			sql = "select cb.com_Id, c.com_name, cc.category_Id, cc.category_name, cb.business_Id, counts, each_price\r\n" + 
+			sql = "select cb.com_Id, c.com_name, cc.category_Id, cc.category_name, cb.business_Id, counts, each_price, vipprice\r\n" + 
 					"from com2bus cb, commodity c,commoditycategory cc\r\n" + 
 					"where cb.com_Id = c.com_Id and cc.category_Id = c.category_Id";
 			java.sql.Statement st = conn.createStatement();
@@ -573,6 +589,7 @@ public class CommodityManager implements ICommodityManager {
 				c.setBusinessId(rs.getString(5));
 				c.setCounts(rs.getInt(6));
 				c.setEachPrice(rs.getFloat(7));
+				c.setVipprice(rs.getFloat(8));
 				commoditys.add(c);
 			}
 			rs.close();
@@ -608,6 +625,8 @@ public class CommodityManager implements ICommodityManager {
 			throw new BusinessException("单价不可为负数！！！");
 		if(commodity.getCounts()<0)
 			throw new BusinessException("数量不可为负数！！！");
+		if(commodity.getVipprice()<0)
+			throw new BusinessException("会员价不可为负数！！！");
 		
 		try{
 			conn = DBUtil.getConnection();
@@ -635,13 +654,14 @@ public class CommodityManager implements ICommodityManager {
 			pst.setString(1, commodity.getComId());
 			pst.setString(2, commodity.getBusinessId());
 			rs = pst.executeQuery();
-			if(rs.next()) {
-				sql = "update com2bus set counts = counts + ? , each_price = ? where com_Id = ? and business_Id = ?";
+			if(rs.next()) {//若添加的项目已经存在则改为修改，增加数量并修改单价
+				sql = "update com2bus set counts = counts + ? , each_price = ?, vipprice = ? where com_Id = ? and business_Id = ?";
 				pst = conn.prepareStatement(sql);
 				pst.setInt(1, commodity.getCounts());
 				pst.setFloat(2, commodity.getEachPrice());
-				pst.setString(3, commodity.getComId());
-				pst.setString(4, commodity.getBusinessId());
+				pst.setFloat(3, commodity.getVipprice());
+				pst.setString(4, commodity.getComId());
+				pst.setString(5, commodity.getBusinessId());
 				pst.execute();
 				rs.close();
 				
@@ -649,12 +669,13 @@ public class CommodityManager implements ICommodityManager {
 				rs.close();
 				pst.close();
 				
-				sql = "insert into com2bus (com_Id, business_Id, counts, each_price) values (?,?,?,?)";
+				sql = "insert into com2bus (com_Id, business_Id, counts, each_price, vipprice) values (?,?,?,?,?)";
 				pst = conn.prepareStatement(sql);
 				pst.setString(1, commodity.getComId());
 				pst.setString(2, commodity.getBusinessId());
 				pst.setInt(3, commodity.getCounts());
 				pst.setFloat(4, commodity.getEachPrice());
+				pst.setFloat(5, commodity.getVipprice());
 				pst.execute();
 			}
 			

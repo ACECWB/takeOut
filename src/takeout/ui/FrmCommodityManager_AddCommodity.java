@@ -34,12 +34,14 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 	private JLabel labelBusinessId = new JLabel("商家编号：");
 	private JLabel labelCounts = new JLabel("数量：");
 	private JLabel labelPrice = new JLabel("单价：");
+	private JLabel labelVIPPrice = new JLabel("会员价：");
 
 	
 	private JTextField edtCommodityId = new JTextField(20);
 	private JTextField edtBusinessId = new JTextField(20);
 	private JTextField edtCounts = new JTextField(20);
 	private JTextField edtPrice = new JTextField(20);
+	private JTextField edtVIPPrice = new JTextField(20);
 
 	public int model = 0;//页面启动模式
 	
@@ -55,7 +57,8 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 //		workPane.add(labelBusinessId); workPane.add(edtBusinessId);
 		workPane.add(labelCounts); workPane.add(edtCounts);
 		workPane.add(labelPrice); workPane.add(edtPrice);
-		
+		workPane.add(labelVIPPrice); workPane.add(edtVIPPrice);
+
 		this.getContentPane().add(workPane, BorderLayout.CENTER);
 		this.setSize(600, 180);
 		this.setLocationRelativeTo(null);
@@ -77,7 +80,8 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 		workPane.add(labelBusinessId); workPane.add(edtBusinessId);
 		workPane.add(labelCounts); workPane.add(edtCounts);
 		workPane.add(labelPrice); workPane.add(edtPrice);
-		
+		workPane.add(labelVIPPrice); workPane.add(edtVIPPrice);
+
 		this.getContentPane().add(workPane, BorderLayout.CENTER);
 		this.setSize(600, 180);
 		this.setLocationRelativeTo(null);
@@ -99,9 +103,11 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 			String commodityid = this.edtCommodityId.getText();
 			String counts = this.edtCounts.getText();
 			String price = this.edtPrice.getText();
+			String vipprice = this.edtVIPPrice.getText();
 			
 			commodity=new Commodity();
 			commodity.setComId(commodityid);
+			
 			String businessid = null;
 			
 			if(this.model==2) {
@@ -118,6 +124,8 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 				JOptionPane.showMessageDialog(null, "请正确输入单价！！！","错误",JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+			
+			commodity.setVipprice(Float.parseFloat(vipprice));
 			try {
 				commodity.setCounts(Integer.parseInt(counts));
 			}catch(Exception ei) {

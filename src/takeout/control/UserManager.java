@@ -3,6 +3,8 @@ package takeout.control;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -11,7 +13,67 @@ import takeout.model.User;
 import takeout.util.*;
 
 public class UserManager implements IUserManager {
-	
+	public void vip(int month)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();//判断该用户是否已经为VIP
+			sql = "select vip_end_time from user where user_Id = ? and vip_end_time is not null and vip_end_time<now()";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, User.currentLoginUser.getUserId());
+			java.sql.ResultSet rs = pst.executeQuery();
+			if(!rs.next()) {//该用户为新VIP
+				rs.close();
+				pst.close();
+				
+				sql = "update user set isvip = 1, vip_start_time = now(), vip_end_time = ? where user_Id = ?";
+				pst = conn.prepareStatement(sql);
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(new Date());
+				cal.add(Calendar.MONTH, month);
+				pst.setTimestamp(1, new java.sql.Timestamp(cal.getTime().getTime()));
+				pst.setString(2, User.currentLoginUser.getUserId());
+				User.currentLoginUser.setIsVip(1);
+				User.currentLoginUser.setVipStartTime(new Date());
+				User.currentLoginUser.setVipEndTime(cal.getTime());
+				pst.execute();
+				pst.close();
+				
+			}else {//该用户为续费VIP
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(rs.getTimestamp(1));
+				cal.add(Calendar.MONTH, month);
+				rs.close();
+				pst.close();
+				
+				sql = "update user set isvip = 1, vip_end_time = ? where user_Id = ?";
+				pst = conn.prepareStatement(sql);
+				pst.setTimestamp(1, new java.sql.Timestamp(cal.getTime().getTime()));
+				pst.setString(2, User.currentLoginUser.getUserId());
+				User.currentLoginUser.setIsVip(1);
+				User.currentLoginUser.setVipEndTime(cal.getTime());
+				pst.execute();
+				pst.close();
+				
+				
+			}
+			conn.close();
+			
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		
+	}
+
 	public void reg(User user) throws BaseException{
 		Connection conn = null;
 		String sql = null;
@@ -63,7 +125,7 @@ public class UserManager implements IUserManager {
 		
 		try {
 			conn = DBUtil.getConnection();
-			sql = "select pwd ,user_name from user where user_Id = ?";
+			sql = "select pwd ,user_name,sex,phone,email,city,isvip,vip_start_time, vip_end_time from user where user_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, userid);
 			java.sql.ResultSet rs = pst.executeQuery();
@@ -72,6 +134,14 @@ public class UserManager implements IUserManager {
 			if(!rs.getString(1).equals(pwd))
 				throw new BusinessException("密码错误！！！");
 			user.setUserName(rs.getString(2));
+			user.setSex(rs.getString(3));
+			user.setPhone(rs.getString(4));
+			user.setEmail(rs.getString(5));
+			user.setCity(rs.getString(6));
+			user.setIsVip(rs.getInt(7));
+			user.setVipStartTime(rs.getTimestamp(8));
+			user.setVipEndTime(rs.getTimestamp(9));
+			
 			rs.close();
 			pst.close();
 			conn.close();
@@ -93,6 +163,12 @@ public class UserManager implements IUserManager {
 	public void modifyUser(User user)throws BaseException{
 		Connection conn = null;
 		String sql = null;
+		if(user.getUserName() == null || "".equals(user.getUserName()))
+			throw new BusinessException("用户名不可为空！！！");
+		if(user.getPhone() == null || "".equals(user.getPhone()))
+			throw new BusinessException("绑定手机号码不可为空！！！");
+		if(user.getCity() == null || "".equals(user.getCity()))
+			throw new BusinessException("用户所在城市不可为空！！！");
 		try {
 			conn = DBUtil.getConnection();
 			sql = "update `user` set user_name = ?, sex = ?, pwd = ?, phone = ?, email = ?, city = ? where user_Id = ? ";

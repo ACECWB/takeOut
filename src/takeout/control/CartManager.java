@@ -51,7 +51,7 @@ public class CartManager implements ICartManager {
 			if(order.getCouponid() != null && !"".equals(order.getCouponid())){//删除同优惠券编号中最快过期的优惠券
 				sql = "select ownorder from ownedcoupons where ineffect_time =(\r\n" + 
 						"select min(ineffect_time) from ownedcoupons where removetime is null AND\r\n" + 
-						"user_Id = ? and business_Id = ? and coupon_Id = ? \r\n" + 
+						"user_Id = ? and business_Id = ? and coupon_Id = ? and ineffect_time>now() \r\n" + 
 						")";
 				pst = conn.prepareStatement(sql);
 				pst.setString(1, order.getUserid());
