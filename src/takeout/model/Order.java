@@ -4,6 +4,9 @@ import java.util.Date;
 
 public class Order {
 	public static final String[] tableTitles = {"订单编号","商家编号","骑手编号","商品编号","数量","价格","优惠券编号","原总价","现总价","下单时间","送达要求","送达时间","状态"};
+	public static final String[] UtableTitles = {"订单编号","商家编号","商家名称","骑手编号","优惠券编号","原总价","现总价","下单时间","送达要求","送达时间","状态","是否已评论"};
+	public static final String[] ItableTitles = {"商品编号","商品名称","商品数量","商品总价格"};
+
 	
 	private String orderid;
 	private String couponid;
@@ -20,8 +23,85 @@ public class Order {
 	
 	private String userid;
 	private String businessid;
+	private String businessname;
 	private String locaid;
 	private int ownorder;
+	private String comname;
+	
+	private int isreviewed;
+	
+	public String getBusinessName() {
+		return businessname;
+	}
+	public void setBusinessName(String businessname) {
+		this.businessname = businessname;
+	}
+	
+	public int getIsReviewed() {
+		return isreviewed;
+	}
+	public void setIsReviewed(int isreviewed) {
+		this.isreviewed = isreviewed;
+	}
+	
+	public void setComName(String comname) {
+		this.comname = comname;
+	}
+	public String getComName() {
+		return comname;
+	}
+	
+	public String getICell(int col){
+//		if(col==0) return "1";
+//		else if(col==1) return "示例计划";
+//		else if(col==2) return "2";
+//		else if(col==3) return "1";
+//		else return "";
+		if(col==0)
+			return ""+this.comid;
+		else if(col==1)
+			return ""+this.comname;
+		else if(col==2)
+			return ""+this.counts;
+		else if(col==3)
+			return ""+this.price;
+		else 
+			return "";
+	}
+	
+	public String getUCell(int col){
+//		if(col==0) return "1";
+//		else if(col==1) return "示例计划";
+//		else if(col==2) return "2";
+//		else if(col==3) return "1";
+//		else return "";
+		if(col==0)
+			return ""+this.orderid;
+		else if(col==1)
+			return ""+this.businessid;
+		else if(col==2)
+			return ""+this.businessname;
+		else if(col==3)
+			return ""+this.deliverid;
+		else if(col==4)
+			return ""+this.couponid;
+		else if(col==5)
+			return ""+this.originamount;
+		else if(col==6)
+			return ""+this.finalamount;
+		else if(col==7)
+			return ""+this.ordertime;
+		else if(col==8)
+			return ""+this.reqtime;
+		else if(col==9)
+			return ""+this.receivetime;
+		else if(col==10)
+			return ""+this.status;
+		else if(col==11)
+			return ""+this.isreviewed;
+		else 
+			return "";
+	}
 	
 	public int getOwnOrder() {
 		return ownorder;

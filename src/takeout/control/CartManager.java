@@ -73,8 +73,8 @@ public class CartManager implements ICartManager {
 			}
 			
 			sql = "insert into orders(order_Id, user_Id, loca_Id, coupon_Id, business_Id, origin_amount\r\n" + 
-					", final_amount, order_time, req_time, `status`,couponorder)\r\n" + 
-					"values (?,?,?,?,?,?,?,?,?,?,?)";
+					", final_amount, order_time, req_time, `status`,couponorder,isreviewed)\r\n" + 
+					"values (?,?,?,?,?,?,?,?,?,?,?,0)";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, order.getOrderid());
 			pst.setString(2, order.getUserid());

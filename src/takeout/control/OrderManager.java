@@ -88,19 +88,19 @@ public class OrderManager implements IOrderManager {
 		}
 	}
 
-	@Override
-	public List<Order> loadAllOrders(String userid) throws BaseException {
-		// TODO Auto-generated method stub
+	public List<Order> loadAllOrders(String userid)throws BaseException{
 		Connection conn = null;
 		String sql = null;
 		List<Order> orders = new ArrayList<>();
 		try {
 			conn = DBUtil.getConnection();
-			sql = "select o.order_Id, business_Id, deliver_Id, com_Id, count, price, coupon_Id,\r\n" + 
+			sql = "select o.order_Id, business_Id, deliver_Id, oi.com_Id, count, price, coupon_Id,\r\n" + 
 					"origin_amount, final_amount, order_time, req_time, receive_time, `status` \r\n" + 
-					"from orders o, orderinfo oi \r\n" + 
-					"where user_Id = ? and o.order_Id = oi.order_Id ";
+					"from orders o, orderinfo oi, commodity c\r\n" + 
+					"where user_Id = ? and o.order_Id = oi.order_Id and c.com_Id = oi.com_Id";
+		
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			
 			pst.setString(1, userid);
 			java.sql.ResultSet rs = pst.executeQuery();
 			while(rs.next()) {
@@ -120,6 +120,77 @@ public class OrderManager implements IOrderManager {
 				o.setStatus(rs.getString(13));
 				orders.add(o);
 			}
+			
+			rs.close();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return orders;
+	}
+	@Override
+	public List<Order> loadAllOrders(String userid, String orderid,int model) throws BaseException {
+		// TODO Auto-generated method stub
+		Connection conn = null;
+		String sql = null;
+		List<Order> orders = new ArrayList<>();
+		try {
+			conn = DBUtil.getConnection();
+			if(model == 2) {//查看订单详细信息
+				sql = "select c.com_Id, com_name, count, price from orderinfo oi, commodity c\r\n" + 
+						"where c.com_Id = oi.com_Id and order_Id = ?";
+				
+			}else if(model == 1) {
+				sql = "select order_Id, o.business_Id, business_name, deliver_Id, coupon_Id, origin_amount, final_amount, order_time, req_time\r\n" + 
+						", receive_time, status, isreviewed from orders o, business b where user_Id = ? and o.business_Id = b.business_Id";
+				
+			}
+		
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			if(model == 1) {
+				pst.setString(1, userid);
+			}else if(model == 2) {
+				pst.setString(1, orderid);
+			}
+			java.sql.ResultSet rs = pst.executeQuery();
+			if(model == 2) {
+				while(rs.next()) {
+					Order o = new Order();
+					o.setComid(rs.getString(1));
+					o.setComName(rs.getString(2));
+					o.setCounts(rs.getInt(3));
+					o.setPrice(rs.getFloat(4));
+					orders.add(o);
+				}
+			}else if(model == 1) {
+				while(rs.next()) {
+					Order o = new Order();
+					o.setOrderid(rs.getString(1));
+					o.setBusinessid(rs.getString(2));
+					o.setBusinessName(rs.getString(3));
+					o.setDeliverid(rs.getString(4));
+					o.setCouponid(rs.getString(5));
+					o.setOriginamount(rs.getFloat(6));
+					o.setFinalamount(rs.getFloat(7));
+					o.setOrderTime(rs.getTimestamp(8));
+					o.setReqtime(rs.getTimestamp(9));
+					o.setReceiveTime(rs.getTimestamp(10));
+					o.setStatus(rs.getString(11));
+					o.setIsReviewed(rs.getInt(12));
+					orders.add(o);
+				}
+			}
+			
 			rs.close();
 			pst.close();
 			conn.close();

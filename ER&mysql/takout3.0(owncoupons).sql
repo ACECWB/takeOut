@@ -382,3 +382,20 @@ alter table fullreduction add business_Id varchar(30) not null
 alter table deliver add `status` varchar(10) not null
 alter table ownedcoupons add removetime datetime
 alter table orders add couponorder int not null
+
+drop table review
+
+create table review(
+	`user_Id` varchar(20) NOT NULL DEFAULT '',
+  `business_Id` varchar(20) NOT NULL,
+  `content` varchar(30) DEFAULT NULL,
+  `review_date` datetime NOT NULL,
+  `stars` int(11) NOT NULL,
+  `pictures` longblob
+)
+
+
+alter table review drop user_Id
+alter table review drop business_Id
+
+alter table review add order_Id varchar(20) not null

@@ -12,6 +12,36 @@ import takeout.util.DBUtil;
 import takeout.util.DbException;
 
 public class IncomeManager implements IIncomeManager {
+	
+	public void addIncome(Income income)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			sql = "insert into deliver_income(deliver_Id, order_Id, time, review, each_bonus) values (?,?,?,?,?)";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, income.getDeliverid());
+			pst.setString(2, income.getOrderid());
+			pst.setTimestamp(3, new java.sql.Timestamp(income.getReviewtime().getTime()));
+			pst.setString(4, income.getReview());
+			pst.setFloat(5, income.getBonus());
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
 
 	public List<Income> loadAllIncomes(String deliverid) throws BaseException {
 		// TODO Auto-generated method stub

@@ -3,14 +3,23 @@ package takeout.model;
 import java.util.Date;
 
 public class Review {
-	public static final String[] tableTitles = {"用户编号","商品编号","商品名称","评论时间","星级","评论内容"};
+	public static final String[] tableTitles = {"用户编号","评论时间","星级","评论内容"};
 	private String businessid;
 	private String comid;
 	private String userid;
 	private String comname;
 	private String content;
-	private int stars;
+	private float stars;
 	private Date reviewtime;
+	private String orderid;
+	
+	public String getOrderId() {
+		return orderid;
+	}
+
+	public void setOrderid(String orderid) {
+		this.orderid = orderid;
+	}
 	
 	public String getBusinessid() {
 		return businessid;
@@ -52,11 +61,11 @@ public class Review {
 		this.content = content;
 	}
 
-	public int getStars() {
+	public float getStars() {
 		return stars;
 	}
 
-	public void setStars(int stars) {
+	public void setStars(float stars) {
 		this.stars = stars;
 	}
 
@@ -77,14 +86,10 @@ public class Review {
 		if(col==0)
 			return ""+this.userid;
 		else if(col==1)
-			return ""+this.comid;
-		else if(col==2)
-			return ""+this.comname;
-		else if(col==3)
 			return ""+this.reviewtime;
-		else if(col==4)
+		else if(col==2)
 			return ""+this.stars;
-		else if(col==5)
+		else if(col==3)
 			return ""+this.content;
 		else 
 			return "";

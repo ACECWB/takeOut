@@ -212,7 +212,7 @@ public class BusinessManager implements IBusiness {
 				Business b = new Business();
 				b.setBusinessId(rs.getString(1));
 				b.setBusinessName(rs.getString(2));
-				b.setStars(rs.getInt(3));
+				b.setStars(rs.getFloat(3));
 				b.setAvg_consume(rs.getFloat(4));
 				b.setSales_volume(rs.getInt(5));
 				b.setCreateTime(rs.getTimestamp(6));

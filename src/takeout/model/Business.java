@@ -7,7 +7,7 @@ public class Business {
 	public static final String[] CtableTitles = {"商家编号","商家名称"};
 	private String businessId;
 	private String businessName;
-	private int stars;
+	private float stars;
 	private float avg_consume;
 	private int sales_volume;
 	private Date createTime;
@@ -39,10 +39,10 @@ public class Business {
 	public void setBusinessName(String businessName) {
 		this.businessName = businessName;
 	}
-	public int getStars() {
+	public float getStars() {
 		return stars;
 	}
-	public void setStars(int stars) {
+	public void setStars(float stars) {
 		this.stars = stars;
 	}
 	public float getAvg_consume() {

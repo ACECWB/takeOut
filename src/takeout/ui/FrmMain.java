@@ -168,7 +168,7 @@ public class FrmMain extends JFrame implements ActionListener{
 	private Object tblData1[][];
 	private Object tblData2[][];
 	
-	private void reloadBusinessTable(){//这是测试数据，需要用实际数替换
+	public void reloadBusinessTable(){//这是测试数据，需要用实际数替换
 		try {
 			if(User.currentLoginUser!=null)
 				allBusiness = new BusinessManager().loadAllBusiness(false);
