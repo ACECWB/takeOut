@@ -31,5 +31,7 @@ public interface ICommodityManager {
 	public void modifyCom(Commodity com)throws BaseException;
 	public void modifyCom2bus(Commodity com)throws BaseException;
 	
+	public List<Commodity> searchCommoditys(String title, String comcate)throws BaseException;
+	
 	
 }

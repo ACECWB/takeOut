@@ -10,5 +10,5 @@ public interface IFullReductionManager {
 	public void addFullReduction(FullReduction fullreduction)throws BaseException;
 	public void deleteFullReduction(String reductId)throws BaseException;
 	
-	
+	public void modifyReduction(FullReduction full)throws BaseException;
 }

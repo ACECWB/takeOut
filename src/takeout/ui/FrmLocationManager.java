@@ -39,19 +39,29 @@ public class FrmLocationManager extends JDialog implements ActionListener{
 	List<Location> locations;
 	private void reloadLocationTable(){
 		try {
-			
-			if(User.currentLoginUser==null)
+			String[] titles = null;
+			if(User.currentLoginUser==null) {//显示管理员地址信息
 				locations=(new LocationManager()).loadAllLocations();
-			else
+				titles = Location.tableTitles;
+				tblData = new Object[locations.size()][titles.length];
+				for(int i=0;i<locations.size();i++){
+					for(int j=0;j<titles.length;j++) {
+						tblData[i][j] = locations.get(i).getCell(j); 
+					}
+				}
+			}else {//显示该用户的所有地址信息
 				locations=(new LocationManager()).loadAllLocations(User.currentLoginUser.getUserId());
-
-			tblData = new Object[locations.size()][Location.UtableTitles.length];
-			for(int i=0;i<locations.size();i++){
-				for(int j=0;j<Location.UtableTitles.length;j++) {
-					tblData[i][j] = locations.get(i).getUCell(j); 
+				titles = Location.UtableTitles;
+				tblData = new Object[locations.size()][titles.length];
+				for(int i=0;i<locations.size();i++){
+					for(int j=0;j<titles.length;j++) {
+						tblData[i][j] = locations.get(i).getUCell(j); 
+					}
 				}
 			}
-			tablmod.setDataVector(tblData, Location.UtableTitles);
+
+			
+			tablmod.setDataVector(tblData, titles);
 			this.locationTable.validate();
 			this.locationTable.repaint();
 		} catch (BaseException e) {

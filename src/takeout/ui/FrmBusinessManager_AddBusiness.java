@@ -48,7 +48,7 @@ public class FrmBusinessManager_AddBusiness extends JDialog implements ActionLis
 //		workPane.add(labelStars); workPane.add(edtStars);
 		
 		this.getContentPane().add(workPane, BorderLayout.CENTER);
-		this.setSize(600, 180);
+		this.setSize(550, 180);
 		this.setLocationRelativeTo(null);
 		
 		this.validate();

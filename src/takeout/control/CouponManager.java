@@ -44,11 +44,12 @@ public class CouponManager implements ICouponManager {
 				}
 		}
 	}
-	public void modifyBcoupon(Coupon coupon)throws BaseException{
+	public void modifyBcoupon(Coupon coupon, int origindays)throws BaseException{
 		Connection conn = null;
 		String sql = null;
 		try {
 			conn = DBUtil.getConnection();
+			conn.setAutoCommit(false);
 			sql = "update coupon set discount_money = ?, need_orders = ?, start_time = ?,\r\n" + 
 					" end_time = ?, effect_days = ? where coupon_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
@@ -60,10 +61,31 @@ public class CouponManager implements ICouponManager {
 			pst.setString(6, coupon.getCouponId());
 			pst.execute();
 			pst.close();
+			System.out.println(origindays+"   "+coupon.getEffectDays());
+			if(origindays != coupon.getEffectDays()) {//更新用户所拥有的优惠券
+				sql = "update ownedcoupons set ineffect_time = DATE_ADD(ineffect_time,INTERVAL ? day) where business_Id = ? and coupon_Id = ? and removetime is null\r\n" + 
+						"";
+				pst = conn.prepareStatement(sql);
+				pst.setInt(1, coupon.getEffectDays() - origindays);
+				pst.setString(2, coupon.getBusinessId());
+				pst.setString(3, coupon.getCouponId());
+				System.out.println(coupon.getBusinessId());
+
+				System.out.println(coupon.getCouponId());
+				pst.execute();
+				pst.close();
+				
+			}
+			conn.commit();
 			conn.close();
 			
 		}catch(SQLException e) {
 			e.printStackTrace();
+			try {
+				conn.rollback();
+			}catch(Exception ex) {
+				ex.printStackTrace();
+			}
 			throw new DbException(e);
 		}finally {
 			if(conn!=null)

@@ -132,6 +132,15 @@ public class BusinessManager implements IBusiness {
 			rs.close();
 			pst.close();
 			
+			sql = "select removetime from business where business_Id = ? and removetime is not null";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, businessId);
+			rs = pst.executeQuery();
+			if(rs.next())
+				throw new BusinessException("该商家已注销！！！");
+			rs.close();
+			pst.close();
+			
 			conn.setAutoCommit(false);
 			sql = "delete from collectorders where business_Id = ?";
 			pst = conn.prepareStatement(sql);

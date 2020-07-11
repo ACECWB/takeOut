@@ -66,6 +66,8 @@ public class Deliver {
 			return ""+this.quitTime;
 		else if(col==4)
 			return ""+this.identity;
+		else if(col==5)
+			return ""+this.status;
 		else 
 			return "";
 	}

@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.sql.Connection;
 
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -155,6 +156,7 @@ public class FrmBuyManager extends JDialog implements ActionListener{
 			return;
 		}
 		else if(e.getSource()==this.btnOk){
+			
 
 			Order o = new Order();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
@@ -191,6 +193,7 @@ public class FrmBuyManager extends JDialog implements ActionListener{
 			} catch (BaseException e1) {
 				this.cart=null;
 				JOptionPane.showMessageDialog(null, e1.getMessage(),"´íÎó",JOptionPane.ERROR_MESSAGE);
+				return;
 			}
 			fcm.reloadBusinessTable();
 			this.fm.reloadComTable(row);

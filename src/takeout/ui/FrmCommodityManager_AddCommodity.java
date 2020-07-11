@@ -60,7 +60,7 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 		workPane.add(labelVIPPrice); workPane.add(edtVIPPrice);
 
 		this.getContentPane().add(workPane, BorderLayout.CENTER);
-		this.setSize(600, 180);
+		this.setSize(400, 180);
 		this.setLocationRelativeTo(null);
 		
 		this.validate();

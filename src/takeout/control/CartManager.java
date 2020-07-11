@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 
 import takeout.itf.ICartManager;
 import takeout.model.Cart;
+import takeout.model.Commodity;
 import takeout.model.Order;
 import takeout.model.User;
 import takeout.util.BaseException;
@@ -17,6 +18,87 @@ import takeout.util.DBUtil;
 import takeout.util.DbException;
 
 public class CartManager implements ICartManager {
+	public void modifyCart(Commodity com)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		
+		
+		
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update cart set counts = ? where user_Id = ? and com_Id = ? and business_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setInt(1, com.getCounts());
+			pst.setString(2, User.currentLoginUser.getUserId());
+			pst.setString(3, com.getComId());
+			pst.setString(4, com.getBusinessId());
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+	public String[] loadAllCates()throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		int i = 0;
+		int size = 0;
+		String[] comcates = null;
+		
+		
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select count(*) from commoditycategory";
+			java.sql.Statement st = conn.createStatement();
+			java.sql.ResultSet rs = st.executeQuery(sql);
+			if(rs.next()) {
+				size = rs.getInt(1);
+				comcates = new String[size+1];
+				comcates[0] = "";
+			}else {
+				comcates = new String[1];
+				comcates[0] = "";
+				return comcates;
+			}
+			rs.close();
+			st.close();
+			
+			sql = "select category_name from commoditycategory";
+			st = conn.createStatement();
+			rs = st.executeQuery(sql);
+			while(rs.next()) {
+				i++;
+				comcates[i] = rs.getString(1);
+			}
+			rs.close();
+			st.close();
+			conn.close();
+					
+			
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return comcates;
+	}
 	public void purchase(Order order)throws BaseException{
 		Connection conn = null;
 		String sql = null;

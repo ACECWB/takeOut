@@ -17,8 +17,9 @@ public class UserManager implements IUserManager {
 		Connection conn = null;
 		String sql = null;
 		try {
-			conn = DBUtil.getConnection();//判断该用户是否已经为VIP
-			sql = "select vip_end_time from user where user_Id = ? and vip_end_time is not null and vip_end_time<now()";
+			conn = DBUtil.getConnection();//判断该用户是否已经为VIP-有结果则为老VIP
+			conn.setAutoCommit(false);
+			sql = "select vip_end_time from user where user_Id = ? and vip_end_time is not null and vip_end_time>now()";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, User.currentLoginUser.getUserId());
 			java.sql.ResultSet rs = pst.executeQuery();
@@ -45,7 +46,7 @@ public class UserManager implements IUserManager {
 				cal.add(Calendar.MONTH, month);
 				rs.close();
 				pst.close();
-				
+				System.out.println("after" + cal.getTime());
 				sql = "update user set isvip = 1, vip_end_time = ? where user_Id = ?";
 				pst = conn.prepareStatement(sql);
 				pst.setTimestamp(1, new java.sql.Timestamp(cal.getTime().getTime()));
@@ -57,11 +58,17 @@ public class UserManager implements IUserManager {
 				
 				
 			}
+			conn.commit();
 			conn.close();
 			
 			
 		}catch(SQLException e) {
 			e.printStackTrace();
+			try {
+				conn.rollback();
+			}catch(Exception ex) {
+				ex.printStackTrace();
+			}
 			throw new DbException(e);
 		}finally {
 			if(conn!=null)

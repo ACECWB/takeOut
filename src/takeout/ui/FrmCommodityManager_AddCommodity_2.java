@@ -46,7 +46,7 @@ public class FrmCommodityManager_AddCommodity_2 extends JDialog implements Actio
 		workPane.add(labelCateName); workPane.add(edtCateName);
 		
 		this.getContentPane().add(workPane, BorderLayout.CENTER);
-		this.setSize(500, 180);
+		this.setSize(350, 120);
 		this.setLocationRelativeTo(null);
 		
 		this.validate();

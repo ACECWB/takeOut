@@ -127,7 +127,7 @@ public class FrmUserInfo extends JDialog implements ActionListener {
 				user.setIsVip((edtIsVip.getText().toString()).equals("ÊÇ")?1:0);
 				user.setVipStartTime(User.currentLoginUser.getVipStartTime());
 				user.setVipEndTime(User.currentLoginUser.getVipEndTime());
-				
+				User.currentLoginUser = user;
 				(new UserManager()).modifyUser(user);
 				this.setVisible(false);
 			}catch(BaseException e1) {

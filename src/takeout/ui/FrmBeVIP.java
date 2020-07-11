@@ -34,7 +34,7 @@ public class FrmBeVIP extends JDialog implements ActionListener{
 
 	private JPanel workPane = new JPanel();
 	
-	private int month = 0;
+	private int month = 1;
 	private Button btnOk = new Button("确定");
 	private Button btnCancel = new Button("取消");
 

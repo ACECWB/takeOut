@@ -3,6 +3,7 @@ package takeout.itf;
 import java.util.List;
 
 import takeout.model.Cart;
+import takeout.model.Commodity;
 import takeout.model.Order;
 import takeout.util.BaseException;
 
@@ -19,4 +20,8 @@ public interface ICartManager {
 	public String[] getCoupons(String userid, String businessid)throws BaseException;
 	public String getAfterCoupon(String couponid, String afterFull)throws BaseException;
 	public void purchase(Order order)throws BaseException;
+	
+	public String[] loadAllCates()throws BaseException;
+	public void modifyCart(Commodity com)throws BaseException;
+	
 }

@@ -12,6 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.Connection;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -24,19 +25,24 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 import takeout.control.BusinessManager;
 import takeout.control.CartManager;
-import takeout.control.CommodityManager;
+import takeout.control.CartManager;
 import takeout.control.CartManager;
 import takeout.control.CartManager;
 import takeout.model.Business;
 import takeout.model.Cart;
+import takeout.model.ComTitle;
 import takeout.model.Commodity;
 import takeout.model.Cart;
 import takeout.model.User;
 import takeout.util.BaseException;
+import takeout.util.BusinessException;
+import takeout.util.DBUtil;
 
 
 public class FrmCartManager extends JDialog implements ActionListener{
@@ -64,24 +70,24 @@ public class FrmCartManager extends JDialog implements ActionListener{
 	private List<Commodity> allCom;
 	
 	private Business curBus;
-	public void reloadComTable(int businessIdx){
-		if(businessIdx<0) return;
-			curBus = allBusiness.get(businessIdx);
-		try {
-			allCom = new CommodityManager().loadAllCommodity(curBus);
-		} catch (BaseException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		tblData1 =  new Object[allCom.size()][Commodity.tableTitles.length];
-		for(int i=0;i<allCom.size();i++){
-			for(int j=0;j<Commodity.tableTitles.length;j++)
-				tblData1[i][j]=allCom.get(i).getCell(j);
-		}
-		tabModel1.setDataVector(tblData1,Commodity.tableTitles);
-		this.dataTable1.validate();
-		this.dataTable1.repaint();
-	}
+//	public void reloadComTable(int businessIdx){
+//		if(businessIdx<0) return;
+//			curBus = allBusiness.get(businessIdx);
+//		try {
+//			allCom = new CartManager().loadAllCarts(User.currentLoginUser.getUserId() ,curBus.getBusinessId());
+//		} catch (BaseException e) {
+//			JOptionPane.showMessageDialog(null, e.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
+//			return;
+//		}
+//		tblData1 =  new Object[allCom.size()][Commodity.tableTitles.length];
+//		for(int i=0;i<allCom.size();i++){
+//			for(int j=0;j<Commodity.tableTitles.length;j++)
+//				tblData1[i][j]=allCom.get(i).getCell(j);
+//		}
+//		tabModel1.setDataVector(tblData1,Commodity.tableTitles);
+//		this.dataTable1.validate();
+//		this.dataTable1.repaint();
+//	}
 	public void reloadCartTable(int businessIdx){
 		if(businessIdx<0) return;
 			curBus = allBusiness.get(businessIdx);
@@ -158,6 +164,58 @@ public class FrmCartManager extends JDialog implements ActionListener{
 			}
 	    	
 	    });
+		
+		this.dataTable1.getModel().addTableModelListener(new TableModelListener() {
+			
+			public void tableChanged(TableModelEvent e) {
+				int i = dataTable1.getSelectedRow();
+				int j = dataTable2.getSelectedRow();
+				int c = e.getColumn();
+				int r = e.getFirstRow();
+				
+				if(c>=0 && r>=0) {
+					if(c == 2) {
+						try {
+							if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
+								throw new BusinessException("数量不可为空！！！");
+							}
+							if(Integer.parseInt(dataTable1.getValueAt(r, c).toString())<0) {
+								throw new BusinessException("数量不可为负数！！！");
+							}
+
+							tblData1[r][c] = dataTable1.getValueAt(r, c);
+							Commodity com = new Commodity();
+							com.setComId(tblData1[r][0].toString());
+							com.setBusinessId(tblData2[j][0].toString());
+							com.setCounts(Integer.parseInt(tblData1[r][2].toString()));
+							
+							(new CartManager()).modifyCart(com);
+							
+						}catch(Exception e2) {
+							JOptionPane.showMessageDialog(null,  "请输入正确值(或该商品现库存数不足)！！！","提示",JOptionPane.ERROR_MESSAGE);
+							tabModel1.setDataVector(tblData1, Cart.tableTitles);
+							dataTable1.validate();
+							dataTable1.repaint();
+						}
+
+//						FrmMain.this.reloadComTable();
+						FrmCartManager.this.reloadCartTable(j);
+					}else {
+						JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+						tabModel1.setDataVector(tblData1, Cart.tableTitles);
+						dataTable1.validate();
+						dataTable1.repaint();
+
+					}
+					
+					
+				}
+
+			}
+
+			
+		});
+		
 //	    this.getContentPane().add(new JScrollPane(this.dataTable1), BorderLayout.CENTER);
 		this.reloadBusinessTable();
 
@@ -185,6 +243,33 @@ public class FrmCartManager extends JDialog implements ActionListener{
 				return;
 			}
 			String businessid = tblData2[i][0].toString();
+			
+			Connection conn = null;
+			String sql = null;
+			try {
+				conn = DBUtil.getConnection();
+				sql = "select cb.com_Id, com_name, cb.counts , c.counts  from cart c, com2bus cb, commodity com\r\n" + 
+						"where user_Id = ? and cb.business_Id = ? and cb.com_Id = c.com_Id and cb.business_Id = c.business_Id and com.com_Id = c.com_Id\r\n" + 
+						"and c.counts > cb.counts";
+				java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+				pst.setString(1, User.currentLoginUser.getUserId());
+				pst.setString(2, businessid);
+				java.sql.ResultSet rs = pst.executeQuery();
+				if(rs.next()) {
+					JOptionPane.showMessageDialog(null,"购物车中商品编号为 "+rs.getString(1)+"的"+rs.getString(2)+"的购买数量为: "+rs.getInt(4)+"，但库存中仅有"+rs.getInt(3),"错误",JOptionPane.ERROR_MESSAGE);
+					rs.close();
+					pst.close();
+					conn.close();
+					return ;
+					
+				}
+				rs.close();
+				pst.close();
+				conn.close();
+			}catch(Exception ex) {
+				ex.printStackTrace();
+			}
+			
 			FrmBuyManager dlg = new FrmBuyManager(this, "购买", true, businessid, this.row, fm);
 			dlg.setVisible(true);
 //			this.reloadComTable(i);

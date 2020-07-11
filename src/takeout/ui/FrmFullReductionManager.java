@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -19,12 +21,16 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
-
+import takeout.control.FullReductionManager;
 import takeout.control.FullReductionManager;
 import takeout.model.FullReduction;
+import takeout.model.FullReduction;
 import takeout.util.BaseException;
+import takeout.util.BusinessException;
 
 
 public class FrmFullReductionManager extends JDialog implements ActionListener{
@@ -66,6 +72,128 @@ public class FrmFullReductionManager extends JDialog implements ActionListener{
 		this.getContentPane().add(toolBar, BorderLayout.NORTH);
 		//提取现有数据
 		this.reloadFullTable();
+		this.comTable.getModel().addTableModelListener(new TableModelListener() {
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				int i = comTable.getSelectedRow();
+				int c = e.getColumn();
+				int r = e.getFirstRow();
+				if(c>=0 && r>=0) {
+					FullReduction full = new FullReduction();
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+					if(c == 1) {
+						try {
+							if(comTable.getValueAt(r, c).toString() == null || "".equals(comTable.getValueAt(r, c).toString())) {
+								throw new BusinessException("商家编号不可为空！！！");
+							}
+
+						}catch(Exception e4) {
+							JOptionPane.showMessageDialog(null,  "请输入正确信息！！！","提示",JOptionPane.ERROR_MESSAGE);
+							tablmod.setDataVector(tblData, FullReduction.tableTitles);
+							comTable.validate();
+							comTable.repaint();
+							return;
+						}
+					}else if(c == 2) {
+						try {
+							if(comTable.getValueAt(r, c).toString() == null || "".equals(comTable.getValueAt(r, c).toString())) {
+								throw new BusinessException("满减金额不可为空！！！");
+							}
+
+						}catch(Exception e4) {
+							JOptionPane.showMessageDialog(null,  "请输入正确信息！！！","提示",JOptionPane.ERROR_MESSAGE);
+							tablmod.setDataVector(tblData, FullReduction.tableTitles);
+							comTable.validate();
+							comTable.repaint();
+							return;
+						}
+					}else if(c == 3) {
+						try {
+							if(comTable.getValueAt(r, c).toString() == null || "".equals(comTable.getValueAt(r, c).toString())) {
+								throw new BusinessException("优惠金额不可为空！！！");
+							}
+							
+							
+						}catch(Exception e4) {
+							JOptionPane.showMessageDialog(null,  "请输入正确信息！！！","提示",JOptionPane.ERROR_MESSAGE);
+							tablmod.setDataVector(tblData, FullReduction.tableTitles);
+							comTable.validate();
+							comTable.repaint();
+							return;
+						}
+					}else if(c == 4) {
+						try {
+							if(comTable.getValueAt(r, c).toString() == null || "".equals(comTable.getValueAt(r, c).toString())) {
+								throw new BusinessException("是否可与优惠券叠加不可为空！！！");
+							}
+							if(!comTable.getValueAt(r, c).toString().equals("是") && !comTable.getValueAt(r, c).toString().equals("否"))
+								throw new BusinessException("内容必须为是或否！！！");
+							
+						}catch(Exception e4) {
+							JOptionPane.showMessageDialog(null,  "请输入正确信息！！！","提示",JOptionPane.ERROR_MESSAGE);
+							tablmod.setDataVector(tblData, FullReduction.tableTitles);
+							comTable.validate();
+							comTable.repaint();
+							return;
+						}
+					}else if(c == 5) {
+						try {
+							if(comTable.getValueAt(r, c).toString() == null || "".equals(comTable.getValueAt(r, c).toString())) {
+								throw new BusinessException("满减活动截止期不可为空！！！");
+							}
+							full.setEndTime(sdf.parse(comTable.getValueAt(r, c).toString()));
+						}catch(Exception e4) {
+							JOptionPane.showMessageDialog(null,  "请输入正确信息！！！","提示",JOptionPane.ERROR_MESSAGE);
+							tablmod.setDataVector(tblData, FullReduction.tableTitles);
+							comTable.validate();
+							comTable.repaint();
+							return;
+						}
+					}else {
+						JOptionPane.showMessageDialog(null,  "不可修改该属性值！！！","提示",JOptionPane.ERROR_MESSAGE);
+						tablmod.setDataVector(tblData, FullReduction.tableTitles);
+						comTable.validate();
+						comTable.repaint();
+						return;
+					}
+					tblData[r][c] = comTable.getValueAt(r, c);
+					
+					full.setReductId(tblData[i][0].toString());
+					full.setBusinessId(tblData[i][1].toString());
+					full.setRequireAmount(Float.parseFloat(tblData[i][2].toString()));
+					full.setDiscountAmount(Float.parseFloat(tblData[i][3].toString()));
+					full.setWithCoupon(tblData[i][4].toString());
+					try {
+						full.setEndTime(sdf.parse(tblData[i][5].toString()));
+					} catch (ParseException e2) {
+						// TODO Auto-generated catch block
+						JOptionPane.showMessageDialog(null,  "请输入正确时间格式！！！","提示",JOptionPane.ERROR_MESSAGE);
+						e2.printStackTrace();
+						tablmod.setDataVector(tblData, FullReduction.tableTitles);
+						comTable.validate();
+						comTable.repaint();
+						return;
+					}
+					try {
+						(new FullReductionManager()).modifyReduction(full);
+					} catch (BaseException e1) {
+						// TODO Auto-generated catch block
+						JOptionPane.showMessageDialog(null,  "信息错误！！！","提示",JOptionPane.ERROR_MESSAGE);
+
+						e1.printStackTrace();
+					}
+					
+					FrmFullReductionManager.this.reloadFullTable();
+					
+					
+					
+				}
+				
+			}
+			
+		});
+
 		this.getContentPane().add(new JScrollPane(this.comTable), BorderLayout.CENTER);
 		
 		// 屏幕居中显示

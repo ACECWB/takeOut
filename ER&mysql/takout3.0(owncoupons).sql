@@ -409,3 +409,11 @@ where  co.business_Id = b.business_Id and co.business_Id = c.business_Id
 )
 alter table user change vip_start_time  vip_start_time  datetime
 alter table user change vip_end_time  vip_end_time  datetime
+
+create view searchcommodity as(
+select  cb.com_Id, c.com_name, cc.category_Id, cc.category_name,
+cb.business_Id, b.business_name, cb.counts, cb.each_price, cb.vipprice
+from com2bus cb, business b, commoditycategory cc, commodity c
+where cb.com_Id = c.com_Id AND
+c.category_Id = cc.category_Id and cb.business_Id = b.business_Id
+)

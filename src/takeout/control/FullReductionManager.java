@@ -13,7 +13,35 @@ import takeout.util.DBUtil;
 import takeout.util.DbException;
 
 public class FullReductionManager implements IFullReductionManager {
-
+	public void modifyReduction(FullReduction full)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update fullreduction set business_Id = ?, require_amount = ? , discount_amount = ?, with_coupon = ? , removetime = ? where reduct_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, full.getBusinessId());
+			pst.setFloat(2, full.getRequireAmount());
+			pst.setFloat(3, full.getDiscountAmount());
+			pst.setString(4, full.getWithCoupon());
+			pst.setTimestamp(5, new java.sql.Timestamp(full.getEndTime().getTime()));
+			pst.setString(6, full.getReductId());
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
 	@Override
 	public List<FullReduction> loadAllFullReductions() throws BaseException {
 		// TODO Auto-generated method stub

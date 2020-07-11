@@ -69,7 +69,8 @@ public class FrmMain extends JFrame implements ActionListener{
 	private JMenu menu_Com = new JMenu("商品管理");
 	private JMenu menu_User = new JMenu("用户管理");
 	private JMenu menu_Deliver = new JMenu("骑手管理");
-	
+	private Button btnSearch = new Button("全局搜索");
+
 	private JMenu menu_Coupon = new JMenu("优惠券管理");
 	private JMenu menu_Statistic = new JMenu("统计");
 	private JMenu menu_CouponInfo = new JMenu("优惠券信息");
@@ -654,6 +655,8 @@ public class FrmMain extends JFrame implements ActionListener{
 							}
 						}else if(model == 3) {
 							SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+							int origindays = Integer.parseInt(tblData1[r][5].toString());
+							int nowdays = 0;
 							try {
 								if(c == 1) {
 									if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
@@ -730,7 +733,8 @@ public class FrmMain extends JFrame implements ActionListener{
 							}
 							bc.setEffectDays(Integer.parseInt(tblData1[i][5].toString()));
 							try {
-								(new CouponManager()).modifyBcoupon(bc);
+								System.out.println(bc.getEffectDays()+"  "+origindays);
+								(new CouponManager()).modifyBcoupon(bc, origindays);
 							} catch (BaseException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
@@ -1041,7 +1045,8 @@ public class FrmMain extends JFrame implements ActionListener{
 			menubar.add(menu_InfoManager);
 			menubar.add(menu_CartManager);
 			menubar.add(menu_CouponInfo);
-			
+			menubar.add(btnSearch);
+			this.btnSearch.addActionListener(this);
 			this.setJMenuBar(menubar);
 			
 		}
@@ -1514,6 +1519,10 @@ public class FrmMain extends JFrame implements ActionListener{
 		}else if(e.getSource()==menuItem_UserInfo) {
 			FrmUserInfo fui = new FrmUserInfo(this, "修改账户信息", true);
 			fui.setVisible(true);
+		}else if(e.getSource()==btnSearch) {
+			FrmSearchCommoditys fsc = new FrmSearchCommoditys(this, "搜索商品", true);
+			fsc.setVisible(true);
+			
 		}
 	}
 }

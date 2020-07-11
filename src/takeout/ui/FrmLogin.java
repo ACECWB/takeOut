@@ -38,6 +38,8 @@ public class FrmLogin extends JDialog implements ActionListener{
 	
 	private JRadioButton btnAdmin = new JRadioButton("管理员");
 	private JRadioButton btnUser = new JRadioButton("用户");
+	private JRadioButton btnBus = new JRadioButton("商家");
+
 	private ButtonGroup btnGroup = new ButtonGroup();
 	
 	private JLabel labelUser = new JLabel("用户：");
@@ -52,20 +54,23 @@ public class FrmLogin extends JDialog implements ActionListener{
 		super(f,s,b);
 		btnGroup.add(btnAdmin);
 		btnGroup.add(btnUser);
+		btnGroup.add(btnBus);
 		toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
 		toolBar.add(btnRegister);
 		toolBar.add(btnLogin);
 //		toolBar.add(btnBack);
 		toolBar.add(btnAdmin);
 		toolBar.add(btnUser);
+		toolBar.add(btnBus);
 //		toolBar.add(btnCancel);
 		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
 		workBar.add(labelUser);
 		workBar.add(edtUserId);
 		workBar.add(labelPwd);
+		labelPwd.setLocation(30, 30);
 		workBar.add(edtPwd);
 		this.getContentPane().add(workBar, BorderLayout.CENTER);
-		this.setSize(300,150);
+		this.setSize(400,150);
 //		double width = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
 //		double height = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 //		this.setLocation((int)(width/2), (int)(height/2));
@@ -76,6 +81,7 @@ public class FrmLogin extends JDialog implements ActionListener{
 		btnLogin.addActionListener(this);
 //		btnCancel.addActionListener(this);
 		btnBack.addActionListener(this);
+		btnBus.addActionListener(this);
 		this.btnRegister.addActionListener(this);
 		
 		btnAdmin.setSelected(true);

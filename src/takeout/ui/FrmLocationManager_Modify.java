@@ -56,11 +56,12 @@ public class FrmLocationManager_Modify extends JDialog implements ActionListener
 		workPane.add(labelPhone);
 		this.edtPhone.setText(l.getPhone());
 		workPane.add(edtPhone);
+		workPane.add(labelConnection);
 		this.edtConnection.setText(l.getConnUser());
 		workPane.add(edtConnection);
 		
 		this.getContentPane().add(workPane, BorderLayout.CENTER);
-		this.setSize(360, 180);
+		this.setSize(300, 180);
 
 		this.setLocationRelativeTo(null);
 		
@@ -85,6 +86,7 @@ public class FrmLocationManager_Modify extends JDialog implements ActionListener
 				String loca = this.edtLocation.getText();
 				String phone = this.edtPhone.getText();
 				String con = this.edtConnection.getText();
+				
 				if(!loca.equals(location.getLoca())) {
 					(new LocationManager()).modifyLoca(location.getLocaId(), loca);
 				}
