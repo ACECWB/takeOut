@@ -3,6 +3,8 @@ package takeout.model;
 import java.util.Date;
 
 public class Business {
+	public static Business currentLoginBusiness=null;
+
 	public static final String[] tableTitles = {"商家编号","商家名称","星级","平均消费","总销量","创建时间","注销时间"};
 	public static final String[] CtableTitles = {"商家编号","商家名称"};
 	private String businessId;
@@ -12,8 +14,14 @@ public class Business {
 	private int sales_volume;
 	private Date createTime;
 	private Date removeTime;
+	private String pwd;
 	
-	
+	public String getPwd() {
+		return this.pwd;
+	}
+	public void setPwd(String pwd) {
+		this.pwd = pwd;
+	}
 	
 	public Date getCreateTime() {
 		return createTime;

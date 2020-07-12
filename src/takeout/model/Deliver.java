@@ -3,6 +3,9 @@ package takeout.model;
 import java.util.Date;
 
 public class Deliver {
+	
+	public static Deliver currentLoginDeliver=null;
+	
 	public static final String[] tableTitles = {"骑手编号","骑手姓名","就职时间","辞职时间","身份","状态"};
 	private String deliverId;
 	private String deliverName;
@@ -10,6 +13,14 @@ public class Deliver {
 	private String identity;
 	private String quitTime;
 	private String status;
+	private String pwd;
+	
+	public String getPwd() {
+		return pwd;
+	}
+	public void setPwd(String pwd) {
+		this.pwd = pwd;
+	}
 	
 	public String getStatus() {
 		return status;

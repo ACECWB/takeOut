@@ -11,4 +11,9 @@ public interface IDeliverManager {
 	public List<Deliver> loadAllDelivers()throws BaseException;
 	
 	public void modifyDeliver(Deliver deliver)throws BaseException;
+	
+	public Deliver reg(Deliver d) throws BaseException;
+	public Deliver login(String userid, String pwd)throws BaseException;
+	
+	
 }

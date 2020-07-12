@@ -17,6 +17,8 @@ import javax.swing.JTextField;
 
 import StartTakeout.takeOutUtil;
 import takeout.model.Admin;
+import takeout.model.Business;
+import takeout.model.Deliver;
 import takeout.model.User;
 import takeout.util.BaseException;
 
@@ -38,7 +40,12 @@ public class FrmRegister extends JDialog implements ActionListener {
 	private JLabel labelCity = new JLabel("所在城市：");
 	private JComboBox cmbSex= new JComboBox(new String[] { "男", "女", "无"});
 
-	
+	private JLabel labelBusName = new JLabel("商家名：");
+	private JLabel labelBusId = new JLabel("商家编号：");
+
+	private JLabel labelDeliverName = new JLabel("骑手姓名：");
+	private JLabel labelDeliverId = new JLabel("骑手编号：");
+
 	private JLabel labelAdmin = new JLabel("管理员账号：");
 	private JLabel labelAdminName = new JLabel("管理员姓名：");
 	private JLabel labelPwd = new JLabel("设置密码：");
@@ -81,6 +88,23 @@ public class FrmRegister extends JDialog implements ActionListener {
 //			this.getContentPane().add(workPane1, BorderLayout.CENTER);
 			this.setSize(320, 500);
 
+		}else if(m == 3) {//商家
+			workPane.add(labelBusId); workPane.add(edtUserId);
+			workPane.add(labelBusName); workPane.add(edtName);
+			workPane.add(labelPwd); workPane.add(edtPwd);
+			workPane.add(labelPwd2); workPane.add(edtPwd2);
+			this.getContentPane().add(workPane, BorderLayout.CENTER);
+//			this.getContentPane().add(workPane1, BorderLayout.CENTER);
+			this.setSize(320, 500);
+			
+		}else if(m == 4) {//骑手
+			workPane.add(labelDeliverId); workPane.add(edtUserId);
+			workPane.add(labelDeliverName); workPane.add(edtName);
+			workPane.add(labelPwd); workPane.add(edtPwd);
+			workPane.add(labelPwd2); workPane.add(edtPwd2);
+			this.getContentPane().add(workPane, BorderLayout.CENTER);
+//			this.getContentPane().add(workPane1, BorderLayout.CENTER);
+			this.setSize(320, 500);
 		}
 		
 		
@@ -128,8 +152,40 @@ public class FrmRegister extends JDialog implements ActionListener {
 					JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+			}else if(model == 3) {
+				if(!pwd1.equals(pwd2)) {
+					JOptionPane.showMessageDialog(null, "两次密码不一致！！！","错误",JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				Business bus = new Business();
+				bus.setBusinessId(userid);
+				bus.setBusinessName(username);
+				bus.setPwd(pwd1);
+				try {
+					Business b=takeOutUtil.businessManager.reg(bus);
+					this.setVisible(false);
+				} catch (BaseException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+		}else if(model == 4) {
+			if(!pwd1.equals(pwd2)) {
+				JOptionPane.showMessageDialog(null, "两次密码不一致！！！","错误",JOptionPane.ERROR_MESSAGE);
+				return;
 			}
+			Deliver d = new Deliver();
+			d.setDeliverName(username);
+			d.setDeliverId(userid);
+			d.setPwd(pwd1);
 			
+			try {
+				d = takeOutUtil.deliverManager.reg(d);
+				this.setVisible(false);
+			} catch (BaseException e1) {
+				JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			
 		}
 			
@@ -137,4 +193,4 @@ public class FrmRegister extends JDialog implements ActionListener {
 	}
 
 
-}
+}}

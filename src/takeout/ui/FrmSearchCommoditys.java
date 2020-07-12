@@ -34,14 +34,11 @@ import takeout.util.BaseException;
 public class FrmSearchCommoditys extends JDialog implements ActionListener {
 	private JPanel toolBar = new JPanel();
 	private Button btnAdd = new Button("添加");
-//	private Button btnModify = new Button("修改");
-//	private Button btnStop = new Button("下架");
+
 	private JComboBox cmbCate;
 	private JTextField edtKeyword = new JTextField(15);
 	private Button btnSearch = new Button("查询");
-//	private Object tblTitle[]={"条码","书名","出版社","价格","状态"};
 	private Object tblData[][];
-//	List<BeanBook> books=null;
 	List<Commodity> coms = null;
 	DefaultTableModel tablmod=new DefaultTableModel();
 	private JTable dataTable=new JTable(tablmod);
@@ -51,11 +48,6 @@ public class FrmSearchCommoditys extends JDialog implements ActionListener {
 			coms=(new CommodityManager()).searchCommoditys(this.edtKeyword.getText(), cmbCate.getSelectedItem().toString());
 			tblData =new Object[coms.size()][Commodity.tableTitles_3.length];
 			for(int i=0;i<coms.size();i++){
-//				tblData[i][0]=coms.get(i).getBarcode();
-//				tblData[i][1]=coms.get(i).getBookname();
-//				tblData[i][2]=coms.get(i).getPubName();
-//				tblData[i][3]=coms.get(i).getPrice()+"";
-//				tblData[i][4]=coms.get(i).getState();
 				for(int j=0;j<Commodity.tableTitles_3.length;j++) {
 					tblData[i][j] = coms.get(i).getSCell(j);
 					

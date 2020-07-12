@@ -9,8 +9,100 @@ import java.sql.Connection;
 import takeout.itf.IBusiness;
 import takeout.util.*;
 import takeout.model.Business;
+import takeout.model.User;
+
 import java.text.SimpleDateFormat;
 public class BusinessManager implements IBusiness {
+	
+	public Business reg(Business bus) throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		if(bus.getBusinessName() == null || "".equals(bus.getBusinessName()))
+			throw new BusinessException("商家名称不可为空！！！");
+		if(bus.getBusinessId() == null || "".equals(bus.getBusinessId()))
+			throw new BusinessException("商家编号不可为空！！！");
+		if(bus.getPwd() == null || "".equals(bus.getPwd()))
+			throw new BusinessException("密码不可为空！！！");
+
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select * from business where business_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, bus.getBusinessId());
+			java.sql.ResultSet rs = pst.executeQuery();
+			if(rs.next())
+				throw new BusinessException("该编号已被注册!!!");
+			rs.close();
+			pst.close();
+			
+			sql = "insert into business(business_Id, business_name, createtime, pwd) values(?, ?, NOW(),?)\r\n" + 
+					"";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, bus.getBusinessId());
+			pst.setString(2, bus.getBusinessName());
+			pst.setString(3, bus.getPwd());
+			pst.execute();
+			pst.close();
+			
+			conn.close();
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return bus;
+		
+	}
+	
+	
+	public Business login(String userid, String pwd)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		Business bus = new Business();
+		bus.setBusinessId(userid);
+		bus.setPwd(pwd);
+		
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select business_name, stars, avg_consume, sales_volume, createtime, pwd from business where business_Id = ? and removetime is null";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, userid);
+			java.sql.ResultSet rs = pst.executeQuery();
+			if(!rs.next())
+				throw new BusinessException("不存在该用户！！！");
+			if(!rs.getString(6).equals(pwd))
+				throw new BusinessException("密码错误！！！");
+			bus.setBusinessName(rs.getString(1));
+			bus.setStars(rs.getInt(2));
+			bus.setAvg_consume(rs.getFloat(3));
+			bus.setSales_volume(rs.getInt(4));
+			bus.setCreateTime(rs.getTimestamp(5));
+			bus.setPwd(rs.getString(6));
+			
+			rs.close();
+			pst.close();
+			conn.close();
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return bus;
+	}
+	
+	
 	public List<Business> loadAllBusiness(String userid) throws BaseException{
 		Connection conn = null;
 		String sql = null;

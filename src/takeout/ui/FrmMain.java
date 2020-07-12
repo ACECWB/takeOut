@@ -70,7 +70,16 @@ public class FrmMain extends JFrame implements ActionListener{
 	private JMenu menu_User = new JMenu("用户管理");
 	private JMenu menu_Deliver = new JMenu("骑手管理");
 	private Button btnSearch = new Button("全局搜索");
+	private JMenu menu_OrderManager = new JMenu("订单处理");
+	private JMenuItem menuItem_QuitOrder = new JMenuItem("取消订单");
+	private JMenuItem menuItem_Call = new JMenuItem("呼叫骑手");
+	private Button btnGet = new Button("抢单");
+	private Button btnFinish = new Button("确认送达");
 
+	private JPanel toolBar = new JPanel();
+	private JPanel workPane = new JPanel();
+
+	
 	private JMenu menu_Coupon = new JMenu("优惠券管理");
 	private JMenu menu_Statistic = new JMenu("统计");
 	private JMenu menu_CouponInfo = new JMenu("优惠券信息");
@@ -146,7 +155,9 @@ public class FrmMain extends JFrame implements ActionListener{
 	List<Income> allIncome = null;
 	List<IncomeStatistic> allTotalIncome = null;
 	List<Review> allReview = null;
+	List<Order> allOrderInfo = null;
 	
+	private Order curOrder = null;
 	private Business curBus = null; 
 	private ComCate curCate = null; 
 	private User curUser = null;
@@ -365,6 +376,65 @@ public class FrmMain extends JFrame implements ActionListener{
 		this.dataTable1.repaint();
 	}
 	
+	public void reloadDOrderTable(){
+		try {
+			allOrder = new OrderManager().loadAllDOrders();
+		} catch (BaseException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		tblData2 = new Object[allOrder.size()][Order.DstableTitles.length];
+		for(int i=0;i<allOrder.size();i++){
+			for(int j=0;j<Order.DstableTitles.length;j++) {
+				tblData2[i][j] = allOrder.get(i).getDCell(j); 
+			}
+		}
+		tabModel2.setDataVector(tblData2, Order.DstableTitles);
+		this.dataTable2.validate();
+		this.dataTable2.repaint();
+	}
+	
+	public void reloadOrderTable(String businessid){
+		
+		try {
+			allOrder = new OrderManager().loadAllBOrders();
+		} catch (BaseException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		tblData2 = new Object[allOrder.size()][Order.BstableTitles.length];
+		for(int i=0;i<allOrder.size();i++){
+			for(int j=0;j<Order.BstableTitles.length;j++) {
+				tblData2[i][j] = allOrder.get(i).getBCell(j); 
+			}
+		}
+		tabModel2.setDataVector(tblData2, Order.BstableTitles);
+		this.dataTable2.validate();
+		this.dataTable2.repaint();
+	}
+	private void reloadOrderInfo(int orderidx){
+		if(orderidx<0) return;
+			curOrder = allOrder.get(orderidx);
+		try {
+			allOrderInfo = new OrderManager().loadAllOrderInfo(curOrder);
+		} catch (BaseException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		tblData1 = new Object[allOrderInfo.size()][Order.ItableTitles.length];
+		for(int i=0;i<allOrderInfo.size();i++){
+			for(int j=0;j<Order.ItableTitles.length;j++) {
+				tblData1[i][j] = allOrderInfo.get(i).getICell(j); 
+			}
+		}
+		tabModel1.setDataVector(tblData1, Order.ItableTitles);
+		this.dataTable1.validate();
+		this.dataTable1.repaint();
+	}
+	
 //	private Object tblDeliverData[][];
 	
 	private void reloadDeliverTable(){
@@ -541,7 +611,7 @@ public class FrmMain extends JFrame implements ActionListener{
 									com.setBusinessId(tblData2[j][0].toString());
 									com.setCounts(Integer.parseInt(tblData1[r][5].toString()));
 									com.setEachPrice(Float.parseFloat(tblData1[r][6].toString()));
-									
+									com.setVipprice(Float.parseFloat(tblData1[r][7].toString()));
 									(new CommodityManager()).modifyCom2bus(com);
 									
 								}catch(Exception e2) {
@@ -1029,7 +1099,8 @@ public class FrmMain extends JFrame implements ActionListener{
 				}
 			});
 		}else if(User.currentLoginUser!=null) {
-			
+			toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
+
 			menu_InfoManager.add(menuItem_UserInfo); menuItem_UserInfo.addActionListener(this);
 			menu_InfoManager.add(menuItem_location); menuItem_location.addActionListener(this);
 			menu_InfoManager.add(menuItem_orderInfo); menuItem_orderInfo.addActionListener(this);
@@ -1046,9 +1117,31 @@ public class FrmMain extends JFrame implements ActionListener{
 			menubar.add(menu_CartManager);
 			menubar.add(menu_CouponInfo);
 			menubar.add(btnSearch);
+//			toolBar.add(menu_InfoManager);
+//			toolBar.add(menu_CartManager);
+//			toolBar.add(menu_CouponInfo);
+//			toolBar.add(btnSearch);
 			this.btnSearch.addActionListener(this);
+//			this.getContentPane().add(toolBar, BorderLayout.NORTH);
+
 			this.setJMenuBar(menubar);
 			
+		}else if(Business.currentLoginBusiness!=null) {
+			this.model = 9;//订单简介-订单详情
+			menu_OrderManager.add(menuItem_Call); menuItem_Call.addActionListener(this);
+			menu_OrderManager.add(menuItem_QuitOrder); menuItem_QuitOrder.addActionListener(this);
+			
+			menubar.add(menu_OrderManager);
+			this.setJMenuBar(menubar);
+			
+		}else if(Deliver.currentLoginDeliver!=null) {
+			this.model = 9;
+			toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
+			toolBar.add(btnGet); btnGet.addActionListener(this);
+			toolBar.add(btnFinish); btnFinish.addActionListener(this);
+			this.getContentPane().add(toolBar, BorderLayout.NORTH);
+
+			this.setJMenuBar(menubar);
 		}
 		JScrollPane jsp2 = new JScrollPane(this.dataTable2);
 		jsp2.setPreferredSize(new Dimension(550,740));
@@ -1091,6 +1184,8 @@ public class FrmMain extends JFrame implements ActionListener{
 						FrmMain.this.reloadIncomeStatisticTable(i);
 					else if(model == 8)
 						FrmMain.this.reloadReviewTable(i);
+					else if(model == 9)
+						FrmMain.this.reloadOrderInfo(i);
 				}
 				
 
@@ -1098,23 +1193,6 @@ public class FrmMain extends JFrame implements ActionListener{
 		
 		    );
 		
-//		this.getContentPane().add(new JScrollPane(this.dataTable1), BorderLayout.CENTER);
-	  
-
-//		this.getContentPane().add(new JScrollPane(this.comCateTable), BorderLayout.WEST);
-//
-//	    this.comCateTable.addMouseListener(new MouseAdapter (){
-//			@Override
-//			public void mouseClicked(MouseEvent e) {
-//				int i=FrmMain.this.comCateTable.getSelectedRow();
-//				if(i<0) {
-//					return;
-//				}
-//				FrmMain.this.reloadComTitleTable(i);
-//			}
-//	
-//	    });
-//	    this.getContentPane().add(new JScrollPane(this.dataTableComTitle), BorderLayout.CENTER);
 
 		statusBar.setLayout(new FlowLayout(FlowLayout.LEFT));
 		if(Admin.currentLoginUser!=null) {
@@ -1122,6 +1200,12 @@ public class FrmMain extends JFrame implements ActionListener{
 		    statusBar.add(label);
 		}else if(User.currentLoginUser!=null) {
 			JLabel label=new JLabel("您好!"+User.currentLoginUser.getUserName());
+		    statusBar.add(label);
+		}else if(Business.currentLoginBusiness!=null) {
+			JLabel label=new JLabel("您好!"+Business.currentLoginBusiness.getBusinessName());
+		    statusBar.add(label);
+		}else if(Deliver.currentLoginDeliver!=null) {
+			JLabel label=new JLabel("您好!"+Deliver.currentLoginDeliver.getDeliverName());
 		    statusBar.add(label);
 		}
 
@@ -1134,6 +1218,13 @@ public class FrmMain extends JFrame implements ActionListener{
 	    if(User.currentLoginUser!=null) {
 	    	this.reloadBusinessTable();
 	    	this.model = 1;
+	    }
+	    if(Business.currentLoginBusiness!=null) {
+	    	
+	    	this.reloadOrderTable(Business.currentLoginBusiness.getBusinessId());
+	    }
+	    if(Deliver.currentLoginDeliver!=null) {
+	    	this.reloadDOrderTable();
 	    }
 	    this.setVisible(true);
 	
@@ -1522,6 +1613,74 @@ public class FrmMain extends JFrame implements ActionListener{
 		}else if(e.getSource()==btnSearch) {
 			FrmSearchCommoditys fsc = new FrmSearchCommoditys(this, "搜索商品", true);
 			fsc.setVisible(true);
+			
+		}else if(e.getSource()==menuItem_Call) {
+			int i=this.dataTable2.getSelectedRow();
+			int j=this.dataTable1.getSelectedRow();
+			if(i<0) {
+				JOptionPane.showMessageDialog(null, "请选择一个订单！！！","错误",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			if(!tblData2[i][9].toString().equals("等待商家处理")) {
+				JOptionPane.showMessageDialog(null, "不可处理该订单！！！","错误",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			try {
+				(new OrderManager()).changeBStatus(tblData2[i][0].toString());
+				this.reloadOrderTable(Business.currentLoginBusiness.getBusinessId());
+			} catch (BaseException e1) {
+				JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
+			}
+			
+		}else if(e.getSource()==menuItem_QuitOrder) {
+			int i=this.dataTable2.getSelectedRow();
+			int j=this.dataTable1.getSelectedRow();
+			if(i<0) {
+				JOptionPane.showMessageDialog(null, "请选择一个订单！！！","错误",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			if(!tblData2[i][9].toString().equals("等待商家处理")) {
+				JOptionPane.showMessageDialog(null, "不可处理该订单！！！","错误",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			try {
+				
+				(new OrderManager()).quitBStatus(tblData2[i][0].toString());
+				this.reloadOrderTable(Business.currentLoginBusiness.getBusinessId());
+			} catch (BaseException e1) {
+				JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
+			}
+			
+			
+		}else if(e.getSource()==btnGet) {
+			int i=this.dataTable2.getSelectedRow();
+			int j=this.dataTable1.getSelectedRow();
+			if(i<0) {
+				JOptionPane.showMessageDialog(null, "请选择一个订单！！！","错误",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			try {
+				(new OrderManager()).getOrder(tblData2[i][0].toString());
+				this.reloadDOrderTable();
+			} catch (BaseException e1) {
+				JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
+			}
+			
+		}else if(e.getSource()==btnFinish) {
+			int i=this.dataTable2.getSelectedRow();
+			int j=this.dataTable1.getSelectedRow();
+			if(i<0) {
+				JOptionPane.showMessageDialog(null, "请选择一个订单！！！","错误",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			try {
+				(new OrderManager()).FinishOrder(tblData2[i][0].toString());
+				this.reloadDOrderTable();
+			} catch (BaseException e1) {
+				JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
+			}
 			
 		}
 	}

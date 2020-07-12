@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import takeout.itf.IOrderManager;
+import takeout.model.Business;
+import takeout.model.Deliver;
 import takeout.model.Order;
 import takeout.util.BaseException;
 import takeout.util.BusinessException;
@@ -13,6 +15,275 @@ import takeout.util.DBUtil;
 import takeout.util.DbException;
 
 public class OrderManager implements IOrderManager {
+	
+	public void FinishOrder(String orderid)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			conn.setAutoCommit(false);
+			sql = "update orders set status = '已送达', receive_time = now() where order_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, orderid);
+			pst.execute();
+			pst.close();
+			
+			sql = "select * from deliverget where order_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, orderid);
+			java.sql.ResultSet rs = pst.executeQuery();
+			if(!rs.next()) {
+				rs.close();
+				pst.close();
+				
+				sql = "update deliver set status = '空闲' where deliver_Id = ?";
+				pst = conn.prepareStatement(sql);
+				pst.setString(1, Deliver.currentLoginDeliver.getDeliverId());
+				pst.execute();
+				
+			}else
+				rs.close();
+			pst.close();
+			
+			conn.commit();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			try {
+				conn.rollback();
+			}catch(Exception ex) {
+				ex.printStackTrace();
+			}
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		
+		
+	}
+
+	public void getOrder(String orderid)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			conn.setAutoCommit(false);
+			sql = "update orders set deliver_Id = ?, status = '正在配送中' where order_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, Deliver.currentLoginDeliver.getDeliverId());
+			pst.setString(2, orderid);
+			pst.execute();
+			pst.close();
+			
+			sql = "update deliver set status = '配送中' where deliver_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, Deliver.currentLoginDeliver.getDeliverId());
+			pst.execute();
+			pst.close();
+			conn.commit();
+			conn.close();
+		}catch(SQLException e) {
+			e.printStackTrace();
+			try {
+				conn.rollback();
+			}catch(Exception ex) {
+				ex.printStackTrace();
+			}
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		
+		
+	}
+	
+	public List<Order> loadAllDOrders()throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		List<Order> orders = new ArrayList<>();
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select order_Id, business_name, location, conn_user, loca, phone_number,\r\n" + 
+					"order_time, req_time, status from deliverget";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			java.sql.ResultSet rs = pst.executeQuery();
+			while(rs.next()) {
+				Order o = new Order();
+				o.setOrderid(rs.getString(1));
+				o.setBusinessName(rs.getString(2));
+				o.setBusLoca(rs.getString(3));
+				o.setConnname(rs.getString(4));
+				o.setLoca(rs.getString(5));
+				o.setPhone(rs.getString(6));
+				o.setOrderTime(rs.getTimestamp(7));
+				o.setReqtime(rs.getTimestamp(8));
+				o.setStatus(rs.getString(9));
+				orders.add(o);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+			
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return orders;
+		
+	}
+	public void quitBStatus(String orderid)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update orders set status = '取消订单' where order_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, orderid);
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		
+	}
+	public void changeBStatus(String orderid)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		try {
+			conn = DBUtil.getConnection();
+			sql = "update orders set status = '等待配送' where order_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, orderid);
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+	public List<Order>loadAllOrderInfo(Order order)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		List<Order> orders = new ArrayList<>();
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select oi.com_Id, com_name, count, price from orderinfo oi, commodity c where oi.com_Id = c.com_Id and order_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, order.getOrderid());
+			java.sql.ResultSet rs = pst.executeQuery();
+			while(rs.next()) {
+				Order o = new Order();
+				o.setComid(rs.getString(1));
+				o.setComName(rs.getString(2));
+				o.setCounts(rs.getInt(3));
+				o.setPrice(rs.getFloat(4));
+				orders.add(o);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+			
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return orders;
+		
+	}
+	public List<Order> loadAllBOrders()throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		List<Order> orders = new ArrayList<>();
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select order_Id, o.user_Id, loca, coupon_Id, deliver_Id, origin_amount,\r\n" + 
+					"final_amount, order_time, req_time, status, receive_time, isreviewed from \r\n" + 
+					"orders o, location l where business_Id = ? and o.loca_Id = l.loca_Id";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, Business.currentLoginBusiness.getBusinessId());
+			java.sql.ResultSet rs = pst.executeQuery();
+			while(rs.next()) {
+				Order o = new Order();
+				o.setOrderid(rs.getString(1));
+				o.setUserid(rs.getString(2));
+				o.setLoca(rs.getString(3));
+				o.setCouponid(rs.getString(4));
+				o.setDeliverid(rs.getString(5));
+				o.setOriginamount(rs.getFloat(6));
+				o.setFinalamount(rs.getFloat(7));
+				o.setOrderTime(rs.getTimestamp(8));
+				o.setReqtime(rs.getTimestamp(9));
+				o.setStatus(rs.getString(10));
+				o.setReceiveTime(rs.getTimestamp(11));
+				o.setIsReviewed(rs.getInt(12));
+				orders.add(o);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+			
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return orders;
+	}
 	public void deleteOrder(String userid, String orderid, String businessid)throws BaseException{
 		Connection conn = null;
 		String sql = null;

@@ -104,7 +104,7 @@ public class FrmCommodityManager_1 extends JDialog implements ActionListener{
 				try {
 					(new CommodityManager()).deleteComTitle(commodityid);
 					this.reloadComTable();
-					this.a.reloadCommodityTable();
+					this.a.reloadTable();
 				} catch (BaseException e1) {
 					JOptionPane.showMessageDialog(null, e1.getMessage(),"´íÎó",JOptionPane.ERROR_MESSAGE);
 				}
@@ -121,7 +121,7 @@ public class FrmCommodityManager_1 extends JDialog implements ActionListener{
 				try {
 					(new CommodityManager()).resetComTitle(commodityid);
 					this.reloadComTable();
-					this.a.reloadCommodityTable();
+					this.a.reloadTable();
 				} catch (BaseException e1) {
 					JOptionPane.showMessageDialog(null, e1.getMessage(),"´íÎó",JOptionPane.ERROR_MESSAGE);
 				}

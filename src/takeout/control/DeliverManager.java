@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import takeout.itf.IDeliverManager;
+import takeout.model.Business;
 import takeout.model.Deliver;
 import takeout.util.BaseException;
 import takeout.util.BusinessException;
@@ -16,6 +17,114 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 public class DeliverManager implements IDeliverManager {
 
+	public Deliver login(String userid, String pwd)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		Deliver d = new Deliver();
+		d.setDeliverId(userid);
+		d.setPwd(pwd);
+		
+		if(d.getDeliverId() == null || "".equals(d.getDeliverId()))
+			throw new BusinessException("骑手编号不可为空！！！");
+		if(d.getPwd() == null || "".equals(d.getPwd()))
+			throw new BusinessException("密码不可为空！！！");
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select deliver_name, employ_time, identity, quit_time, status, pwd from deliver where deliver_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, userid);
+			java.sql.ResultSet rs = pst.executeQuery();
+			if(rs.next()) {
+				if(rs.getTimestamp(4) != null) {
+					rs.close();
+					pst.close();
+					throw new BusinessException("该账号不存在！！！");
+				}
+				if(!rs.getString(6).equals(pwd)) {
+					rs.close();
+					pst.close();
+					
+					throw new BusinessException("密码错误！！！");
+
+				}
+				
+				d.setDeliverName(rs.getString(1));
+				d.setEmployTime(sdf.format(rs.getTimestamp(2)));
+				d.setIdentity(rs.getString(3));
+				d.setStatus(rs.getString(5));
+				
+			}else {
+				throw new BusinessException("该账号不存在！！！");
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+			
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return d;
+		
+		
+	}
+	
+	public Deliver reg(Deliver d) throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		if(d.getDeliverName() == null || "".equals(d.getDeliverName()))
+			throw new BusinessException("骑手姓名不可为空！！！");
+		if(d.getDeliverId() == null || "".equals(d.getDeliverId()))
+			throw new BusinessException("骑手编号不可为空！！！");
+		if(d.getPwd() == null || "".equals(d.getPwd()))
+			throw new BusinessException("密码不可为空！！！");
+
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select * from deliver where deliver_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, d.getDeliverId());
+			java.sql.ResultSet rs = pst.executeQuery();
+			if(rs.next())
+				throw new BusinessException("该编号已被注册!!!");
+			rs.close();
+			pst.close();
+			
+			sql = "insert into deliver(deliver_Id, deliver_name, employ_time, "
+					+ "identity, status, pwd) values (?,?,now(),'新人','空闲',?)";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, d.getDeliverId());
+			pst.setString(2, d.getDeliverName());
+			pst.setString(3, d.getPwd());
+			pst.execute();
+			pst.close();
+			conn.close();
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return d;
+		
+	}
+	
 	public void modifyDeliver(Deliver deliver)throws BaseException{
 		Connection conn = null;
 		String sql = null;

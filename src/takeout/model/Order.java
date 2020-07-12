@@ -6,6 +6,9 @@ public class Order {
 	public static final String[] tableTitles = {"订单编号","商家编号","骑手编号","商品编号","数量","价格","优惠券编号","原总价","现总价","下单时间","送达要求","送达时间","状态"};
 	public static final String[] UtableTitles = {"订单编号","商家编号","商家名称","骑手编号","优惠券编号","原总价","现总价","下单时间","送达要求","送达时间","状态","是否已评论"};
 	public static final String[] ItableTitles = {"商品编号","商品名称","商品数量","商品总价格"};
+	public static final String[] BtableTitles = {"订单编号","用户编号","地址信息","优惠券编号","骑手编号","原总价","最终价格","下单时间","要求送达时间","状态","接收时间","是否已评论"};
+	public static final String[] BstableTitles = {"订单编号","用户编号","地址信息","优惠券编号","骑手编号","原总价","最终价格","下单时间","要求送达时间","状态"};
+	public static final String[] DstableTitles = {"订单编号","商家名称","商家地址","用户联系人","用户地址","用户手机号码","下单时间","要求送达时间","状态"};
 
 	
 	private String orderid;
@@ -29,7 +32,96 @@ public class Order {
 	private String comname;
 	
 	private int isreviewed;
+	private String userloca;
+	private String busloca;
+	private String connname;
+	private String phone;
 	
+	public String getPhone() {
+		return this.phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone; 
+	}
+	
+	public String getBusLoca() {
+		return this.busloca;
+	}
+	public void setBusLoca(String busloca) {
+		this.busloca = busloca;
+	}
+	public String getConnname() {
+		return this.connname;
+	}
+	public void setConnname(String name) {
+		this.connname = name;
+	}
+	public String getDCell(int col){
+//		if(col==0) return "1";
+//		else if(col==1) return "示例计划";
+//		else if(col==2) return "2";
+//		else if(col==3) return "1";
+//		else return "";
+		if(col==0)
+			return ""+this.orderid;
+		else if(col==1)
+			return ""+this.businessname;
+		else if(col==2)
+			return ""+this.busloca;
+		else if(col==3)
+			return ""+this.connname;
+		else if(col==4)
+			return ""+this.userloca;
+		else if(col==5)
+			return ""+this.phone;
+		else if(col==6)
+			return ""+this.ordertime;
+		else if(col==7)
+			return ""+this.reqtime;
+		else if(col==8)
+			return ""+this.status;
+		else 
+			return "";
+	}
+	public String getBCell(int col){
+//		if(col==0) return "1";
+//		else if(col==1) return "示例计划";
+//		else if(col==2) return "2";
+//		else if(col==3) return "1";
+//		else return "";
+		if(col==0)
+			return ""+this.orderid;
+		else if(col==1)
+			return ""+this.userid;
+		else if(col==2)
+			return ""+this.userloca;
+		else if(col==3)
+			return ""+this.couponid;
+		else if(col==4)
+			return ""+this.deliverid;
+		else if(col==5)
+			return ""+this.originamount;
+		else if(col==6)
+			return ""+this.finalamount;
+		else if(col==7)
+			return ""+this.ordertime;
+		else if(col==8)
+			return ""+this.reqtime;
+		else if(col==9)
+			return ""+this.status;
+		else if(col==10)
+			return ""+this.receivetime;
+		else if(col==11)
+			return ""+this.isreviewed;
+		else 
+			return "";
+	}
+	public String getUserLoca() {
+		return this.userloca;
+	}
+	public void setLoca(String userloca) {
+		this.userloca = userloca;
+	}
 	public String getBusinessName() {
 		return businessname;
 	}
@@ -50,6 +142,8 @@ public class Order {
 	public String getComName() {
 		return comname;
 	}
+	
+	
 	
 	public String getICell(int col){
 //		if(col==0) return "1";

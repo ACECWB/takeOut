@@ -84,8 +84,8 @@ public class CommodityManager implements ICommodityManager {
 			pst.setString(5, com.getBusinessId());
 			pst.execute();
 			pst.close();
-			
-			
+	
+			System.out.println();
 			sql = "update cart set price = counts * ?  where com_Id = ? and business_Id = ? and user_Id in(\r\n" + 
 					"select user_Id from user where vip_end_time is null or vip_end_time<NOW()\r\n" + 
 					")"; 
@@ -108,7 +108,7 @@ public class CommodityManager implements ICommodityManager {
 			
 			conn.commit();
 			conn.close();
-			
+			System.out.println(3);
 		}catch(SQLException e) {
 			e.printStackTrace();
 			try {
@@ -126,7 +126,7 @@ public class CommodityManager implements ICommodityManager {
 				}
 		}
 	}
-	public void modifyCom(Commodity com)throws BaseException{
+	public void modifyCom(Commodity com)throws BaseException{//修改商品名称、分类编号
 		Connection conn = null;
 		String sql = null;
 		if(com.getCategoryId() == null || "".equals(com.getCategoryId()))

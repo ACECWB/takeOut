@@ -23,6 +23,8 @@ import javax.swing.JTextField;
 
 import StartTakeout.takeOutUtil;
 import takeout.model.Admin;
+import takeout.model.Business;
+import takeout.model.Deliver;
 import takeout.model.User;
 import takeout.ui.FrmRegister;
 import takeout.util.BaseException;
@@ -39,6 +41,7 @@ public class FrmLogin extends JDialog implements ActionListener{
 	private JRadioButton btnAdmin = new JRadioButton("管理员");
 	private JRadioButton btnUser = new JRadioButton("用户");
 	private JRadioButton btnBus = new JRadioButton("商家");
+	private JRadioButton btnDeliver = new JRadioButton("骑手");
 
 	private ButtonGroup btnGroup = new ButtonGroup();
 	
@@ -48,13 +51,14 @@ public class FrmLogin extends JDialog implements ActionListener{
 	private JPasswordField edtPwd = new JPasswordField(20);
 	
 //	private FrmChoice fs =null;
-	private int model = 1;//1:管理员, 2:用户
+	private int model = 1;//1:管理员, 2:用户,3:商家，4：骑手
 	
 	public FrmLogin(FrmMain f, String s, boolean b) {
 		super(f,s,b);
 		btnGroup.add(btnAdmin);
 		btnGroup.add(btnUser);
 		btnGroup.add(btnBus);
+		btnGroup.add(btnDeliver);
 		toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
 		toolBar.add(btnRegister);
 		toolBar.add(btnLogin);
@@ -62,6 +66,7 @@ public class FrmLogin extends JDialog implements ActionListener{
 		toolBar.add(btnAdmin);
 		toolBar.add(btnUser);
 		toolBar.add(btnBus);
+		toolBar.add(btnDeliver);
 //		toolBar.add(btnCancel);
 		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
 		workBar.add(labelUser);
@@ -70,7 +75,7 @@ public class FrmLogin extends JDialog implements ActionListener{
 		labelPwd.setLocation(30, 30);
 		workBar.add(edtPwd);
 		this.getContentPane().add(workBar, BorderLayout.CENTER);
-		this.setSize(400,150);
+		this.setSize(600,150);
 //		double width = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
 //		double height = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 //		this.setLocation((int)(width/2), (int)(height/2));
@@ -82,6 +87,7 @@ public class FrmLogin extends JDialog implements ActionListener{
 //		btnCancel.addActionListener(this);
 		btnBack.addActionListener(this);
 		btnBus.addActionListener(this);
+		btnDeliver.addActionListener(this);
 		this.btnRegister.addActionListener(this);
 		
 		btnAdmin.setSelected(true);
@@ -118,6 +124,29 @@ public class FrmLogin extends JDialog implements ActionListener{
 					return;
 				}
 				this.setVisible(false);
+			}else if(model == 3) {
+				String userid=this.edtUserId.getText();
+				String pwd=new String(this.edtPwd.getPassword());
+				try {
+					Business.currentLoginBusiness= takeOutUtil.businessManager.login(userid, pwd);
+				} catch (BaseException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				this.setVisible(false);
+
+			}else if(model == 4) {
+				String userid=this.edtUserId.getText();
+				String pwd=new String(this.edtPwd.getPassword());
+				try {
+					Deliver.currentLoginDeliver= takeOutUtil.deliverManager.login(userid, pwd);
+				} catch (BaseException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				this.setVisible(false);
+				
+				
 			}else {
 				JOptionPane.showMessageDialog(null, "请选择你的身份！！！", "错误",JOptionPane.ERROR_MESSAGE);
 
@@ -152,6 +181,10 @@ public class FrmLogin extends JDialog implements ActionListener{
 		}else if(e.getSource()==this.btnUser) {
 			this.model = 2;
 			
+		}else if(e.getSource()==this.btnBus) {
+			this.model = 3;
+		}else if(e.getSource()==this.btnDeliver) {
+			this.model = 4;
 		}
 		
 		

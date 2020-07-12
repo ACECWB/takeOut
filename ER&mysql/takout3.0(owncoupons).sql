@@ -417,3 +417,20 @@ from com2bus cb, business b, commoditycategory cc, commodity c
 where cb.com_Id = c.com_Id AND
 c.category_Id = cc.category_Id and cb.business_Id = b.business_Id
 )
+
+alter table deliver add pwd varchar(30) not null
+alter table business add pwd varchar(30) not null
+alter table business add location varchar(30) not null
+
+create view deliverget
+as(
+select o.order_Id, b.business_name, b.location, l.conn_user, l.loca, l.phone_number,
+o.order_time, o.req_time,o.status from orders o, business b, location l
+where o.status = '等待配送' or o.status = '正在配送中' and o.business_Id = b.business_Id and l.loca_Id = o.loca_Id
+)
+
+
+
+
+
+
