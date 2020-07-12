@@ -47,7 +47,7 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 	
 	public FrmCommodityManager_AddCommodity(FrmMain frmMain, String s, boolean b) {
 		super(frmMain, s, b);
-		model = 1;
+		model = 1;//全局添加
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		toolBar.add(btnOk);
 		toolBar.add(btnCancel);
@@ -70,7 +70,7 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 	
 	public FrmCommodityManager_AddCommodity(FrmCommodityManager frmCommodityManager, String s, boolean b) {
 		super(frmCommodityManager, s, b);
-		model = 2;
+		model = 2;//已点击商家后的添加，无需输入商家编号
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		toolBar.add(btnOk);
 		toolBar.add(btnCancel);
@@ -91,6 +91,30 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 		this.btnCancel.addActionListener(this);
 	}
 	
+	public FrmCommodityManager_AddCommodity(FrmBusCom frmBusCom, String s, boolean b) {
+		// TODO Auto-generated constructor stub
+		super(frmBusCom, s, b);
+		model = 3;//商家自己添加
+		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		toolBar.add(btnOk);
+		toolBar.add(btnCancel);
+		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
+		
+		workPane.add(labelCommodityId); workPane.add(edtCommodityId);
+		workPane.add(labelCounts); workPane.add(edtCounts);
+		workPane.add(labelPrice); workPane.add(edtPrice);
+		workPane.add(labelVIPPrice); workPane.add(edtVIPPrice);
+
+		this.getContentPane().add(workPane, BorderLayout.CENTER);
+		this.setSize(600, 180);
+		this.setLocationRelativeTo(null);
+		
+		this.validate();
+		this.btnOk.addActionListener(this);
+		this.btnCancel.addActionListener(this);
+		
+	}
+
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnCancel) {
 			this.setVisible(false);
@@ -114,6 +138,8 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 				businessid = this.edtBusinessId.getText();
 			}else if(this.model==1){
 				businessid = bus.getBusinessId();
+			}else if(model == 3) {
+				businessid = Business.currentLoginBusiness.getBusinessId();
 			}
 			commodity.setBusinessId(businessid);
 			
@@ -125,7 +151,6 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 				return;
 			}
 			
-			commodity.setVipprice(Float.parseFloat(vipprice));
 			try {
 				commodity.setCounts(Integer.parseInt(counts));
 			}catch(Exception ei) {
@@ -133,7 +158,13 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 				return;
 			}
 			
-			
+			try {
+				commodity.setVipprice(Float.parseFloat(vipprice));
+
+			}catch(Exception ei) {
+				JOptionPane.showMessageDialog(null, "请正确输入会员价！！！","错误",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			try {
 				(new CommodityManager()).addCommodity(commodity);
 				this.setVisible(false);

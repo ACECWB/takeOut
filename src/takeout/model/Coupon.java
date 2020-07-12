@@ -4,11 +4,13 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 
 public class Coupon {
-	public static final String[] BtableTitles = {"优惠券编号","优惠金额","需要订单数","活动开始时间","活动结束时间","有效天数","删除时间"};
+	public static final String[] BtableTitles = {"优惠券编号","优惠金额","需要订单数","活动开始时间","活动结束时间","有效天数"};
 	public static final String[] CtableTitles = {"商家编号","商家名称","优惠券编号","有效截止日期"};
 	public static final String[] CtableTitles1 = {"商家编号","商家名称","优惠券编号","有效截止日期","序号"};
 	public static final String[] UtableTitles = {"商家编号","商家名称","优惠券编号","有效截止日期"};
-	public static final String[] OtableTitles = {"商家编号","商家名称","优惠券编号","活动截止日期","要求单数","已集单数","优惠金额","有效天数"};
+	public static final String[] OtableTitles = {"商家编号","商家名称", "优惠券编号", "活动截止日期","要求单数","已集单数","优惠金额","有效天数"};
+	public static final String[] AtableTitles = {"优惠券编号","商家编号","要求单数","优惠金额","有效天数","活动开始时间","活动结束时间"};
+
 
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	
@@ -20,14 +22,30 @@ public class Coupon {
 	private Date startTime;
 	private Date endTime;
 	private int effectDays;
-	private Date removetime;
 	
 	private int ownorder;
 	private String userid;
 	private Date ineffectDate;
 	private int alreadycounts;
 	
-	
+	public String getACell(int col){
+		if(col==0)
+			return ""+this.couponId;
+		else if(col==1)
+			return ""+this.businessId;
+		else if(col==2)
+			return ""+this.needOrders;
+		else if(col==3)
+			return ""+this.discountMoney;
+		else if(col==4)
+			return ""+this.effectDays;
+		else if(col==5)
+			return ""+this.startTime;
+		else if(col==6)
+			return ""+this.endTime;
+		else 
+			return "";
+	}
 	public int getAlreadyCounts() {
 		return alreadycounts;
 	}
@@ -82,12 +100,7 @@ public class Coupon {
 	public String getUserId() {
 		return userid;
 	}
-	public void setRemoveTime(Date removetime) {
-		this.removetime = removetime;
-	}
-	public Date getRemoveTime() {
-		return removetime;
-	}
+
 	public void setBusinessName(String businessName) {
 		this.businessName = businessName;
 	}
@@ -193,8 +206,6 @@ public class Coupon {
 			return ""+this.endTime;
 		else if(col==5)
 			return ""+this.effectDays;
-		else if(col==6)
-			return ""+this.removetime;
 		else 
 			return "";
 	}

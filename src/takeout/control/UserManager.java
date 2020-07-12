@@ -13,6 +13,68 @@ import takeout.model.User;
 import takeout.util.*;
 
 public class UserManager implements IUserManager {
+	
+	
+	public void exchangeCoupon(String businessid, String couponid, int days)throws BaseException {
+		Connection conn = null;
+		String sql = null;
+		int require = 0;
+		int own = 0;
+		try {
+			conn = DBUtil.getConnection();
+			conn.setAutoCommit(false);
+			sql = "select need_orders, alreadycounts from userownedcollects where user_Id = ? and business_Id = ? and coupon_Id = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, User.currentLoginUser.getUserId());
+			pst.setString(2, businessid);
+			pst.setString(3, couponid);
+			java.sql.ResultSet rs = pst.executeQuery();
+			rs.next();
+			require = rs.getInt(1);
+			own = rs.getInt(2);
+			if(rs.getInt(1)>rs.getInt(2))
+				throw new BusinessException("集单数不足！！！");
+			rs.close();
+			pst.close();
+			//若集单数足够，则更新集单数
+			sql = "update collectorders set alreadycounts = ? where user_Id = ? and business_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(1, own - require);
+			pst.setString(2, User.currentLoginUser.getUserId());
+			pst.setString(3, businessid);
+			pst.execute();
+			pst.close();
+			//随后添加新的优惠券
+			sql = "insert into ownedcoupons(user_Id, business_Id, coupon_Id, ineffect_time) values (?,?,?,?)";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, User.currentLoginUser.getUserId());
+			pst.setString(2, businessid);
+			pst.setString(3, couponid);
+			pst.setTimestamp(4, new java.sql.Timestamp((new Date()).getTime() + days*24*60*60*1000L));
+			pst.execute();
+			pst.close();
+			
+			conn.commit();
+			conn.close();
+		}catch(SQLException e) {
+			e.printStackTrace();
+			try {
+				conn.rollback();
+			}catch(Exception ex) {
+				ex.printStackTrace();
+			}
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		
+		
+	}
 	public void vip(int month)throws BaseException{
 		Connection conn = null;
 		String sql = null;
@@ -55,9 +117,16 @@ public class UserManager implements IUserManager {
 				User.currentLoginUser.setVipEndTime(cal.getTime());
 				pst.execute();
 				pst.close();
-				
-				
+					
 			}
+			
+			sql = "update cart c, com2bus cb set c.price = c.counts * cb.vipprice \r\n" + 
+					"where c.user_Id = ? and c.com_Id = cb.com_Id and c.business_Id = cb.business_Id";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, User.currentLoginUser.getUserId());
+			pst.execute();
+			pst.close();
+			
 			conn.commit();
 			conn.close();
 			
@@ -132,7 +201,7 @@ public class UserManager implements IUserManager {
 		
 		try {
 			conn = DBUtil.getConnection();
-			sql = "select pwd ,user_name,sex,phone,email,city,isvip,vip_start_time, vip_end_time from user where user_Id = ?";
+			sql = "select pwd ,user_name,sex,phone,email,city,isvip,vip_start_time, vip_end_time from user where user_Id = ? and removetime is null";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, userid);
 			java.sql.ResultSet rs = pst.executeQuery();

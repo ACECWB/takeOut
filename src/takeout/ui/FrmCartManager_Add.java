@@ -94,16 +94,35 @@ public class FrmCartManager_Add extends JDialog implements ActionListener{
 		
 	}
 
+	public FrmCartManager_Add(FrmRecommend frmRecommend, String s, boolean b) {
+		// TODO Auto-generated constructor stub
+		super(frmRecommend, s, b);
+		this.setFocusable(true);
+
+		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		toolBar.add(btnOk);
+		toolBar.add(btnCancel);
+		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
+//		workPane.add(labelBusinessId); workPane.add(edtBusinessId);
+		workPane.add(labelCounts); workPane.add(edtCounts);
+//		workPane.add(labelStars); workPane.add(edtStars);
+		
+		this.getContentPane().add(workPane, BorderLayout.CENTER);
+		this.setSize(300, 180);
+		this.setLocationRelativeTo(null);
+		
+		this.validate();
+		this.btnOk.addActionListener(this);
+		this.btnCancel.addActionListener(this);
+		
+	}
+
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnCancel) {
 			this.setVisible(false);
 			return;
 		}
 		else if(e.getSource()==this.btnOk){
-			
-//			String businessid = this.edtBusinessId.getText();
-//			String businessname = this.edtCounts.getText();
-//			String stars = this.edtStars.getText();
 			
 			if(counts < Integer.parseInt(this.edtCounts.getText().toString())) {
 				System.out.println(counts + "  " + this.edtCounts.getText().toString());
@@ -112,9 +131,7 @@ public class FrmCartManager_Add extends JDialog implements ActionListener{
 			}
 			
 			cart=new Cart();
-//			cart.setBusinessId(businessid);
-//			cart.setBusinessName(businessname);
-//			business.setStars(Integer.parseInt(stars));
+
 			cart.setUserid(User.currentLoginUser.getUserId());
 			cart.setBusinessid(businessid);
 			cart.setComid(comid);

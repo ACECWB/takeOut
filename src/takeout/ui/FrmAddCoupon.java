@@ -124,6 +124,30 @@ public class FrmAddCoupon extends JDialog implements ActionListener{
 		this.btnOk.addActionListener(this);
 		this.btnCancel.addActionListener(this);
 	}
+	public FrmAddCoupon(FrmCoupon frmCoupon, String s, boolean b) {
+		// TODO Auto-generated constructor stub
+		super(frmCoupon, s, b);
+		this.model = 3;
+		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		toolBar.add(btnOk);
+		toolBar.add(btnCancel);
+		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
+		
+		workPane.add(labelCouponId); workPane.add(edtCouponId);
+		workPane.add(labelDiscount); workPane.add(edtDiscount);
+		workPane.add(labelRequire); workPane.add(edtRequire);
+		workPane.add(labelStart); workPane.add(edtStart);
+		workPane.add(labelEnd); workPane.add(edtEnd);
+		workPane.add(labelEffect); workPane.add(edtEffect);
+		
+		this.getContentPane().add(workPane, BorderLayout.CENTER);
+		this.setSize(500, 380);
+		this.setLocationRelativeTo(null);
+		
+		this.validate();
+		this.btnOk.addActionListener(this);
+		this.btnCancel.addActionListener(this);
+	}
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnCancel) {
 			this.setVisible(false);
@@ -137,6 +161,8 @@ public class FrmAddCoupon extends JDialog implements ActionListener{
 			coupon = new Coupon();
 			if(model == 3) {
 				coupon.setBusinessId(this.id);
+				if(Business.currentLoginBusiness!=null)
+					coupon.setBusinessId(Business.currentLoginBusiness.getBusinessId());
 				coupon.setCouponId(this.edtCouponId.getText());
 				if("".equals(this.edtDiscount.getText())) {
 					JOptionPane.showMessageDialog(null, "«Î ‰»Î”≈ª›Ω∂Ó£°£°£°", "¥ÌŒÛ",JOptionPane.ERROR_MESSAGE);

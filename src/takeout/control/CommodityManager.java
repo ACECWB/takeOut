@@ -14,6 +14,53 @@ import takeout.util.*;
 
 public class CommodityManager implements ICommodityManager {
 	
+	public List<Commodity> loadAllRecoms()throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		List<Commodity> coms = new ArrayList<>();
+		try{
+			conn = DBUtil.getConnection();
+			sql = "select business_Id, business_name, com_Id, com_name, sales, counts,\r\n" + 
+					"each_price, vipprice from recomgoods ";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			java.sql.ResultSet rs = pst.executeQuery();
+			while(rs.next()) {
+				Commodity c = new Commodity();
+				c.setBusinessId(rs.getString(1));
+				c.setBusinessname(rs.getString(2));
+				c.setComId(rs.getString(3));
+				c.setComName(rs.getString(4));
+				c.setSales(rs.getInt(5));
+				c.setCounts(rs.getInt(6));
+				c.setEachPrice(rs.getFloat(7));
+				c.setVipprice(rs.getFloat(8));
+				coms.add(c);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+			
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			try {
+				conn.rollback();
+			}catch(Exception ex) {
+				ex.printStackTrace();
+			}
+			
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return coms;
+		
+	}
 	public List<Commodity> searchCommoditys(String title, String comcate)throws BaseException{
 		Connection conn = null;
 		String sql = null;
@@ -23,6 +70,10 @@ public class CommodityManager implements ICommodityManager {
 			sql = "select com_Id, com_name, category_Id, category_name, business_Id,\r\n" + 
 					"business_name, counts, each_price, vipprice from searchcommodity\r\n" + 
 					"where com_name like ?";
+			if(Business.currentLoginBusiness!=null) {
+				sql += " and business_Id = "+Business.currentLoginBusiness.getBusinessId();
+			}
+			
 			if(comcate!=null && !"".equals(comcate))
 				sql+=" and category_name = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
@@ -657,6 +708,9 @@ public class CommodityManager implements ICommodityManager {
 			sql = "select cb.com_Id, c.com_name, cc.category_Id, cc.category_name, cb.business_Id, counts, each_price, vipprice\r\n" + 
 					"from com2bus cb, commodity c,commoditycategory cc\r\n" + 
 					"where cb.com_Id = c.com_Id and cc.category_Id = c.category_Id";
+			if(Business.currentLoginBusiness!=null) {
+				sql += "and cb.business_Id = "+Business.currentLoginBusiness.getBusinessId();
+			}
 			java.sql.Statement st = conn.createStatement();
 			java.sql.ResultSet rs = st.executeQuery(sql);
 			while(rs.next()) {

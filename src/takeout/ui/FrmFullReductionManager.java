@@ -46,7 +46,7 @@ public class FrmFullReductionManager extends JDialog implements ActionListener{
 	
 	private void reloadFullTable(){
 		try {
-			List<FullReduction> fulls=(new FullReductionManager()).loadAllFullReductions();
+			List<FullReduction> fulls=(new FullReductionManager()).loadAllFullReductions(true);
 			tblData = new Object[fulls.size()][FullReduction.tableTitles.length];
 			for(int i=0;i<fulls.size();i++){
 				for(int j=0;j<FullReduction.tableTitles.length;j++) {
@@ -215,7 +215,7 @@ public class FrmFullReductionManager extends JDialog implements ActionListener{
 	
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnAdd){
-			FrmFullReductionManager_Add dlg=new FrmFullReductionManager_Add(this,"添加满减活动",true);
+			FrmFullReductionManager_Add dlg=new FrmFullReductionManager_Add(this,"添加满减活动",true, 0);
 			dlg.setVisible(true);
 			if(dlg.getFullReduction()!=null){//刷新表格
 				this.reloadFullTable();

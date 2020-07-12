@@ -430,6 +430,12 @@ where o.status = '等待配送' or o.status = '正在配送中' and o.business_I
 )
 
 
+drop view deliverget
+create view deliverget as(
+select o.order_Id, b.business_name, b.location, l.conn_user, l.loca, l.phone_number,
+o.order_time, o.req_time,o.status from orders o, business b, location l
+where (o.status = '等待配送' or o.status = '正在配送中') and o.business_Id = b.business_Id and l.loca_Id = o.loca_Id
+)
 
 
 

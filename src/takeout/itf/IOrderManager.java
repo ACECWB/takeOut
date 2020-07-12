@@ -17,7 +17,7 @@ public interface IOrderManager {
 	
 	public void getOrder(String orderid)throws BaseException;
 	public void FinishOrder(String orderid)throws BaseException;
-	
+	public List<Order> loadAllBOrders1(int model)throws BaseException;
 	
 	public void deleteOrder(String userid, String orderid, String businessid)throws BaseException;
 }

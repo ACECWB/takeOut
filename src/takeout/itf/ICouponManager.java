@@ -7,7 +7,7 @@ import java.util.List;
 import takeout.model.*;
 
 public interface ICouponManager {
-	public List<Coupon> loadAllBCoupons(Business business)throws BaseException;
+	public List<Coupon> loadAllBCoupons(Business business , boolean withDeleted)throws BaseException;
 	public List<Coupon> loadAllCCoupons(User user)throws BaseException;
 	public List<Coupon> loadAllUCoupons(String userid)throws BaseException;
 	public List<Coupon> loadAllCollects(String userid)throws BaseException;

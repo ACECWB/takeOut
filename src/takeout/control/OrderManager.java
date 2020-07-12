@@ -22,8 +22,19 @@ public class OrderManager implements IOrderManager {
 		try {
 			conn = DBUtil.getConnection();
 			conn.setAutoCommit(false);
-			sql = "update orders set status = '已送达', receive_time = now() where order_Id = ?";
+			sql = "select status from orders where order_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, orderid);
+			java.sql.ResultSet rs = pst.executeQuery();
+			rs.next();
+			System.out.println(rs.getString(1));
+			if(rs.getString(1).equals("等待配送"))
+				throw new BusinessException("该订单未接收！！！");
+			rs.close();
+			pst.close();
+			
+			sql = "update orders set status = '已送达', receive_time = now() where order_Id = ?";
+			pst = conn.prepareStatement(sql);
 			pst.setString(1, orderid);
 			pst.execute();
 			pst.close();
@@ -31,7 +42,7 @@ public class OrderManager implements IOrderManager {
 			sql = "select * from deliverget where order_Id = ?";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, orderid);
-			java.sql.ResultSet rs = pst.executeQuery();
+			rs = pst.executeQuery();
 			if(!rs.next()) {
 				rs.close();
 				pst.close();
@@ -44,6 +55,66 @@ public class OrderManager implements IOrderManager {
 			}else
 				rs.close();
 			pst.close();
+			
+			sql = "select business_Id, user_Id from orders where order_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, orderid);
+			rs = pst.executeQuery();
+			rs.next();
+			String businessid = rs.getString(1);
+			String userid = rs.getString(2);
+			rs.close();
+			pst.close();
+			
+			sql = "update business set avg_consume = (\r\n" + 
+					"select avg(final_amount) from orders where business_Id = ? and status = '已送达'\r\n" + 
+					"), sales_volume = sales_volume + 1\r\n" + 
+					"where business_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, businessid);
+			pst.setString(2, businessid);
+			pst.execute();
+			pst.close();
+			
+			
+			sql = "insert into deliver_income(deliver_Id, order_Id, time) values (?,?,now())";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, Deliver.currentLoginDeliver.getDeliverId());
+			pst.setString(2, orderid);
+			pst.execute();
+			pst.close();
+			
+			int counts = 0;
+			sql = "select alreadycounts from collectorders where user_Id = ? and business_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, userid);
+			pst.setString(2, businessid);
+			rs = pst.executeQuery();
+			if(!rs.next()) {//此前该用户无该商家的购买信息因此插入一条集单数据
+				counts = 1;
+				rs.close();
+				pst.close();
+				sql = "insert into collectorders(user_Id, business_Id, alreadycounts) values (?,?,?)";
+				pst = conn.prepareStatement(sql);
+				pst.setString(1, userid);
+				pst.setString(2, businessid);
+				pst.setInt(3, 1);
+				pst.execute();
+				pst.close();
+				
+			}else {//已有购买数据则知需要更新
+				counts = rs.getInt(1) + 1;
+				rs.close();
+				pst.close();
+				//下单就把集单数+1，退单则-1
+				sql = "update collectorders set alreadycounts = alreadycounts + 1 where user_Id = ? and business_Id = ?";
+				pst = conn.prepareStatement(sql);
+				pst.setString(1, userid);
+				pst.setString(2, businessid);
+				pst.execute();
+				pst.close();
+				
+			}
 			
 			conn.commit();
 			conn.close();
@@ -238,6 +309,58 @@ public class OrderManager implements IOrderManager {
 		return orders;
 		
 	}
+	public List<Order> loadAllBOrders1(int model)throws BaseException{
+		Connection conn = null;
+		String sql = null;
+		List<Order> orders = new ArrayList<>();
+		try {
+			conn = DBUtil.getConnection();
+			sql = "select order_Id, o.user_Id, loca, coupon_Id, deliver_Id, origin_amount,\r\n" + 
+					"final_amount, order_time, req_time, status, receive_time, isreviewed from \r\n" + 
+					"orders o, location l where business_Id = ? and o.loca_Id = l.loca_Id ";
+			if(model == 1)
+				sql += " and status in ('等待商家处理','等待配送')";
+			else if(model == 2)
+				sql += " and status not in ('等待商家处理','等待配送')";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, Business.currentLoginBusiness.getBusinessId());
+			java.sql.ResultSet rs = pst.executeQuery();
+			while(rs.next()) {
+				Order o = new Order();
+				o.setOrderid(rs.getString(1));
+				o.setUserid(rs.getString(2));
+				o.setLoca(rs.getString(3));
+				o.setCouponid(rs.getString(4));
+				o.setDeliverid(rs.getString(5));
+				o.setOriginamount(rs.getFloat(6));
+				o.setFinalamount(rs.getFloat(7));
+				o.setOrderTime(rs.getTimestamp(8));
+				o.setReqtime(rs.getTimestamp(9));
+				o.setStatus(rs.getString(10));
+				o.setReceiveTime(rs.getTimestamp(11));
+				o.setIsReviewed(rs.getInt(12));
+				orders.add(o);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+			
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}finally {
+			if(conn!=null)
+				try {
+					conn.close();
+				}catch(SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return orders;
+	}
+	
+
 	public List<Order> loadAllBOrders()throws BaseException{
 		Connection conn = null;
 		String sql = null;

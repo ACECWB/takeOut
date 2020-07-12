@@ -5,6 +5,8 @@ public class Commodity extends ComTitle{
 	public static final String[] tableTitles_1 = {"商品编号","商品名称"};
 	public static final String[] tableTitles_2 = {"类型编号","类型名"};
 	public static final String[] tableTitles_3 = {"商品编号","商品名称","类型编号","类型名","商家编号","商家名称","数量","单价","会员价"};
+	public static final String[] BtableTitles = {"商品编号","商品名称","类型编号","类型名","数量","单价","会员价"};
+	public static final String[] RtableTitles = {"商家编号","商家名称","商品编号","商品名称","销量","库存","单价","会员价"};
 
 
 	private String comId;
@@ -13,10 +15,58 @@ public class Commodity extends ComTitle{
 	private String categoryName;
 	private String businessId;
 	private int counts;
+	private int sales;
 	private String businessname;
 	private float eachPrice;
 	private float vipprice;
 	
+	public String getRCell(int col){
+
+		if(col==0)
+			return ""+this.businessId;
+		else if(col==1)
+			return ""+this.businessname;
+		else if(col==2)
+			return ""+this.comId;
+		else if(col==3)
+			return ""+this.comName;
+		else if(col==4)
+			return ""+this.sales;
+		else if(col==5)
+			return ""+this.counts;
+		else if(col==6)
+			return ""+this.eachPrice;
+		else if(col==7)
+			return ""+this.vipprice;
+		else 
+			return "";
+	}
+	
+	public void setSales(int sales) {
+		this.sales = sales;
+	}
+	public int getSales() {
+		return this.sales;
+	}
+	public String getBCell(int col){
+
+		if(col==0)
+			return ""+this.comId;
+		else if(col==1)
+			return ""+this.comName;
+		else if(col==2)
+			return ""+this.categoryId;
+		else if(col==3)
+			return ""+this.categoryName;
+		else if(col==4)
+			return ""+this.counts;
+		else if(col==5)
+			return ""+this.eachPrice;
+		else if(col==6)
+			return ""+this.vipprice;
+		else 
+			return "";
+	}
 	public String getBusinessname() {
 		return this.businessname;
 	}

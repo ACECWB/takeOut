@@ -75,6 +75,19 @@ public class FrmMain extends JFrame implements ActionListener{
 	private JMenuItem menuItem_Call = new JMenuItem("呼叫骑手");
 	private Button btnGet = new Button("抢单");
 	private Button btnFinish = new Button("确认送达");
+	
+	private Button btnBusCom = new Button("商品管理");
+	private Button btnCheckIncome = new Button("查看收入");
+
+	private Button btnRecom = new Button("今日推荐");
+
+	private JMenu menu_Cut=new JMenu("优惠管理");
+	private JMenuItem menuItem_Coupon = new JMenuItem("优惠券管理");
+	private JMenuItem menuItem_Reduct = new JMenuItem("满减管理");
+
+	private JMenuItem menuItem_LookOrders = new JMenuItem("查看当前订单信息");
+	private JMenuItem menuItem_LookHistory = new JMenuItem("查看历史订单");
+	private JMenuItem menuItem_BLookReview = new JMenuItem("查看所有评论");
 
 	private JPanel toolBar = new JPanel();
 	private JPanel workPane = new JPanel();
@@ -101,7 +114,9 @@ public class FrmMain extends JFrame implements ActionListener{
 
 
 	private int model = 0;//1:商家-商品，2:商品类别-商品，3:商家-优惠券，4:用户-优惠券，5:用户-订单，6:骑手-订单,7:骑手-收入统计
-//	private JMenu menu_commoditycategoryManager = new JMenuItem("商品类别管理");
+	//10:商家中-评论-订单详情
+	
+	//	private JMenu menu_commoditycategoryManager = new JMenuItem("商品类别管理");
 	private JMenuItem menuItem_ModifyPwd = new JMenuItem("修改密码");
 
 	private JMenuItem menuItem_deleteCom = new JMenuItem("删除商家商品信息");
@@ -310,7 +325,7 @@ public class FrmMain extends JFrame implements ActionListener{
 		if(businessIdx<0) return;
 			curBus = allBusiness.get(businessIdx);
 		try {
-			allCoupon = new CouponManager().loadAllBCoupons(curBus);
+			allCoupon = new CouponManager().loadAllBCoupons(curBus, true);
 		} catch (BaseException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
 			return;
@@ -399,6 +414,43 @@ public class FrmMain extends JFrame implements ActionListener{
 		
 		try {
 			allOrder = new OrderManager().loadAllBOrders();
+		} catch (BaseException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		tblData2 = new Object[allOrder.size()][Order.BstableTitles.length];
+		for(int i=0;i<allOrder.size();i++){
+			for(int j=0;j<Order.BstableTitles.length;j++) {
+				tblData2[i][j] = allOrder.get(i).getBCell(j); 
+			}
+		}
+		tabModel2.setDataVector(tblData2, Order.BstableTitles);
+		this.dataTable2.validate();
+		this.dataTable2.repaint();
+	}
+	public void reloadBReview() {
+		try {
+			allReview = new ReviewManager().loadAllBReviews(Business.currentLoginBusiness.getBusinessId());
+		} catch (BaseException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		tblData2 = new Object[allReview.size()][Review.BtableTitles.length];
+		for(int i=0;i<allReview.size();i++){
+			for(int j=0;j<Review.BtableTitles.length;j++) {
+				tblData2[i][j] = allReview.get(i).getBCell(j); 
+			}
+		}
+		tabModel2.setDataVector(tblData2, Review.BtableTitles);
+		this.dataTable2.validate();
+		this.dataTable2.repaint();
+	}
+	public void reloadOrderTable1(String businessid, int m){
+		
+		try {
+			allOrder = new OrderManager().loadAllBOrders1(m);
 		} catch (BaseException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
 			return;
@@ -539,6 +591,7 @@ public class FrmMain extends JFrame implements ActionListener{
 			menu_Manager.add(menuItem_locationManager); menuItem_locationManager.addActionListener(this);
 	//		menu_Manager.add(menuItem_adminManager); menuItem_adminManager.addActionListener(this);
 			menu_Manager.add(menuItem_ModifyPwd); menuItem_ModifyPwd.addActionListener(this);
+//			menu_Manager.add(menuItem_Coupon); menuItem_Coupon.addActionListener(this);
 			
 			menu_Business.add(menuItem_businessManager); menuItem_businessManager.addActionListener(this);
 			menu_Business.add(menuItem_addBus); menuItem_addBus.addActionListener(this);
@@ -838,13 +891,8 @@ public class FrmMain extends JFrame implements ActionListener{
 							coupon.setUserId(tblData1[j][0].toString());
 							coupon.setBusinessId(tblData1[i][0].toString());
 							coupon.setCouponId(tblData1[i][2].toString());
-							coupon.setOwnOrder(Integer.parseInt(tblData1[i][4].toString()));
-							try {
-								coupon.setRemoveTime(sdf.parse(tblData1[i][3].toString()));
-							} catch (ParseException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
+							coupon.setOwnOrder(Integer.parseInt(tblData1[i][3].toString()));
+						
 							try {
 								(new CouponManager()).modifyCcoupon(coupon);
 							} catch (BaseException e1) {
@@ -1116,11 +1164,13 @@ public class FrmMain extends JFrame implements ActionListener{
 			menubar.add(menu_InfoManager);
 			menubar.add(menu_CartManager);
 			menubar.add(menu_CouponInfo);
+			menubar.add(btnRecom);
 			menubar.add(btnSearch);
 //			toolBar.add(menu_InfoManager);
 //			toolBar.add(menu_CartManager);
 //			toolBar.add(menu_CouponInfo);
 //			toolBar.add(btnSearch);
+			this.btnRecom.addActionListener(this);
 			this.btnSearch.addActionListener(this);
 //			this.getContentPane().add(toolBar, BorderLayout.NORTH);
 
@@ -1130,8 +1180,17 @@ public class FrmMain extends JFrame implements ActionListener{
 			this.model = 9;//订单简介-订单详情
 			menu_OrderManager.add(menuItem_Call); menuItem_Call.addActionListener(this);
 			menu_OrderManager.add(menuItem_QuitOrder); menuItem_QuitOrder.addActionListener(this);
+			menu_OrderManager.add(menuItem_LookOrders); menuItem_LookOrders.addActionListener(this);
+			menu_OrderManager.add(menuItem_LookHistory); menuItem_LookHistory.addActionListener(this);
+			menu_OrderManager.add(menuItem_BLookReview); menuItem_BLookReview.addActionListener(this);
+			
+			menu_Cut.add(menuItem_Coupon); menuItem_Coupon.addActionListener(this);
+			menu_Cut.add(menuItem_Reduct); menuItem_Reduct.addActionListener(this);
 			
 			menubar.add(menu_OrderManager);
+			menubar.add(menu_Cut);
+			menubar.add(btnBusCom);
+			this.btnBusCom.addActionListener(this);
 			this.setJMenuBar(menubar);
 			
 		}else if(Deliver.currentLoginDeliver!=null) {
@@ -1139,6 +1198,7 @@ public class FrmMain extends JFrame implements ActionListener{
 			toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
 			toolBar.add(btnGet); btnGet.addActionListener(this);
 			toolBar.add(btnFinish); btnFinish.addActionListener(this);
+			toolBar.add(btnCheckIncome); btnCheckIncome.addActionListener(this);
 			this.getContentPane().add(toolBar, BorderLayout.NORTH);
 
 			this.setJMenuBar(menubar);
@@ -1184,8 +1244,10 @@ public class FrmMain extends JFrame implements ActionListener{
 						FrmMain.this.reloadIncomeStatisticTable(i);
 					else if(model == 8)
 						FrmMain.this.reloadReviewTable(i);
-					else if(model == 9)
+					else if(model == 9 || model == 10)
 						FrmMain.this.reloadOrderInfo(i);
+					
+						
 				}
 				
 
@@ -1220,8 +1282,8 @@ public class FrmMain extends JFrame implements ActionListener{
 	    	this.model = 1;
 	    }
 	    if(Business.currentLoginBusiness!=null) {
-	    	
-	    	this.reloadOrderTable(Business.currentLoginBusiness.getBusinessId());
+	    	//1:查看当前可处理的订单，2：历史订单
+	    	this.reloadOrderTable1(Business.currentLoginBusiness.getBusinessId(), 1);
 	    }
 	    if(Deliver.currentLoginDeliver!=null) {
 	    	this.reloadDOrderTable();
@@ -1462,8 +1524,8 @@ public class FrmMain extends JFrame implements ActionListener{
 					try {
 						(new CouponManager()).deleteBCoupon(couponid);
 						this.reloadBusinessTable();
-						this.reloadBCouponTable(j);
-						dataTable2.setRowSelectionInterval(j,j);
+						this.reloadBCouponTable(i);
+						dataTable2.setRowSelectionInterval(i,i);
 					} catch (BaseException e1) {
 						JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
 					}
@@ -1580,7 +1642,7 @@ public class FrmMain extends JFrame implements ActionListener{
 		}else if(e.getSource()==menuItem_addgoods) {
 			int i=this.dataTable2.getSelectedRow();
 			int j=this.dataTable1.getSelectedRow();
-			if(i<0) {
+			if(j<0) {
 				JOptionPane.showMessageDialog(null, "请选择一个商品！！！","错误",JOptionPane.ERROR_MESSAGE);
 				return;
 			}
@@ -1625,9 +1687,13 @@ public class FrmMain extends JFrame implements ActionListener{
 				JOptionPane.showMessageDialog(null, "不可处理该订单！！！","错误",JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+			if(tblData2[i][9].toString().equals("等待配送")) {
+				JOptionPane.showMessageDialog(null, "该订单已处于等待配送中！！！","错误",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			try {
 				(new OrderManager()).changeBStatus(tblData2[i][0].toString());
-				this.reloadOrderTable(Business.currentLoginBusiness.getBusinessId());
+				this.reloadOrderTable1(Business.currentLoginBusiness.getBusinessId(), 1);
 			} catch (BaseException e1) {
 				JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
 			}
@@ -1682,6 +1748,35 @@ public class FrmMain extends JFrame implements ActionListener{
 				JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
 			}
 			
+		}else if(e.getSource()==this.menuItem_Coupon) {
+			FrmCoupon fc = new FrmCoupon(this, "优惠券管理", true);
+			fc.setVisible(true);
+
+			
+		}else if(e.getSource()==this.menuItem_Reduct) {
+			FrmBusReduct fbr = new FrmBusReduct(this, "满减管理", true);
+			fbr.setVisible(true);
+			
+		}else if(e.getSource()==this.menuItem_LookOrders) {
+	    	this.reloadOrderTable1(Business.currentLoginBusiness.getBusinessId(), 1);
+
+		}else if(e.getSource()==this.menuItem_LookHistory) {
+	    	this.reloadOrderTable1(Business.currentLoginBusiness.getBusinessId(), 2);
+
+		}else if(e.getSource()==this.menuItem_BLookReview) {
+			this.model = 10;
+			this.reloadBReview();
+		}else if(e.getSource()==this.btnBusCom) {
+			FrmBusCom fbc = new FrmBusCom(this, "商品管理", true);
+			fbc.setVisible(true);
+			
+		}else if(e.getSource()==this.btnCheckIncome) {
+			FrmCheckIncome fci = new FrmCheckIncome(this, "收入账单", true);
+			fci.setVisible(true);
+			
+		}else if(e.getSource()==this.btnRecom) {
+			FrmRecommend fr = new FrmRecommend(this, "今日推荐商品", true);
+			fr.setVisible(true);
 		}
 	}
 }

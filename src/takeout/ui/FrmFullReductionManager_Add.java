@@ -16,6 +16,7 @@ import javax.swing.JTextField;
 
 import takeout.util.*;
 import takeout.control.FullReductionManager;
+import takeout.model.Business;
 import takeout.model.FullReduction;
 
 import java.text.ParseException;
@@ -34,8 +35,8 @@ public class FrmFullReductionManager_Add extends JDialog implements ActionListen
 	private JLabel labelRequire = new JLabel("金额要求：");
 	private JLabel labelDiscount = new JLabel("减免金额：");
 	private JLabel labelWith = new JLabel("是否可与优惠券一起使用：");
-//	private JLabel labelStart = new JLabel("活动开始时间：");
-//	private JLabel labelEnd = new JLabel("活动结束时间：");
+	private JLabel labelEnd = new JLabel("活动结束时间：");
+
 
 	private JComboBox cmbWith= new JComboBox(new String[] { "是", "否"});
 
@@ -43,24 +44,26 @@ public class FrmFullReductionManager_Add extends JDialog implements ActionListen
 	private JTextField edtBusinessId = new JTextField(20);
 	private JTextField edtRequire = new JTextField(20);
 	private JTextField edtDiscount = new JTextField(20);
-//	private JTextField edtStart = new JTextField(20);
-//	private JTextField edtEnd = new JTextField(20);
-		
-	public FrmFullReductionManager_Add(JDialog f, String s, boolean b) {
+	private JTextField edtEnd = new JTextField(20);
+	private int model = 0;
+	public FrmFullReductionManager_Add(JDialog f, String s, boolean b, int model) {
 		super(f, s, b);
+		this.model = model;
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		toolBar.add(btnOk);
 		toolBar.add(btnCancel);
 		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
 		
-		workPane.add(labelReductId); workPane.add(edtReductId);		
-		workPane.add(labelBusinessId); workPane.add(edtBusinessId);
+		workPane.add(labelReductId); workPane.add(edtReductId);	
+		if(model == 0) {
+			workPane.add(labelBusinessId); workPane.add(edtBusinessId);
+		}
 		workPane.add(labelRequire); workPane.add(edtRequire);
 		workPane.add(labelDiscount); workPane.add(edtDiscount);
 		workPane.add(labelWith); workPane.add(cmbWith);
-//		workPane.add(labelStart); workPane.add(edtStart);
-//		workPane.add(labelEnd); workPane.add(edtEnd);
+		workPane.add(labelEnd); workPane.add(edtEnd);
 
+		
 		this.getContentPane().add(workPane, BorderLayout.CENTER);
 		this.setSize(300, 250);
 		this.setLocationRelativeTo(null);
@@ -78,15 +81,19 @@ public class FrmFullReductionManager_Add extends JDialog implements ActionListen
 		}
 		else if(e.getSource()==this.btnOk){
 			
-//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 			reduct = new FullReduction();
 			
 			try {
 				reduct.setDiscountAmount(Float.parseFloat(this.edtDiscount.getText().toString()));
 				reduct.setReductId(this.edtReductId.getText().toString());
-				reduct.setBusinessId(this.edtBusinessId.getText().toString());
+				if(model == 0)
+					reduct.setBusinessId(this.edtBusinessId.getText().toString());
+				else if(model == 1)
+					reduct.setBusinessId(Business.currentLoginBusiness.getBusinessId());
 				reduct.setRequireAmount(Integer.parseInt(this.edtRequire.getText().toString()));
 				reduct.setWithCoupon(this.cmbWith.getSelectedItem().toString());
+				reduct.setEndTime(sdf.parse(this.edtEnd.getText().toString()));
 				System.out.println(reduct.getBusinessId() + "  "+reduct.getReductId());
 
 			}catch(Exception ex) {
@@ -94,14 +101,7 @@ public class FrmFullReductionManager_Add extends JDialog implements ActionListen
 				return;
 			}
 			
-			
-//			try {
-//				reduct.setEndTime(sdf.parse(this.edtEnd.getText()));
-//			} catch (ParseException e2) {
-//				// TODO Auto-generated catch block
-//				e2.printStackTrace();
-//			}
-			
+
 			try {
 				System.out.println(reduct.getBusinessId() + "  "+reduct.getReductId());
 

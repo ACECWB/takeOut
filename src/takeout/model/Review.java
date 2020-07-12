@@ -5,6 +5,7 @@ import java.util.Date;
 public class Review {
 	public static final String[] tableTitles = {"用户编号","评论时间","星级","评论内容"};
 	public static final String[] UtableTitles = {"订单编号","商家编号","商家名称","星级","评论内容","骑手编号","骑手名称","骑手评价","评价日期"};
+	public static final String[] BtableTitles = {"订单编号","星级","评论内容","骑手编号","骑手名称","骑手评价","评价日期"};
 
 	
 	private String businessid;
@@ -21,6 +22,29 @@ public class Review {
 	private String delivername;
 	private String deliverreview;
 	
+	public String getBCell(int col){
+//		if(col==0) return "1";
+//		else if(col==1) return "示例计划";
+//		else if(col==2) return "2";
+//		else if(col==3) return "1";
+//		else return "";
+		if(col==0)
+			return ""+this.orderid;
+		else if(col==1)
+			return ""+this.stars;
+		else if(col==2)
+			return ""+this.content;
+		else if(col==3)
+			return ""+this.deliverid;
+		else if(col==4)
+			return ""+this.delivername;
+		else if(col==5)
+			return ""+this.deliverreview;
+		else if(col==6)
+			return ""+this.reviewtime;
+		else 
+			return "";
+	}
 	public String getBusinessid() {
 		return businessid;
 	}

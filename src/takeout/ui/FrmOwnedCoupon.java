@@ -32,8 +32,8 @@ import takeout.util.BaseException;
 
 public class FrmOwnedCoupon extends JDialog implements ActionListener{
 	private JPanel toolBar = new JPanel();
-
 	
+
 	private Object tblData[][];
 	DefaultTableModel tablmod=new DefaultTableModel();
 	public JTable couponTable=new JTable(tablmod);
@@ -65,7 +65,8 @@ public class FrmOwnedCoupon extends JDialog implements ActionListener{
 	
 	public FrmOwnedCoupon(FrmMain frmMain, String s, boolean b) {
 		super(frmMain, s, b);
-		
+	
+
 		//提取现有数据
 		this.reloadCouponInfoTable();
 		this.getContentPane().add(new JScrollPane(this.couponTable), BorderLayout.CENTER);

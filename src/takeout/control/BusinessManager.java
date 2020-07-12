@@ -186,7 +186,7 @@ public class BusinessManager implements IBusiness {
 			rs.close();
 			pst.close();
 			
-			sql = "insert into business(business_Id, business_name, stars, avg_consume, sales_volume,createtime) values (?,?,0,0,0,now())";
+			sql = "insert into business(business_Id, business_name, stars, avg_consume, sales_volume,createtime,pwd,location) values (?,?,0,0,0,now(),1,1)";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, business.getBusinessId());
 			pst.setString(2, business.getBusinessName());

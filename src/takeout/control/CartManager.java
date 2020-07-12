@@ -22,10 +22,10 @@ public class CartManager implements ICartManager {
 		Connection conn = null;
 		String sql = null;
 		
-		
-		
+
 		try {
 			conn = DBUtil.getConnection();
+			conn.setAutoCommit(false);
 			sql = "update cart set counts = ? where user_Id = ? and com_Id = ? and business_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setInt(1, com.getCounts());
@@ -34,10 +34,26 @@ public class CartManager implements ICartManager {
 			pst.setString(4, com.getBusinessId());
 			pst.execute();
 			pst.close();
+			
+			sql = "update cart set price = counts * ? where user_Id = ? and com_Id = ? and business_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setFloat(1, com.getEachPrice());
+			pst.setString(2, User.currentLoginUser.getUserId());
+			pst.setString(3, com.getComId());
+			pst.setString(4, com.getBusinessId());
+			pst.execute();
+			pst.close();
+			
+			conn.commit();
 			conn.close();
 			
 		}catch(SQLException e) {
 			e.printStackTrace();
+			try {
+				conn.rollback();
+			}catch(Exception ex) {
+				ex.printStackTrace();
+			}
 			throw new DbException(e);
 		}finally {
 			if(conn!=null)
@@ -190,78 +206,81 @@ public class CartManager implements ICartManager {
 			pst.execute();
 			pst.close();
 			
-			sql = "select alreadycounts from collectorders where user_Id = ? and business_Id = ?";
-			pst = conn.prepareStatement(sql);
-			pst.setString(1, order.getUserid());
-			pst.setString(2, order.getBusinessid());
-			rs = pst.executeQuery();
-			if(!rs.next()) {
-				counts = 1;
-				rs.close();
-				pst.close();
-				sql = "insert into collectorders(user_Id, business_Id, alreadycounts) values (?,?,?)";
-				pst = conn.prepareStatement(sql);
-				pst.setString(1, order.getUserid());
-				pst.setString(2, order.getBusinessid());
-				pst.setInt(3, 1);
-				pst.execute();
-				pst.close();
-				
-			}else {
-				counts = rs.getInt(1) + 1;
-				rs.close();
-				pst.close();
-				sql = "update collectorders set alreadycounts = alreadycounts + 1 where user_Id = ? and business_Id = ?";
-				pst = conn.prepareStatement(sql);
-				pst.setString(1, order.getUserid());
-				pst.setString(2, order.getBusinessid());
-				pst.execute();
-				pst.close();
-				
-			}
-			int require = 0;
-			int days = 0;
-			String couponid = null;
-			sql = "select coupon_Id, need_orders, effect_days from coupon where business_Id = ?";
-			pst = conn.prepareStatement(sql);
-			pst.setString(1, order.getBusinessid());
-			rs = pst.executeQuery();
-			System.out.println(123);
-			if(!rs.next()) {
-				;
-			}else {
-				
-				System.out.println("counts: "+counts+"   require: "+rs.getInt(1));
-
-				couponid = rs.getString(1);
-				require = rs.getInt(2);
-				days = rs.getInt(3);
-				if(require > counts)
-					;
-				else {
-					counts = counts - require;
-					rs.close();
-					pst.close();
-					
-					sql = "update collectorders set alreadycounts = ? where user_Id = ? and business_Id = ?";
-					pst = conn.prepareStatement(sql);
-					pst.setInt(1, counts);
-					pst.setString(2, order.getUserid());
-					pst.setString(3, order.getBusinessid());
-					pst.execute();
-					pst.close();
-					
-					sql = "insert into ownedcoupons(user_Id, business_Id, coupon_Id, ineffect_time) values (?,?,?,?)";
-					pst = conn.prepareStatement(sql);
-					pst.setString(1, order.getUserid());
-					pst.setString(2, order.getBusinessid());
-					pst.setString(3, couponid);
-					pst.setTimestamp(4, new java.sql.Timestamp(order.getOrderTime().getTime() + days*24*60*60*1000L));
-					pst.execute();
-					pst.close();
-					
-				}
-			}
+//			sql = "select alreadycounts from collectorders where user_Id = ? and business_Id = ?";
+//			pst = conn.prepareStatement(sql);
+//			pst.setString(1, order.getUserid());
+//			pst.setString(2, order.getBusinessid());
+//			rs = pst.executeQuery();
+//			if(!rs.next()) {//此前该用户无该商家的购买信息因此插入一条集单数据
+//				counts = 1;
+//				rs.close();
+//				pst.close();
+//				sql = "insert into collectorders(user_Id, business_Id, alreadycounts) values (?,?,?)";
+//				pst = conn.prepareStatement(sql);
+//				pst.setString(1, order.getUserid());
+//				pst.setString(2, order.getBusinessid());
+//				pst.setInt(3, 1);
+//				pst.execute();
+//				pst.close();
+//				
+//			}else {//已有购买数据则知需要更新
+//				counts = rs.getInt(1) + 1;
+//				rs.close();
+//				pst.close();
+//				//下单就把集单数+1，退单则-1
+//				sql = "update collectorders set alreadycounts = alreadycounts + 1 where user_Id = ? and business_Id = ?";
+//				pst = conn.prepareStatement(sql);
+//				pst.setString(1, order.getUserid());
+//				pst.setString(2, order.getBusinessid());
+//				pst.execute();
+//				pst.close();
+//				
+//			}
+			
+			//以下是假定每个商家一个优惠券，下单购买时自动换取
+//			int require = 0;
+//			int days = 0;
+//			String couponid = null;//只假定每个商家一个优惠券,
+//			sql = "select coupon_Id, need_orders, effect_days from coupon where business_Id = ?";
+//			pst = conn.prepareStatement(sql);
+//			pst.setString(1, order.getBusinessid());
+//			rs = pst.executeQuery();
+//			System.out.println(123);
+//			if(!rs.next()) {//若该商家无优惠券则不更新
+//				;
+//			}else {//若该商家设置了一个优惠券则判断目前集单数是否足够换取优惠券。若足够则自动换取并更新集单数
+//				
+////				System.out.println("counts: "+counts+"   require: "+rs.getInt(1));
+//
+//				couponid = rs.getString(1);
+//				require = rs.getInt(2);
+//				days = rs.getInt(3);
+//				if(require > counts)
+//					;
+//				else {
+//					counts = counts - require;
+//					rs.close();
+//					pst.close();
+//					
+//					sql = "update collectorders set alreadycounts = ? where user_Id = ? and business_Id = ?";
+//					pst = conn.prepareStatement(sql);
+//					pst.setInt(1, counts);
+//					pst.setString(2, order.getUserid());
+//					pst.setString(3, order.getBusinessid());
+//					pst.execute();
+//					pst.close();
+//					
+//					sql = "insert into ownedcoupons(user_Id, business_Id, coupon_Id, ineffect_time) values (?,?,?,?)";
+//					pst = conn.prepareStatement(sql);
+//					pst.setString(1, order.getUserid());
+//					pst.setString(2, order.getBusinessid());
+//					pst.setString(3, couponid);
+//					pst.setTimestamp(4, new java.sql.Timestamp(order.getOrderTime().getTime() + days*24*60*60*1000L));
+//					pst.execute();
+//					pst.close();
+//					
+//				}
+//			}
 			
 			
 			
@@ -295,7 +314,7 @@ public class CartManager implements ICartManager {
 		
 		try {
 			conn = DBUtil.getConnection();
-			sql = "select with_coupon, c.business_Id from fullreduction fr, coupon c where c.coupon_Id = ? and c.business_Id = fr.business_Id "; 
+			sql = "select with_coupon, c.business_Id from fullreduction fr, coupon c where c.coupon_Id = ? and c.business_Id = fr.business_Id and fr.removetime>now()"; 
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, couponid);
 			java.sql.ResultSet rs = pst.executeQuery();

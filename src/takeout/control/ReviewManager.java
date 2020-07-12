@@ -123,18 +123,22 @@ public class ReviewManager implements IReviewManager {
 		List<Review> reviews = new ArrayList<>();
 		try {
 			conn = DBUtil.getConnection();
-			sql = "select o.user_Id, content, stars, review_date from review r, orders o\r\n" + 
-					"where o.order_Id = r.order_Id and o.business_Id = ?";
+			sql = "select business_Id, user_Id, content, stars, review_date, order_Id, deliver_Id, deliver_name,\r\n" + 
+					"review from busreview where business_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, businessid);
 			java.sql.ResultSet rs = pst.executeQuery();
 			while(rs.next()) {
 				Review r= new Review();
-				r.setUserid(rs.getString(1));
-				r.setContent(rs.getString(2));
-				r.setStars(rs.getInt(3));
-				r.setReviewtime(rs.getTimestamp(4));
-				r.setBusinessid(businessid);
+				r.setBusinessid(rs.getString(1));
+				r.setUserid(rs.getString(2));
+				r.setContent(rs.getString(3));
+				r.setStars(rs.getInt(4));
+				r.setReviewtime(rs.getTimestamp(5));
+				r.setOrderid(rs.getString(6));
+				r.setDeliverid(rs.getString(7));
+				r.setDelivername(rs.getString(8));
+				r.setDeliverreview(rs.getString(9));
 				reviews.add(r);
 			}
 			rs.close();

@@ -197,7 +197,7 @@ public class DeliverManager implements IDeliverManager {
 			rs.close();
 			pst.close();
 			
-			sql = "insert into deliver(deliver_Id, deliver_name, employ_time, identity, status) values (?,?,?,?, 'ø’œ–')";
+			sql = "insert into deliver(deliver_Id, deliver_name, employ_time, identity, status,pwd) values (?,?,?,?, 'ø’œ–',1)";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, deliver.getDeliverId());
 			pst.setString(2, deliver.getDeliverName());

@@ -23,7 +23,7 @@ public class CouponManager implements ICouponManager {
 			conn = DBUtil.getConnection();
 			sql = "update ownedcoupons set ineffect_time = ? where user_Id = ? and business_Id = ? and coupon_Id = ? and ownorder = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
-			pst.setTimestamp(1, new java.sql.Timestamp(coupon.getRemoveTime().getTime()));
+			pst.setTimestamp(1, new java.sql.Timestamp(coupon.getEndTime().getTime()));
 			pst.setString(2, coupon.getUserId());
 			pst.setString(3, coupon.getBusinessId());
 			pst.setString(4, coupon.getCouponId());
@@ -97,14 +97,17 @@ public class CouponManager implements ICouponManager {
 		}
 	}
 
-	public List<Coupon> loadAllBCoupons(Business business)throws BaseException{
+	public List<Coupon> loadAllBCoupons(Business business, boolean withDeleted)throws BaseException{
 		Connection conn = null;
 		String sql = null;
 		List<Coupon> coupons = new ArrayList<>();
 		try {
 			conn = DBUtil.getConnection();
-			sql = "select coupon_Id, discount_money, need_orders, start_time, end_time, effect_days,removetime\r\n" + 
+			sql = "select coupon_Id, discount_money, need_orders, start_time, end_time, effect_days\r\n" + 
 					"from coupon where business_Id = ?";
+			if(withDeleted == true) {
+				sql += " and end_time > now()";
+			}
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, business.getBusinessId());
 			java.sql.ResultSet rs = pst.executeQuery();
@@ -116,7 +119,6 @@ public class CouponManager implements ICouponManager {
 				c.setStartTime(rs.getTimestamp(4));
 				c.setEndTime(rs.getTimestamp(5));
 				c.setEffectDays(rs.getInt(6));
-				c.setRemoveTime(rs.getTimestamp(7));
 				coupons.add(c);
 			}
 			rs.close();
@@ -140,7 +142,7 @@ public class CouponManager implements ICouponManager {
 		String sql = null;
 		List<Coupon> coupons = new ArrayList<>();
 		try {
-			conn = DBUtil.getConnection();
+			conn = DBUtil.getConnection();//视图
 			sql = "select business_Id, business_name, coupon_Id, end_time, need_orders, alreadycounts,\r\n" + 
 					" discount_money, effect_days from userownedcollects where end_time>now() and user_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
@@ -402,18 +404,18 @@ public class CouponManager implements ICouponManager {
 		
 		try {
 			conn = DBUtil.getConnection();
-			sql = "select removetime from coupon where coupon_Id = ?";
+			sql = "select end_time from coupon where coupon_Id = ? and end_time>now()";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, couponid);
 			java.sql.ResultSet rs = pst.executeQuery();
-			rs.next();
-			if(rs.getTimestamp(1)!=null)
-				throw new BusinessException("该优惠券已被删除!!!");
+			if(!rs.next()) {
+				throw new BusinessException("该优惠券已被删除！！！");
+			}
 			rs.close();
 			pst.close();
 			
 			conn.setAutoCommit(false);
-			sql = "update coupon set removetime = now() where coupon_Id = ?";
+			sql = "update coupon set end_time = now() where coupon_Id = ?";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, couponid);
 			pst.execute();

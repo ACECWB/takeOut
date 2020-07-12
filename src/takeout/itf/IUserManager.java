@@ -20,5 +20,6 @@ public interface IUserManager {
 	public void modifyUser(User user)throws BaseException;
 	public void reg(User user) throws BaseException;
 	public void vip(int month)throws BaseException;
+	public void exchangeCoupon(String businessid, String couponid, int days)throws BaseException;
 
 }

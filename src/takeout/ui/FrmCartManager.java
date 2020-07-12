@@ -174,6 +174,7 @@ public class FrmCartManager extends JDialog implements ActionListener{
 				int r = e.getFirstRow();
 				
 				if(c>=0 && r>=0) {
+					int origincounts = Integer.parseInt(tblData1[r][2].toString());
 					if(c == 2) {
 						try {
 							if(dataTable1.getValueAt(r, c).toString() == null || "".equals(dataTable1.getValueAt(r, c).toString())) {
@@ -188,7 +189,8 @@ public class FrmCartManager extends JDialog implements ActionListener{
 							com.setComId(tblData1[r][0].toString());
 							com.setBusinessId(tblData2[j][0].toString());
 							com.setCounts(Integer.parseInt(tblData1[r][2].toString()));
-							
+							com.setEachPrice(Float.parseFloat(tblData1[r][3].toString())/origincounts);
+							System.out.println(com.getEachPrice());
 							(new CartManager()).modifyCart(com);
 							
 						}catch(Exception e2) {
@@ -296,8 +298,12 @@ public class FrmCartManager extends JDialog implements ActionListener{
 				String comid = this.tblData1[i][0].toString();
 				try {
 					(new CartManager()).deleteCart(User.currentLoginUser.getUserId(),businessid,comid);
-					this.reloadCartTable(j);
 					this.reloadBusinessTable();
+					if(allBusiness.size()>j) {
+						this.reloadCartTable(j);
+						dataTable2.setRowSelectionInterval(j,j);
+					}
+
 				} catch (BaseException e1) {
 					JOptionPane.showMessageDialog(null, e1.getMessage(),"´íÎó",JOptionPane.ERROR_MESSAGE);
 				}

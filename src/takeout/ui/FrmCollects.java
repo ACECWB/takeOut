@@ -23,7 +23,9 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
+import takeout.control.CartManager;
 import takeout.control.CouponManager;
+import takeout.control.UserManager;
 import takeout.model.Coupon;
 import takeout.model.User;
 import takeout.util.BaseException;
@@ -31,6 +33,7 @@ import takeout.util.BaseException;
 
 public class FrmCollects extends JDialog implements ActionListener{
 	private JPanel toolBar = new JPanel();
+	private Button btnExchange = new Button("换取");
 
 	
 	private Object tblData[][];
@@ -64,16 +67,19 @@ public class FrmCollects extends JDialog implements ActionListener{
 	
 	public FrmCollects(FrmMain frmMain, String s, boolean b) {
 		super(frmMain, s, b);
+		toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
+		toolBar.add(btnExchange);
 		
+		this.getContentPane().add(toolBar, BorderLayout.NORTH);
+
 		//提取现有数据
 		this.reloadCollectInfoTable();
 		this.getContentPane().add(new JScrollPane(this.couponTable), BorderLayout.CENTER);
-		
+		this.btnExchange.addActionListener(this);
 		// 屏幕居中显示
 		this.setSize(500, 500);
 		this.setLocationRelativeTo(null);
 		this.validate();
-	
 
 }
 
@@ -82,7 +88,27 @@ public class FrmCollects extends JDialog implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-	
+		if(e.getSource()==this.btnExchange) {
+			
+			int i=this.couponTable.getSelectedRow();
+
+			if(i<0) {
+				JOptionPane.showMessageDialog(null,  "请选择优惠券","提示",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			if(JOptionPane.showConfirmDialog(this,"确定兑换该优惠券吗？","确认",JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+				String businessid=this.tblData[i][0].toString();
+				String couponid = this.tblData[i][2].toString();
+				int days = Integer.parseInt(this.tblData[i][7].toString());
+				try {
+					(new UserManager()).exchangeCoupon(businessid,couponid, days);
+					this.reloadCollectInfoTable();
+				} catch (BaseException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
+				}
+				
+			}
+		}
 	}
 }
 	

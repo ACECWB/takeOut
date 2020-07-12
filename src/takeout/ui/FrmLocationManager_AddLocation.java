@@ -72,11 +72,11 @@ public class FrmLocationManager_AddLocation extends JDialog implements ActionLis
 				userid = User.currentLoginUser.getUserId();
 			}
 				
-			
 			String loca = this.edtLocation.getText();
 			String connUser = this.edtConnUser.getText();
 			String phone = this.edtPhone.getText();
-			
+			System.out.println(loca	);
+
 			location=new Location();
 			location.setUserId(userid);
 			location.setLoca(loca);
