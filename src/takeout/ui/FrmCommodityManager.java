@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -29,6 +31,7 @@ import takeout.model.Commodity;
 import takeout.model.User;
 import takeout.util.BaseException;
 import takeout.util.BusinessException;
+import takeout.util.DBUtil;
 
 
 public class FrmCommodityManager extends JDialog implements ActionListener{
@@ -166,6 +169,8 @@ public class FrmCommodityManager extends JDialog implements ActionListener{
 							tablmod.setDataVector(tblData, Commodity.tableTitles);
 							commodityTable.validate();
 							commodityTable.repaint();
+							FrmCommodityManager.this.reloadTable();
+
 							return;
 
 						}
@@ -216,6 +221,7 @@ public class FrmCommodityManager extends JDialog implements ActionListener{
 	
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==this.btnAdd){
+			
 			FrmCommodityManager_AddCommodity dlg=new FrmCommodityManager_AddCommodity(this,"添加商品信息",true);
 			dlg.setVisible(true);
 			if(dlg.getCommodity()!=null){//刷新表格

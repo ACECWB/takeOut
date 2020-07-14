@@ -19,8 +19,10 @@ public class AdminManager implements IAdminManager {
 		Admin ad = new Admin();
 		
 		if(userid==null || userid.equals("")) {
-			throw new BusinessException("用户名不能为空");
+			throw new BusinessException("用户账号不能为空");
 		}
+		if(username==null || username.equals(""))
+			throw new BusinessException("用户名不可为空");
 		if(pwd==null || pwd2==null||pwd.equals("")||pwd2.equals("")) {
 			throw new BusinessException("密码不能为空");
 		}
@@ -35,7 +37,7 @@ public class AdminManager implements IAdminManager {
 			pst.setString(1, userid);
 			java.sql.ResultSet rs = pst.executeQuery();
 			if(rs.next()) {
-				throw new BusinessException("该用户名已存在！！！");
+				throw new BusinessException("该用户账号已存在！！！");
 			}
 			pst.close();
 			rs.close();
@@ -75,7 +77,7 @@ public class AdminManager implements IAdminManager {
 		String sql = null;
 		try {
 			conn = DBUtil.getConnection();
-			sql = "select * from admin where admin_Id = ?";
+			sql = "select admin_Id, admin_name, admin_pwd from admin where admin_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, userid);
 			java.sql.ResultSet rs = pst.executeQuery();
@@ -83,6 +85,7 @@ public class AdminManager implements IAdminManager {
 				throw new BusinessException("该用户不存在！");
 			}
 			if(rs.getString(3).equals(pwd)) {
+				ad.setName(rs.getString(2));
 				return ad;
 			}else {
 				throw new BusinessException("密码错误！！！");

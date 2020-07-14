@@ -18,7 +18,7 @@ public class IncomeManager implements IIncomeManager {
 		String sql = null;
 		try {
 			conn = DBUtil.getConnection();
-			sql = "update deliver_income set review = ? , each_bonus = ? where order_Id = ?";
+			sql = "update deliver_income set review = ? , each_bonus = each_bonus + ? where order_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(3, income.getOrderid());
 			pst.setString(1, income.getReview());

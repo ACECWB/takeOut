@@ -180,7 +180,7 @@ public class FrmFullReductionManager extends JDialog implements ActionListener{
 					} catch (BaseException e1) {
 						// TODO Auto-generated catch block
 						JOptionPane.showMessageDialog(null,  "信息错误！！！","提示",JOptionPane.ERROR_MESSAGE);
-
+						
 						e1.printStackTrace();
 					}
 					

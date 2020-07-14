@@ -3,6 +3,7 @@ package takeout.ui;
 import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.FlowLayout;
+import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,6 +21,7 @@ import takeout.model.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class FrmAddCoupon extends JDialog implements ActionListener{
 	private Coupon coupon = null;
@@ -110,7 +112,7 @@ public class FrmAddCoupon extends JDialog implements ActionListener{
 			workPane.add(labelEffect); workPane.add(edtEffect);
 
 		}else if(model == 4) {
-			workPane.add(labelBusinessId); workPane.add(edtBusinessId);
+//			workPane.add(labelBusinessId); workPane.add(edtBusinessId);
 			workPane.add(labelCouponId); workPane.add(edtCouponId);
 			workPane.add(labelInEffect); workPane.add(edtInEffect);
 		}
@@ -206,13 +208,23 @@ public class FrmAddCoupon extends JDialog implements ActionListener{
 				
 			}else if(model == 4) {
 				coupon.setUserId(this.id);
-				coupon.setBusinessId(this.edtBusinessId.getText());
+//				coupon.setBusinessId(this.edtBusinessId.getText());
 				coupon.setCouponId(this.edtCouponId.getText());
 				
-				if("".equals(this.edtInEffect.getText())) {
-					JOptionPane.showMessageDialog(null, "请输入有效时间！！！", "错误",JOptionPane.ERROR_MESSAGE);
+				
+				try {
+					if("".equals(this.edtInEffect.getText()) || sdf.parse(this.edtInEffect.getText().toString()).before(new Date())) {
+						JOptionPane.showMessageDialog(null, "请输入有效时间！！！", "错误",JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+				} catch (HeadlessException e2) {
+					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "信息错误！！！", "错误",JOptionPane.ERROR_MESSAGE);
 					return;
-				}
+				} catch (ParseException e2) {
+					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "时间格式错误！！！", "错误",JOptionPane.ERROR_MESSAGE);
+					return;				}
 				
 				try {
 					coupon.setIneffectDate(sdf.parse(this.edtInEffect.getText()));

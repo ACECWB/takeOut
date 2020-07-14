@@ -21,13 +21,12 @@ public class CouponManager implements ICouponManager {
 		String sql = null;
 		try {
 			conn = DBUtil.getConnection();
-			sql = "update ownedcoupons set ineffect_time = ? where user_Id = ? and business_Id = ? and coupon_Id = ? and ownorder = ?";
+			sql = "update ownedcoupons set ineffect_time = ? where user_Id = ? and coupon_Id = ? and ownorder = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
-			pst.setTimestamp(1, new java.sql.Timestamp(coupon.getEndTime().getTime()));
+			pst.setTimestamp(1, new java.sql.Timestamp(coupon.getIneffectDate().getTime()));
 			pst.setString(2, coupon.getUserId());
-			pst.setString(3, coupon.getBusinessId());
-			pst.setString(4, coupon.getCouponId());
-			pst.setInt(5, coupon.getOwnOrder());
+			pst.setString(3, coupon.getCouponId());
+			pst.setInt(4, coupon.getOwnOrder());
 			pst.execute();
 			pst.close();
 			conn.close();
@@ -63,12 +62,11 @@ public class CouponManager implements ICouponManager {
 			pst.close();
 			System.out.println(origindays+"   "+coupon.getEffectDays());
 			if(origindays != coupon.getEffectDays()) {//更新用户所拥有的优惠券
-				sql = "update ownedcoupons set ineffect_time = DATE_ADD(ineffect_time,INTERVAL ? day) where business_Id = ? and coupon_Id = ? and removetime is null\r\n" + 
+				sql = "update ownedcoupons set ineffect_time = DATE_ADD(ineffect_time,INTERVAL ? day) where coupon_Id = ? and removetime is null\r\n" + 
 						"";
 				pst = conn.prepareStatement(sql);
 				pst.setInt(1, coupon.getEffectDays() - origindays);
-				pst.setString(2, coupon.getBusinessId());
-				pst.setString(3, coupon.getCouponId());
+				pst.setString(2, coupon.getCouponId());
 				System.out.println(coupon.getBusinessId());
 
 				System.out.println(coupon.getCouponId());
@@ -186,8 +184,8 @@ public class CouponManager implements ICouponManager {
 		try {
 			conn = DBUtil.getConnection();
 			sql = "\r\n" + 
-					"select oc.business_Id, b.business_name, oc.coupon_Id, c.discount_money, oc.ineffect_time from business b, ownedcoupons oc,coupon c\r\n" + 
-					"where user_Id = ? and oc.coupon_Id = c.coupon_Id and oc.business_Id = b.business_Id and ineffect_time>now() order by ineffect_time\r\n" + 
+					"select c.business_Id, b.business_name, oc.coupon_Id, c.discount_money, oc.ineffect_time from business b, ownedcoupons oc,coupon c\r\n" + 
+					"where user_Id = ? and oc.coupon_Id = c.coupon_Id and c.business_Id = b.business_Id and ineffect_time>now() order by ineffect_time\r\n" + 
 					"\r\n" + 
 					"";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
@@ -227,9 +225,9 @@ public class CouponManager implements ICouponManager {
 		List<Coupon> coupons = new ArrayList<>();
 		try {
 			conn = DBUtil.getConnection();
-			sql = "select oc.business_Id, business_name, coupon_Id, ineffect_time, ownorder \r\n" + 
-					"from business b, ownedcoupons oc\r\n" + 
-					"where b.business_Id = oc.business_Id and user_Id = ?";
+			sql = "select b.business_Id, b.business_name, oc.coupon_Id, oc.ineffect_time, oc.ownorder \r\n" + 
+					"from business b, ownedcoupons oc, coupon c\r\n" + 
+					"where oc.coupon_Id = c.coupon_Id and c.business_Id = b.business_Id and user_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, user.getUserId());
 			java.sql.ResultSet rs = pst.executeQuery();
@@ -266,30 +264,28 @@ public class CouponManager implements ICouponManager {
 		String sql = null;
 		try {
 			conn =DBUtil.getConnection();
-			if(coupon.getBusinessId() == null || "".equals(coupon.getBusinessId()))
-				throw new BusinessException("商家编号不可为空！！！");
+//			if(coupon.getBusinessId() == null || "".equals(coupon.getBusinessId()))
+//				throw new BusinessException("商家编号不可为空！！！");
 			if(coupon.getCouponId() == null || "".equals(coupon.getCouponId()))
 				throw new BusinessException("优惠券编号不可为空！！！");
 			if(coupon.getIneffectDate() == null || "".equals(coupon.getIneffectDate().toString()))
 				throw new BusinessException("有效截止期不可为空！！！");
 			
-			sql = "select * from coupon where business_Id = ? and coupon_Id = ?";
+			sql = "select * from coupon where coupon_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
-			pst.setString(1, coupon.getBusinessId());
-			pst.setString(2, coupon.getCouponId());
+			pst.setString(1, coupon.getCouponId());
 			java.sql.ResultSet rs = pst.executeQuery();
 			if(!rs.next())
 				throw new BusinessException("不存在该优惠券！！！");
 			rs.close();
 			pst.close();
 			
-			sql = "insert into ownedcoupons(user_Id, business_Id, coupon_Id, ineffect_time)\r\n" + 
-					"values (?,?,?,?)";
+			sql = "insert into ownedcoupons(user_Id, coupon_Id, ineffect_time)\r\n" + 
+					"values (?,?,?)";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, coupon.getUserId());
-			pst.setString(2, coupon.getBusinessId());
-			pst.setString(3, coupon.getCouponId());
-			pst.setTimestamp(4, new java.sql.Timestamp(coupon.getIneffectDate().getTime()));
+			pst.setString(2, coupon.getCouponId());
+			pst.setTimestamp(3, new java.sql.Timestamp(coupon.getIneffectDate().getTime()));
 			pst.execute();
 			pst.close();
 			conn.close();

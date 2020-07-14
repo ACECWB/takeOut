@@ -32,12 +32,15 @@ public class FrmDeliverManager_AddDeliver extends JDialog implements ActionListe
 	private JLabel labelDeliverName = new JLabel("骑手姓名：");
 	private JLabel labelEmployTime = new JLabel("就职时间：");
 	private JLabel labelIdentity = new JLabel("身份：");
+	private JLabel labelPwd = new JLabel("密码:");
+
 	private JComboBox cmbDeliverIdentity= new JComboBox(new String[] { "新人", "正式员工", "单王"});
 
 	private JTextField edtDeliverId = new JTextField(20);
 	private JTextField edtDeliverName = new JTextField(20);
 	private JTextField edtEmployTime = new JTextField(20);
-	
+	private JTextField edtPwd = new JTextField(20);
+
 	public FrmDeliverManager_AddDeliver(JDialog f, String s, boolean b) {
 		super(f, s, b);
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -69,7 +72,8 @@ public class FrmDeliverManager_AddDeliver extends JDialog implements ActionListe
 		workPane.add(labelDeliverName); workPane.add(edtDeliverName);
 		workPane.add(labelEmployTime); workPane.add(edtEmployTime);
 		workPane.add(labelIdentity); workPane.add(cmbDeliverIdentity);
-		
+		workPane.add(labelPwd); workPane.add(edtPwd);
+
 		this.getContentPane().add(workPane, BorderLayout.CENTER);
 		this.setSize(600, 180);
 		this.setLocationRelativeTo(null);
@@ -89,13 +93,14 @@ public class FrmDeliverManager_AddDeliver extends JDialog implements ActionListe
 			String delivername = this.edtDeliverName.getText();
 			String employtime = this.edtEmployTime.getText();
 			String identity = this.cmbDeliverIdentity.getSelectedItem().toString();
+			String pwd = this.edtPwd.getText().toString();
 			
 			deliver=new Deliver();
 			deliver.setDeliverId(deliverid);
 			deliver.setDeliverName(delivername);
 			deliver.setIdentity(identity);
 			deliver.setEmployTime(employtime);
-			
+			deliver.setPwd(pwd);
 			try {
 				(new DeliverManager()).addDeliver(deliver);
 				this.setVisible(false);

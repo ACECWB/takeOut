@@ -76,11 +76,23 @@ public class OrderManager implements IOrderManager {
 			pst.execute();
 			pst.close();
 			
+			float bonus = 0;
+			sql = "select * from deliver where deliver_Id = ? and identity = '新人'";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, Deliver.currentLoginDeliver.getDeliverId());
+			rs = pst.executeQuery();
+			if(rs.next()) {
+				bonus = (float) 0.5;
+			}else {
+				bonus = 0;
+			}
 			
-			sql = "insert into deliver_income(deliver_Id, order_Id, time) values (?,?,now())";
+			
+			sql = "insert into deliver_income(deliver_Id, order_Id, time, each_bonus) values (?,?,now(),?)";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, Deliver.currentLoginDeliver.getDeliverId());
 			pst.setString(2, orderid);
+			pst.setFloat(3, bonus);
 			pst.execute();
 			pst.close();
 			
@@ -145,8 +157,18 @@ public class OrderManager implements IOrderManager {
 		try {
 			conn = DBUtil.getConnection();
 			conn.setAutoCommit(false);
-			sql = "update orders set deliver_Id = ?, status = '正在配送中' where order_Id = ?";
+			sql = "select * from orders where order_Id = ? and status <> '等待配送'";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, orderid);
+			java.sql.ResultSet rs = pst.executeQuery();
+			if(rs.next()) {
+				throw new BusinessException("该订单已抢到！！！");
+			}
+			rs.close();
+			pst.close();
+			
+			sql = "update orders set deliver_Id = ?, status = '正在配送中' where order_Id = ?";
+			pst = conn.prepareStatement(sql);
 			pst.setString(1, Deliver.currentLoginDeliver.getDeliverId());
 			pst.setString(2, orderid);
 			pst.execute();

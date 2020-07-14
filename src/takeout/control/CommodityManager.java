@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import takeout.itf.ICommodityManager;
 import takeout.model.Business;
 import takeout.model.ComCate;
@@ -180,10 +182,14 @@ public class CommodityManager implements ICommodityManager {
 	public void modifyCom(Commodity com)throws BaseException{//修改商品名称、分类编号
 		Connection conn = null;
 		String sql = null;
-		if(com.getCategoryId() == null || "".equals(com.getCategoryId()))
-			throw new BusinessException("商品类别编号不可为空！！！");
-		if(com.getComName() == null || "".equals(com.getComName()))
-			throw new BusinessException("商品名称不可为空！！！");
+		if(com.getCategoryId() == null || "".equals(com.getCategoryId())) {
+			JOptionPane.showMessageDialog(null,  "商品类别编号不可为空！！！","提示",JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		if(com.getComName() == null || "".equals(com.getComName())) {
+			JOptionPane.showMessageDialog(null,  "商品名称不可为空！！！","提示",JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		
 		try {
 			conn = DBUtil.getConnection();
@@ -192,8 +198,10 @@ public class CommodityManager implements ICommodityManager {
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, com.getCategoryId());
 			java.sql.ResultSet rs = pst.executeQuery();
-			if(!rs.next())
-				throw new BusinessException("不存在该商品分类编号！！！");
+			if(!rs.next()) {
+				JOptionPane.showMessageDialog(null,  "不存在该商品类别！！！","提示",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			rs.close();
 			pst.close();
 			
@@ -433,8 +441,16 @@ public class CommodityManager implements ICommodityManager {
 		try{
 			conn = DBUtil.getConnection();
 			conn.setAutoCommit(false);
-			sql = "update commodity set removetime = now() where category_Id = ?";
+			
+			sql = "select * from commoditycategory where category_Id = ? and  removetime is null";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, comcateid);
+			java.sql.ResultSet rs = pst.executeQuery();
+			if(!rs.next())
+				throw new BusinessException("该商品类已删除！！！");
+			
+			sql = "update commodity set removetime = now() where category_Id = ?";
+			pst = conn.prepareStatement(sql);
 			pst.setString(1, comcateid);
 			pst.execute();
 			pst.close();
@@ -611,8 +627,18 @@ public class CommodityManager implements ICommodityManager {
 		try{
 			conn = DBUtil.getConnection();
 			conn.setAutoCommit(false);
-			sql = "update commodity set removetime = now() where com_Id = ?";
+			sql = "select * from commodity where com_Id = ? and removetime is null";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, comId);
+			java.sql.ResultSet rs = pst.executeQuery();
+			if(!rs.next())
+				throw new BusinessException("该商品已经下架！！！");
+			rs.close();
+			pst.close();
+			
+			
+			sql = "update commodity set removetime = now() where com_Id = ?";
+			pst = conn.prepareStatement(sql);
 			pst.setString(1, comId);
 			pst.execute();
 			pst.close();
@@ -773,7 +799,7 @@ public class CommodityManager implements ICommodityManager {
 			rs.close();
 			pst.close();
 			
-			sql = "select * from business where business_Id = ?";
+			sql = "select * from business where business_Id = ? and removetime is null";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, commodity.getBusinessId());
 			rs = pst.executeQuery();

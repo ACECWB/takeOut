@@ -12,6 +12,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -56,6 +58,7 @@ import takeout.model.User;
 import takeout.ui.FrmLogin;
 import takeout.util.BaseException;
 import takeout.util.BusinessException;
+import takeout.util.DBUtil;
 
 
 
@@ -891,8 +894,13 @@ public class FrmMain extends JFrame implements ActionListener{
 							coupon.setUserId(tblData1[j][0].toString());
 							coupon.setBusinessId(tblData1[i][0].toString());
 							coupon.setCouponId(tblData1[i][2].toString());
-							coupon.setOwnOrder(Integer.parseInt(tblData1[i][3].toString()));
-						
+							coupon.setOwnOrder(Integer.parseInt(tblData1[i][4].toString()));
+							try {
+								coupon.setIneffectDate(sdf.parse(tblData1[i][3].toString()));
+							} catch (ParseException e2) {
+								// TODO Auto-generated catch block
+								e2.printStackTrace();
+							}
 							try {
 								(new CouponManager()).modifyCcoupon(coupon);
 							} catch (BaseException e1) {
@@ -1138,7 +1146,12 @@ public class FrmMain extends JFrame implements ActionListener{
 								(new DeliverManager()).modifyDeliver(deliver);
 							} catch (BaseException e1) {
 								// TODO Auto-generated catch block
-								e1.printStackTrace();
+								JOptionPane.showMessageDialog(null,  "请输入正确值！！！","提示",JOptionPane.ERROR_MESSAGE);
+								tabModel2.setDataVector(tblData2, Deliver.tableTitles);
+								dataTable2.validate();
+								dataTable2.repaint();
+								FrmMain.this.reloadDeliverTable();
+								return;
 							}
 							
 						}
@@ -1343,7 +1356,26 @@ public class FrmMain extends JFrame implements ActionListener{
 				JOptionPane.showMessageDialog(null,  "请选择商家","提示",JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			
+			Connection conn = null;
+			String sql = null;
+			try {
+				conn = DBUtil.getConnection();
+				sql = "select * from business where business_Id = ? and removetime is null";
+				java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+				pst.setString(1, tblData2[i][0].toString());
+				java.sql.ResultSet rs = pst.executeQuery();
+				if(!rs.next()) {
+					JOptionPane.showMessageDialog(null, "不存在该商家！！！","错误",JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+					
+				rs.close();
+				pst.close();
+				conn.close();
+				
+			}catch(SQLException ex) {
+				ex.printStackTrace();
+			}
 			FrmCommodityManager_AddCommodity dlg=new FrmCommodityManager_AddCommodity(this,"添加商品信息",true);
 			dlg.bus = curBus;
 			

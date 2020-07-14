@@ -23,6 +23,8 @@ public class BusinessManager implements IBusiness {
 			throw new BusinessException("商家编号不可为空！！！");
 		if(bus.getPwd() == null || "".equals(bus.getPwd()))
 			throw new BusinessException("密码不可为空！！！");
+		if(bus.getLoca()==null || "".equals(bus.getLoca()))
+			throw new BusinessException("地址信息不可为空！！！");
 
 		try {
 			conn = DBUtil.getConnection();
@@ -35,12 +37,13 @@ public class BusinessManager implements IBusiness {
 			rs.close();
 			pst.close();
 			
-			sql = "insert into business(business_Id, business_name, createtime, pwd) values(?, ?, NOW(),?)\r\n" + 
+			sql = "insert into business(business_Id, business_name, createtime, pwd, location) values(?, ?, NOW(),?,?)\r\n" + 
 					"";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, bus.getBusinessId());
 			pst.setString(2, bus.getBusinessName());
 			pst.setString(3, bus.getPwd());
+			pst.setString(4, bus.getLoca());
 			pst.execute();
 			pst.close();
 			
@@ -173,6 +176,11 @@ public class BusinessManager implements IBusiness {
 			throw new BusinessException("商家编号不可为空！！！");
 		if(business.getBusinessName()==null || "".equals(business.getBusinessName()))
 			throw new BusinessException("商家名称不可为空！！！");
+		if(business.getPwd()==null || "".equals(business.getPwd()))
+			throw new BusinessException("商家密码不可为空！！！");
+		if(business.getLoca()==null || "".equals(business.getLoca()))
+			throw new BusinessException("商家地址不可为空！！！");
+		
 		Connection conn = null;
 		String sql = null;
 		try {
@@ -186,10 +194,12 @@ public class BusinessManager implements IBusiness {
 			rs.close();
 			pst.close();
 			
-			sql = "insert into business(business_Id, business_name, stars, avg_consume, sales_volume,createtime,pwd,location) values (?,?,0,0,0,now(),1,1)";
+			sql = "insert into business(business_Id, business_name, stars, avg_consume, sales_volume,createtime,pwd,location) values (?,?,0,0,0,now(),?,?)";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, business.getBusinessId());
 			pst.setString(2, business.getBusinessName());
+			pst.setString(3, business.getPwd());
+			pst.setString(4, business.getLoca());
 			pst.execute();
 			pst.close();
 			conn.close();
@@ -246,7 +256,7 @@ public class BusinessManager implements IBusiness {
 			pst.execute();
 			pst.close();
 			
-			sql = "delete from ownedcoupons where business_Id = ?";
+			sql = "delete oc from ownedcoupons oc,coupon c where oc.coupon_Id = c.coupon_Id and c.business_Id = ?";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, businessId);
 			pst.execute();

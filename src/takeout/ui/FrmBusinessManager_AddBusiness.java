@@ -31,11 +31,15 @@ public class FrmBusinessManager_AddBusiness extends JDialog implements ActionLis
 	private JLabel labelBusinessId = new JLabel("商家编号：");
 	private JLabel labelBusinessName = new JLabel("商家名称：");
 //	private JLabel labelStars = new JLabel("商家星级：");
+	private JLabel labelPwd = new JLabel("密码：");
+	private JLabel labelLoca = new JLabel("地址：");
 
 	private JTextField edtBusinessId = new JTextField(20);
 	private JTextField edtBusinessName = new JTextField(20);
 //	private JTextField edtStars = new JTextField(20);
-	
+	private JTextField edtPwd = new JTextField(20);
+	private JTextField edtLoca = new JTextField(20);
+
 	public FrmBusinessManager_AddBusiness(FrmMain frmMain, String s, boolean b) {
 		super(frmMain, s, b);
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -46,7 +50,9 @@ public class FrmBusinessManager_AddBusiness extends JDialog implements ActionLis
 		workPane.add(labelBusinessId); workPane.add(edtBusinessId);
 		workPane.add(labelBusinessName); workPane.add(edtBusinessName);
 //		workPane.add(labelStars); workPane.add(edtStars);
-		
+		workPane.add(labelPwd); workPane.add(edtPwd);
+		workPane.add(labelLoca); workPane.add(edtLoca);
+
 		this.getContentPane().add(workPane, BorderLayout.CENTER);
 		this.setSize(550, 180);
 		this.setLocationRelativeTo(null);
@@ -65,11 +71,15 @@ public class FrmBusinessManager_AddBusiness extends JDialog implements ActionLis
 			
 			String businessid = this.edtBusinessId.getText();
 			String businessname = this.edtBusinessName.getText();
+			String pwd = this.edtPwd.getText();
+			String loca = this.edtLoca.getText();
 //			String stars = this.edtStars.getText();
 			
 			business=new Business();
 			business.setBusinessId(businessid);
 			business.setBusinessName(businessname);
+			business.setPwd(pwd);
+			business.setLoca(loca);
 //			business.setStars(Integer.parseInt(stars));
 			
 			try {

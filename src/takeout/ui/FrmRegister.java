@@ -42,6 +42,8 @@ public class FrmRegister extends JDialog implements ActionListener {
 
 	private JLabel labelBusName = new JLabel("商家名：");
 	private JLabel labelBusId = new JLabel("商家编号：");
+	private JLabel labelLoca = new JLabel("地址：");
+	private JTextField edtLoca = new JTextField(20);
 
 	private JLabel labelDeliverName = new JLabel("骑手姓名：");
 	private JLabel labelDeliverId = new JLabel("骑手编号：");
@@ -91,6 +93,8 @@ public class FrmRegister extends JDialog implements ActionListener {
 		}else if(m == 3) {//商家
 			workPane.add(labelBusId); workPane.add(edtUserId);
 			workPane.add(labelBusName); workPane.add(edtName);
+			workPane.add(labelLoca); workPane.add(edtLoca);
+
 			workPane.add(labelPwd); workPane.add(edtPwd);
 			workPane.add(labelPwd2); workPane.add(edtPwd2);
 			this.getContentPane().add(workPane, BorderLayout.CENTER);
@@ -160,6 +164,7 @@ public class FrmRegister extends JDialog implements ActionListener {
 				Business bus = new Business();
 				bus.setBusinessId(userid);
 				bus.setBusinessName(username);
+				bus.setLoca(this.edtLoca.getText().toString());
 				bus.setPwd(pwd1);
 				try {
 					Business b=takeOutUtil.businessManager.reg(bus);

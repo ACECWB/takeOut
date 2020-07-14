@@ -3,6 +3,7 @@ package takeout.control;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -123,6 +124,8 @@ public class CartManager implements ICartManager {
 			throw new BusinessException("地址编号不可为空！！！");
 		if(order.getOrderTime() == null || "".equals(order.getOrderTime().toString()))
 			throw new BusinessException("要求送达时间不可为空！！！");
+		if(order.getReqtime().before(new Date(System.currentTimeMillis() + 30*60*1000L)))
+			throw new BusinessException("要求送达时间不可在过去或未来的30分钟内");
 		
 		try {
 			conn = DBUtil.getConnection();
@@ -149,12 +152,11 @@ public class CartManager implements ICartManager {
 			if(order.getCouponid() != null && !"".equals(order.getCouponid())){//删除同优惠券编号中最快过期的优惠券
 				sql = "select ownorder from ownedcoupons where ineffect_time =(\r\n" + 
 						"select min(ineffect_time) from ownedcoupons where removetime is null AND\r\n" + 
-						"user_Id = ? and business_Id = ? and coupon_Id = ? and ineffect_time>now() \r\n" + 
+						"user_Id = ?  and coupon_Id = ? and ineffect_time>now() \r\n" + 
 						")";
 				pst = conn.prepareStatement(sql);
 				pst.setString(1, order.getUserid());
-				pst.setString(2, order.getBusinessid());
-				pst.setString(3, order.getCouponid());
+				pst.setString(2, order.getCouponid());
 				rs = pst.executeQuery();
 				rs.next();
 				System.out.print(order.getCouponid());
@@ -388,7 +390,7 @@ public class CartManager implements ICartManager {
 //			rs.close();
 //			pst.close();
 			
-			sql = "select count(DISTINCT(coupon_Id)) count from ownedcoupons where user_Id = ? and business_Id = ? and removetime is null"; 		
+			sql = "select count(DISTINCT(oc.coupon_Id)) count from ownedcoupons oc, coupon c where user_Id = ? and oc.coupon_Id = c.coupon_Id and c.business_Id = ? and oc.removetime is null"; 		
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, userid);
 			pst.setString(2, businessid);
@@ -400,7 +402,7 @@ public class CartManager implements ICartManager {
 			rs.close();
 			pst.close();
 			
-			sql = "select DISTINCT(coupon_Id) from ownedcoupons where user_Id = ? and business_Id = ? and removetime is null";
+			sql = "select DISTINCT(oc.coupon_Id) from ownedcoupons oc, coupon c where user_Id = ? and c.business_Id = ? and oc.coupon_Id = c.coupon_Id and oc.removetime is null";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, userid);
 			pst.setString(2, businessid);

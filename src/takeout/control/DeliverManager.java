@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import takeout.itf.IDeliverManager;
 import takeout.model.Business;
 import takeout.model.Deliver;
@@ -131,6 +133,7 @@ public class DeliverManager implements IDeliverManager {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		try {
 			conn = DBUtil.getConnection();
+
 			sql = "update deliver set deliver_name = ?, employ_time = ?, quit_time = ?, identity = ? where deliver_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, deliver.getDeliverName());
@@ -138,7 +141,7 @@ public class DeliverManager implements IDeliverManager {
 				pst.setTimestamp(2, new java.sql.Timestamp(sdf.parse(deliver.getEmployTime()).getTime()));
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new BusinessException("时间格式错误！！！！");
 			}
 			if(deliver.getQuitTime() == null || "null".equals(deliver.getQuitTime()))
 				pst.setNull(3, java.sql.Types.DATE);
@@ -148,7 +151,7 @@ public class DeliverManager implements IDeliverManager {
 					pst.setTimestamp(3, new java.sql.Timestamp(sdf.parse(deliver.getQuitTime()).getTime()));
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new BusinessException("时间格式错误！！！！");
 				}
 			}
 			
@@ -184,6 +187,8 @@ public class DeliverManager implements IDeliverManager {
 			throw new BusinessException("骑手就职时间格式不正确或为空！！！");
 		if(deliver.getIdentity()==null || "".equals(deliver.getIdentity()))
 			throw new BusinessException("骑手身份不可为空！！！");
+		if(deliver.getPwd()==null || "".equals(deliver.getPwd()))
+			throw new BusinessException("骑手密码不可为空！！");
 		SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
 
 		try {
@@ -197,7 +202,7 @@ public class DeliverManager implements IDeliverManager {
 			rs.close();
 			pst.close();
 			
-			sql = "insert into deliver(deliver_Id, deliver_name, employ_time, identity, status,pwd) values (?,?,?,?, '空闲',1)";
+			sql = "insert into deliver(deliver_Id, deliver_name, employ_time, identity, status,pwd) values (?,?,?,?, '空闲',?)";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, deliver.getDeliverId());
 			pst.setString(2, deliver.getDeliverName());
@@ -205,9 +210,11 @@ public class DeliverManager implements IDeliverManager {
 				pst.setTimestamp(3, new java.sql.Timestamp(sdf.parse(deliver.getEmployTime()).getTime()));
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new BusinessException("时间格式错误！！！");
+
 			}
 			pst.setString(4, deliver.getIdentity());
+			pst.setString(5, deliver.getPwd());
 			pst.execute();
 			pst.close();
 			conn.close();
@@ -250,7 +257,7 @@ public class DeliverManager implements IDeliverManager {
 			rs.close();
 			pst.close();
 			
-			sql = "update deliver set quit_time = now() where deliver_Id = ?";
+			sql = "update deliver set quit_time = now(), status = '辞职'  where deliver_Id = ?";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, deliverId);
 			pst.execute();

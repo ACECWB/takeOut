@@ -6,6 +6,8 @@ import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -141,6 +143,9 @@ public class FrmCommodityManager_AddCommodity extends JDialog implements ActionL
 			}else if(model == 3) {
 				businessid = Business.currentLoginBusiness.getBusinessId();
 			}
+			
+			
+			
 			commodity.setBusinessId(businessid);
 			
 			try{

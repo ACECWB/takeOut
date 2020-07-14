@@ -123,19 +123,29 @@ public class FrmCartManager_Add extends JDialog implements ActionListener{
 			return;
 		}
 		else if(e.getSource()==this.btnOk){
-			
-			if(counts < Integer.parseInt(this.edtCounts.getText().toString())) {
-				System.out.println(counts + "  " + this.edtCounts.getText().toString());
-				JOptionPane.showMessageDialog(null, "购买数量大于库存数量！！！","错误",JOptionPane.ERROR_MESSAGE);
+			try {
+				if(counts < Integer.parseInt(this.edtCounts.getText().toString())) {
+					System.out.println(counts + "  " + this.edtCounts.getText().toString());
+					JOptionPane.showMessageDialog(null, "购买数量大于库存数量！！！","错误",JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+			}catch(Exception ei) {
+				JOptionPane.showMessageDialog(null, "请正确输入数量！！！","错误",JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+			
 			
 			cart=new Cart();
 
 			cart.setUserid(User.currentLoginUser.getUserId());
 			cart.setBusinessid(businessid);
 			cart.setComid(comid);
-			cart.setCounts(Integer.parseInt(this.edtCounts.getText().toString()));				
+			try {
+				cart.setCounts(Integer.parseInt(this.edtCounts.getText().toString()));				
+			}catch(Exception ei) {
+				JOptionPane.showMessageDialog(null, "请正确输入数量！！！","错误",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			cart.setPrice(price * cart.getCounts());
 			cart.setBusinessname(businessname);
 			cart.setComname(comname);

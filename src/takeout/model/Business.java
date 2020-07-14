@@ -16,6 +16,15 @@ public class Business {
 	private Date removeTime;
 	private String pwd;
 	
+	private String loca;
+	
+	public String getLoca() {
+		return this.loca;
+	}
+	public void setLoca(String loca) {
+		this.loca = loca;
+	}
+	
 	public String getPwd() {
 		return this.pwd;
 	}

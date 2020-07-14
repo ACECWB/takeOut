@@ -51,6 +51,10 @@ public class IncomeStatisticManager implements IIncomeStatisticManager {
 				else if(s.getCounts()>650)
 					totalincome = 99*2 + 200*3 + 100*5 + 100*6 + 100*7 +(s.getCounts()-649)*8;
 				
+				if(s.getCounts() > 500) {
+					totalincome = totalincome + (s.getCounts() - 499) * 0.5;
+				}
+				
 				s.setTotalincome((float)(totalincome + s.getCut() + s.getBonus()));
 				is.add(s);
 				

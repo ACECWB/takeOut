@@ -45,12 +45,11 @@ public class UserManager implements IUserManager {
 			pst.execute();
 			pst.close();
 			//随后添加新的优惠券
-			sql = "insert into ownedcoupons(user_Id, business_Id, coupon_Id, ineffect_time) values (?,?,?,?)";
+			sql = "insert into ownedcoupons(user_Id, coupon_Id, ineffect_time) values (?,?,?)";
 			pst = conn.prepareStatement(sql);
 			pst.setString(1, User.currentLoginUser.getUserId());
-			pst.setString(2, businessid);
-			pst.setString(3, couponid);
-			pst.setTimestamp(4, new java.sql.Timestamp((new Date()).getTime() + days*24*60*60*1000L));
+			pst.setString(2, couponid);
+			pst.setTimestamp(3, new java.sql.Timestamp((new Date()).getTime() + days*24*60*60*1000L));
 			pst.execute();
 			pst.close();
 			
@@ -405,11 +404,33 @@ public class UserManager implements IUserManager {
 		String sql = null;
 		try {
 			conn = DBUtil.getConnection();
+			conn.setAutoCommit(false);
 			sql = "update user set removetime = now() where user_Id = ?";
 			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setString(1, userid);
 			pst.execute();
 			pst.close();
+			
+			sql = "delete from ownedcoupons where user_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, userid);
+			pst.execute();
+			pst.close();
+			
+			sql = "delete from cart where user_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, userid);
+			pst.execute();
+			pst.close();
+			
+			sql = "delete from collectorders where user_Id = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setString(1, userid);
+			pst.execute();
+			pst.close();
+			
+			
+			conn.commit();
 			conn.close();
 		}catch(SQLException e) {
 			e.printStackTrace();
